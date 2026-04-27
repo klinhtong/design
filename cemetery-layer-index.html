@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cemetery as Landscape — mapme · Community Mode</title>
+<meta name="description" content="Kiến trúc nghĩa trang Việt Nam. Nơi người mất vẫn ở trong cảnh quan của người sống. Lens series với Architect Thy Dang." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+  :root{
+    --bg:#121316;
+    --bg-2:#181a1e;
+    --bg-3:#22252a;
+    --bg-4:#2b2f35;
+    --paper:#ecebe5;
+    --paper-dim:#bfbcb2;
+    --paper-mute:#878378;
+    --ink:#121316;
+    --border:rgba(236,235,229,.09);
+    --border-2:rgba(236,235,229,.2);
+    --accent:#9ba6b0;        /* weathered stone */
+    --accent-2:#b6c1cb;
+    --accent-soft:rgba(155,166,176,.14);
+    --ochre:#c4a171;
+    --moss:#6e8264;
+    --ruby:#b66d6d;
+    --indigo:#4f5b84;
+    --maxw:900px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--paper);
+    font-family:"Manrope",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-size:15.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent-2);text-decoration:none;border-bottom:1px solid rgba(155,166,176,.28)}
+  a:hover{border-bottom-color:var(--accent-2)}
+  img{max-width:100%;display:block}
+
+  /* NAV */
+  nav.top{position:sticky;top:0;z-index:50;background:rgba(18,19,22,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;font-size:13.5px}
+  nav.top .logo{display:inline-flex;align-items:center;gap:8px;color:var(--paper);border:0}
+  nav.top .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px rgba(155,166,176,.6)}
+  nav.top .logo em{color:var(--accent);font-style:normal;font-weight:600}
+  nav.top .crumbs{color:var(--paper-mute);display:flex;gap:8px;align-items:center}
+  nav.top .crumbs a{color:var(--paper-mute);border:0}
+  nav.top .crumbs a:hover{color:var(--paper)}
+  nav.top .crumbs span.sep{color:var(--paper-mute);opacity:.5}
+  nav.top .actions{margin-left:auto;display:flex;gap:8px}
+  nav.top .btn{background:transparent;border:1px solid var(--border-2);color:var(--paper);padding:6px 12px;border-radius:999px;font-size:12.5px;cursor:pointer;font-family:inherit}
+  nav.top .btn:hover{background:var(--bg-3)}
+  nav.top .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:500}
+
+  /* HERO */
+  .hero{position:relative;min-height:70vh;display:flex;align-items:flex-end;overflow:hidden;background:#0a0b0d}
+  .hero-bg{position:absolute;inset:0;background:
+    radial-gradient(ellipse at 25% 40%,rgba(155,166,176,.25) 0,transparent 55%),
+    radial-gradient(ellipse at 75% 85%,rgba(79,91,132,.2) 0,transparent 55%),
+    linear-gradient(160deg,#1a1d22 0%,#262b32 35%,#3c434d 65%,#6a7180 100%)}
+  .hero-bg::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 18% 30%,rgba(240,235,220,.22) 0,transparent 32%),
+    radial-gradient(circle at 82% 28%,rgba(0,0,0,.35) 0,transparent 45%),
+    linear-gradient(to bottom,transparent 45%,rgba(18,19,22,.9) 100%)}
+  .hero-noise{position:absolute;inset:0;opacity:.08;mix-blend-mode:overlay;background-image:
+    repeating-radial-gradient(circle at 25% 35%,rgba(255,255,255,.08) 0,transparent 3px),
+    repeating-radial-gradient(circle at 75% 65%,rgba(0,0,0,.1) 0,transparent 2px)}
+  .hero-content{position:relative;padding:56px 24px 64px;max-width:var(--maxw);margin:0 auto;width:100%;z-index:2}
+  .kicker{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .kicker .pill{background:var(--accent-soft);border:1px solid rgba(155,166,176,.35);padding:3px 10px;border-radius:999px;color:var(--accent-2)}
+  h1.title{font-family:"Fraunces",Georgia,serif;font-weight:300;font-size:clamp(42px,6.2vw,76px);line-height:1.03;letter-spacing:-.025em;margin:0 0 18px;color:var(--paper)}
+  h1.title em{font-style:italic;color:var(--accent-2);font-weight:400}
+  .dek{font-family:"Fraunces",Georgia,serif;font-size:clamp(17px,2vw,21px);font-weight:300;line-height:1.5;max-width:680px;color:var(--paper-dim);margin:0}
+  .hero-meta{margin-top:34px;display:flex;flex-wrap:wrap;gap:28px;font-size:13px;color:var(--paper-mute);padding-top:22px;border-top:1px solid rgba(236,235,229,.08)}
+  .hero-meta div{display:flex;flex-direction:column;gap:3px}
+  .hero-meta label{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);opacity:.7}
+  .hero-meta strong{color:var(--paper);font-weight:500;font-size:14px}
+
+  /* SECTIONS */
+  .section{max-width:var(--maxw);margin:0 auto;padding:72px 24px 40px}
+  .section-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:12px}
+  .section h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(30px,4vw,44px);line-height:1.15;letter-spacing:-.02em;margin:0 0 18px}
+  .section > p.lede{font-family:"Fraunces",Georgia,serif;font-size:18.5px;font-weight:300;line-height:1.55;color:var(--paper-dim);max-width:720px;margin:0 0 40px}
+
+  /* FACTS STRIP */
+  .facts{max-width:var(--maxw);margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-bottom:1px solid var(--border);border-top:1px solid var(--border)}
+  .fact{padding:10px 18px 10px 0;border-left:1px solid var(--border)}
+  .fact:first-child{border-left:0}
+  .fact{padding-left:18px}
+  .fact:first-child{padding-left:0}
+  .fact .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:6px}
+  .fact .v{font-family:"Fraunces",Georgia,serif;font-size:22px;font-weight:300;letter-spacing:-.01em;color:var(--paper);line-height:1.15}
+  @media (max-width:780px){.facts{grid-template-columns:repeat(2,1fr)}.fact{padding:12px 0;border-left:0;border-top:1px solid var(--border)}.fact:nth-child(even){padding-left:14px;border-left:1px solid var(--border)}.fact:first-child{border-top:0}.fact:nth-child(2){border-top:0}}
+
+  /* TYPOLOGY GRID */
+  .typology{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .type-card{background:var(--bg-2);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;overflow:hidden}
+  .type-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 0%,var(--ring,rgba(155,166,176,.1)) 0,transparent 50%);pointer-events:none}
+  .type-card > *{position:relative;z-index:1}
+  .type-card .num{font-family:"Fraunces",Georgia,serif;font-size:42px;font-weight:300;color:var(--accent);line-height:1;letter-spacing:-.03em;margin-bottom:10px}
+  .type-card h3{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:22px;letter-spacing:-.01em;margin:0 0 4px;line-height:1.15}
+  .type-card .vn{font-size:12.5px;color:var(--paper-mute);font-style:italic;margin:0 0 14px}
+  .type-card p{font-size:14px;color:var(--paper-dim);line-height:1.55;margin:0 0 14px}
+  .type-card .specs{display:flex;flex-wrap:wrap;gap:6px;padding-top:12px;border-top:1px solid var(--border)}
+  .type-card .spec{font-size:10.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--border-2);color:var(--paper-mute)}
+  @media (max-width:780px){.typology{grid-template-columns:1fr}}
+
+  /* MAP */
+  .map-section{max-width:1100px;margin:24px auto;padding:24px;display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
+  .map-side h3{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:22px;letter-spacing:-.01em;margin:0 0 10px}
+  .map-side > p{font-size:13.5px;color:var(--paper-dim);line-height:1.6;margin:0 0 16px}
+  .map-legend{display:flex;flex-direction:column;gap:7px;font-size:12.5px;color:var(--paper-dim);border-top:1px solid var(--border);padding-top:14px}
+  .map-legend .row{display:flex;align-items:center;gap:10px}
+  .map-legend .sw{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+  #cemeteryMap{width:100%;height:540px;border-radius:16px;background:#e8e4da;border:1px solid var(--border)}
+  @media (max-width:900px){.map-section{grid-template-columns:1fr}}
+
+  /* LENS / ESSAY */
+  .lens-section{background:var(--bg-2);padding:72px 24px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .lens-inner{max-width:var(--maxw);margin:0 auto}
+  .lens-inner h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;letter-spacing:-.02em;margin:0 0 8px}
+  .lens-curator{display:flex;gap:16px;align-items:center;padding:18px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px}
+  .lens-curator .portrait{width:68px;height:68px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#55606f,#8a94a3 60%,#b8bfc9)}
+  .lens-curator .meta .name{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:18px;letter-spacing:-.005em}
+  .lens-curator .meta .role{font-size:12.5px;color:var(--paper-mute);margin-top:2px}
+  .lens-inner p{font-family:"Fraunces",Georgia,serif;font-size:18px;line-height:1.7;color:var(--paper-dim);font-weight:300;margin:0 0 20px}
+  .lens-inner p.lead{font-size:21px;color:var(--paper);line-height:1.55}
+  .lens-inner p.lead::first-letter{font-size:70px;float:left;font-weight:400;line-height:.85;margin:8px 12px 0 -2px;color:var(--accent-2);font-family:"Fraunces",Georgia,serif}
+  .lens-inner blockquote{margin:36px 0;padding:0;border:0;text-align:center}
+  .lens-inner blockquote p{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:26px;line-height:1.35;color:var(--paper);max-width:640px;margin:0 auto 12px;font-weight:300}
+  .lens-inner blockquote cite{font-style:normal;font-family:"Manrope",sans-serif;font-size:12px;letter-spacing:.08em;color:var(--paper-mute);text-transform:uppercase}
+  .lens-inner h3{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:21px;margin:36px 0 12px;letter-spacing:-.005em}
+  .draft-note{font-family:"Manrope",sans-serif;font-size:12.5px;color:var(--paper-mute);background:var(--bg-3);border:1px dashed var(--border-2);border-radius:8px;padding:12px 14px;margin:28px 0;font-style:normal;line-height:1.5}
+
+  /* CASE STUDIES */
+  .cases{max-width:var(--maxw);margin:0 auto;padding:64px 24px 32px}
+  .cases h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;letter-spacing:-.02em;margin:0 0 10px}
+  .cases > p.sub{color:var(--paper-dim);font-size:14.5px;margin:0 0 32px;max-width:680px;line-height:1.55}
+  .case-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .case-card{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit}
+  .case-card:hover{border-color:var(--border-2);transform:translateY(-2px)}
+  .case-card .where{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-2);margin-bottom:8px;font-weight:600}
+  .case-card h4{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:21px;letter-spacing:-.01em;margin:0 0 4px;line-height:1.2}
+  .case-card .vn{font-size:12px;color:var(--paper-mute);font-style:italic;margin:0 0 12px}
+  .case-card > p{font-size:13.5px;color:var(--paper-dim);line-height:1.55;margin:0 0 12px;flex:1}
+  .case-card .attributes{display:flex;flex-wrap:wrap;gap:5px;padding-top:12px;border-top:1px solid var(--border);margin-top:auto}
+  .case-card .attr{font-size:10.5px;padding:3px 8px;border-radius:999px;border:1px solid var(--border-2);color:var(--paper-mute)}
+  @media (max-width:780px){.case-grid{grid-template-columns:1fr}}
+
+  /* How to read this layer */
+  .howto{max-width:var(--maxw);margin:48px auto;padding:0 24px}
+  .howto h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;letter-spacing:-.02em;margin:0 0 10px}
+  .howto > p.sub{color:var(--paper-dim);font-size:14.5px;line-height:1.55;margin:0 0 28px;max-width:620px;font-family:"Fraunces",Georgia,serif;font-weight:300;font-size:16.5px}
+  .phase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .phase{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px}
+  .phase .stage{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;font-weight:600;color:var(--accent-2);margin-bottom:8px}
+  .phase h3{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:20px;letter-spacing:-.005em;margin:0 0 6px}
+  .phase .when{font-size:11.5px;color:var(--paper-mute);margin:0 0 14px}
+  .phase ul{list-style:none;padding:0;margin:0}
+  .phase li{font-size:13px;color:var(--paper-dim);padding:7px 0;border-top:1px solid var(--border);display:flex;align-items:flex-start;gap:8px;line-height:1.45}
+  .phase li:first-child{border-top:0;padding-top:0}
+  .phase li::before{content:"→";color:var(--accent-2);opacity:.7;font-size:12px;flex-shrink:0;margin-top:1px}
+  @media (max-width:780px){.phase-grid{grid-template-columns:1fr}}
+
+  /* RELATED */
+  .related{max-width:var(--maxw);margin:48px auto;padding:24px}
+  .related h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:24px;letter-spacing:-.015em;margin:0 0 18px}
+  .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .rel-card{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;color:inherit;border-bottom:1px solid var(--border);transition:transform .2s, border-color .2s}
+  .rel-card:hover{transform:translateY(-2px);border-color:var(--border-2)}
+  .rel-card .t{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-2);margin-bottom:6px}
+  .rel-card h4{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:16px;margin:0 0 4px;letter-spacing:-.005em}
+  .rel-card p{font-size:12.5px;color:var(--paper-mute);margin:0;line-height:1.45}
+  @media (max-width:780px){.related-grid{grid-template-columns:1fr}}
+
+  /* FOOTER */
+  footer{padding:40px 24px 56px;text-align:center;color:var(--paper-mute);font-size:13px;border-top:1px solid var(--border);margin-top:24px}
+  footer p{margin:4px 0}
+  footer a{color:var(--paper-dim);border:0}
+  footer a:hover{color:var(--paper)}
+
+  /* Leaflet warm editorial */
+  .leaflet-container{font:inherit;background:#e8e4da}
+  .leaflet-control-zoom{border:1px solid rgba(20,20,20,.2)!important;overflow:hidden;border-radius:8px!important;box-shadow:0 2px 8px rgba(0,0,0,.08)!important}
+  .leaflet-control-zoom a{background:#f4f1e9!important;color:#1a1a1a!important;border-color:rgba(20,20,20,.15)!important}
+  .leaflet-control-attribution{background:rgba(244,241,233,.85)!important;color:#5a554a!important;font-size:10px}
+  .leaflet-control-attribution a{color:#5a554a!important}
+  .cem-marker{width:12px;height:12px;border-radius:2px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .cem-marker.royal{background:#c4a171}
+  .cem-marker.family{background:#9ba6b0}
+  .cem-marker.khmer{background:#c27a53}
+  .cem-marker.catholic{background:#6c7a92}
+  .cem-marker.coastal{background:#4f7f86}
+  .cem-marker.ancient{background:#6e8264}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <a class="logo" href="mapme-app.html"><svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="mapme" style="width:26px;height:26px;flex-shrink:0"><path d="M50 52 L88 31 L88 71 L50 92 Z" fill="#7B3FEB"/><path d="M12 31 L50 52 L50 92 L12 71 Z" fill="#A370F7"/><path d="M50 8 L88 31 L50 52 L12 31 Z" fill="#6E9834"/><path d="M50 8 Q70 16 88 31 Q66 24 50 32 Q34 24 12 31 Q30 16 50 8 Z" fill="#B6D86E"/><path d="M12 66 Q25 58 38 66 T62 66 T88 62" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg>map<em>me</em></a>
+  <div class="crumbs">
+    <a href="mapme-app.html#community">Cộng đồng</a><span class="sep">/</span>
+    <a href="cemetery-map.html">Cemetery map</a><span class="sep">/</span>
+    <span style="color:var(--paper)">Index đầy đủ</span>
+  </div>
+  <div class="actions">
+    <button class="btn">Lưu</button>
+    <button class="btn">Chia sẻ</button>
+    <button class="btn primary">Đóng góp lens</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-noise"></div>
+  <div class="hero-content">
+    <div class="kicker">
+      <span class="pill">Community Mode · Curator lens</span>
+      <span>Curator · Architect Thy Dang</span>
+    </div>
+    <h1 class="title">Cemetery <em>as Landscape</em></h1>
+    <p class="dek">Trong văn hóa Việt, người mất không đi đâu xa. Họ ở lại — trong ruộng lúa, trong vườn nhà, trong những đỉnh tháp bên chùa. Kiến trúc nghĩa trang không là nơi đóng kín mà là <strong style="color:var(--paper)">lớp thứ hai của cảnh quan sống</strong>.</p>
+    <div class="hero-meta">
+      <div><label>Typology</label><strong>6 loại kiến trúc</strong></div>
+      <div><label>Sites indexed</label><strong>24 di tích</strong></div>
+      <div><label>Regions</label><strong>Bắc · Trung · Mekong</strong></div>
+      <div><label>Layer type</label><strong>Community · cultural</strong></div>
+      <div><label>Data keeper</label><strong>Thy Dang · mapme</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- FACTS STRIP -->
+<section class="facts">
+  <div class="fact"><div class="k">Part of</div><div class="v">Community Mode</div></div>
+  <div class="fact"><div class="k">Coupled to</div><div class="v">Craft Villages</div></div>
+  <div class="fact"><div class="k">Coupled to</div><div class="v">Mekong History</div></div>
+  <div class="fact"><div class="k">Lens type</div><div class="v">Reading of landscape</div></div>
+  <div class="fact"><div class="k">Launch</div><div class="v">Sep 2026</div></div>
+</section>
+
+<!-- TYPOLOGY -->
+<section class="section">
+  <div class="section-label">Typology · Sáu loại kiến trúc mộ ở Việt Nam</div>
+  <h2>Sáu cách người Việt<br>giữ người mất trong đất.</h2>
+  <p class="lede">Không có một "kiểu nghĩa trang Việt Nam" duy nhất. Mỗi vùng, mỗi tín ngưỡng, mỗi lịch sử để lại một cách riêng. Dưới đây là sáu mô hình lặp lại đủ nhiều để gọi là typology.</p>
+
+  <div class="typology">
+    <div class="type-card" style="--ring:rgba(155,166,176,.14)">
+      <div class="num">01</div>
+      <h3>Mekong family tombs</h3>
+      <div class="vn">Mộ gia đình trên ruộng / trong vườn</div>
+      <p>Đặc trưng Đồng bằng sông Cửu Long. Mộ xây ngay trên phần đất gia đình — giữa ruộng lúa, ngay cạnh nhà, trên bờ kênh. Thường nâng cao để tránh lũ. Không tách khỏi không gian sinh sống: người sống đi làm ruộng, ngang qua mộ ông bà mỗi ngày.</p>
+      <div class="specs"><span class="spec">Vật liệu: gạch, bê tông, đá</span><span class="spec">Bối cảnh: ruộng lúa · vườn nhà</span><span class="spec">Giai đoạn: đương đại</span></div>
+    </div>
+
+    <div class="type-card" style="--ring:rgba(196,161,113,.14)">
+      <div class="num">02</div>
+      <h3>Huế royal landscape tombs</h3>
+      <div class="vn">Lăng tẩm triều Nguyễn</div>
+      <p>Quy mô cảnh quan — đồi, hồ, đình, cổng, mộ — được thiết kế như một công trình đọc cả đời vua trong đất. Lăng Minh Mạng, Tự Đức, Khải Định. Ảnh hưởng Trung Hoa rõ nhưng bản địa hóa sâu qua phong thủy Việt và thiên nhiên Huế.</p>
+      <div class="specs"><span class="spec">Vật liệu: đá xanh, gạch, khảm sành</span><span class="spec">Bối cảnh: đồi núi Huế</span><span class="spec">Giai đoạn: 1820–1925</span></div>
+    </div>
+
+    <div class="type-card" style="--ring:rgba(194,122,83,.14)">
+      <div class="num">03</div>
+      <h3>Khmer stupa gardens</h3>
+      <div class="vn">Vườn tháp Khmer Nam Bộ</div>
+      <p>Trong sân chùa Khmer (Sóc Trăng, Trà Vinh, An Giang), các tháp mộ nhỏ đứng thành vườn. Tro cốt sau hỏa táng được đưa vào tháp của gia đình hoặc cộng đồng. Không phải "nghĩa trang" theo nghĩa Việt — mà là một phần của pagoda, dành cho ký ức tập thể.</p>
+      <div class="specs"><span class="spec">Vật liệu: vữa sơn, vàng lá</span><span class="spec">Bối cảnh: sân chùa</span><span class="spec">Tín ngưỡng: Phật giáo Nam tông Khmer</span></div>
+    </div>
+
+    <div class="type-card" style="--ring:rgba(108,122,146,.14)">
+      <div class="num">04</div>
+      <h3>Catholic cemeteries</h3>
+      <div class="vn">Nghĩa trang Công giáo</div>
+      <p>Lưới bàn cờ theo mẫu châu Âu. Thánh giá, tượng Đức Mẹ, tên bằng Chữ Quốc ngữ và Latinh. Tập trung quanh các xứ đạo Mỹ Tho, Cần Thơ, Gò Công. Nhiều nghĩa trang cũ ở trung tâm Sài Gòn đã bị di dời; những cái ngoài thành phố vẫn đang hoạt động.</p>
+      <div class="specs"><span class="spec">Vật liệu: đá, bê tông, sắt rèn</span><span class="spec">Bối cảnh: gần nhà thờ</span><span class="spec">Giai đoạn: cuối TK XIX–nay</span></div>
+    </div>
+
+    <div class="type-card" style="--ring:rgba(79,127,134,.14)">
+      <div class="num">05</div>
+      <h3>Coastal Ông Nam Hải shrines</h3>
+      <div class="vn">Lăng Ông Nam Hải · tín ngưỡng cá Ông</div>
+      <p>Tín ngưỡng cá Ông của ngư dân Nam Bộ: khi cá voi chết dạt bờ, làng chôn và thờ như thành hoàng. Xương cá được giữ trong đình hoặc lăng. Kiến trúc mộ + đình + miếu kết hợp. Tìm thấy dọc Vũng Tàu, Bến Tre, Kiên Giang, Cà Mau.</p>
+      <div class="specs"><span class="spec">Vật liệu: ngói, gỗ, xương cá voi</span><span class="spec">Bối cảnh: làng biển</span><span class="spec">Tín ngưỡng: dân gian ngư dân</span></div>
+    </div>
+
+    <div class="type-card" style="--ring:rgba(110,130,100,.14)">
+      <div class="num">06</div>
+      <h3>Oc Eo archaeological mounds</h3>
+      <div class="vn">Gò mộ cổ văn hóa Óc Eo</div>
+      <p>Tiền Việt — thuộc vương quốc Phù Nam (TK I–VI). An Giang, Kiên Giang. Gò đất, gạch nung, đồ trang sức bằng vàng, tượng nhỏ. Lớp chôn cất sớm nhất ghi nhận được ở Đồng bằng sông Cửu Long, trước khi có khái niệm "Việt Nam".</p>
+      <div class="specs"><span class="spec">Vật liệu: đất đắp, gạch nung</span><span class="spec">Bối cảnh: khảo cổ</span><span class="spec">Giai đoạn: TK I–VI</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-section">
+  <div class="map-side">
+    <div class="section-label" style="margin-bottom:10px">24 sites indexed</div>
+    <h3>Bản đồ kiến trúc mộ Việt Nam</h3>
+    <p>Mỗi dấu là một di tích được biên mục theo một trong sáu typology. Bấm vào để xem ghi chú kiến trúc, ảnh và ghi chép cộng đồng. Dữ liệu geo khởi tạo từ pipeline QGIS của mapme.</p>
+    <div class="map-legend">
+      <div class="row"><span class="sw" style="background:#c4a171"></span>Huế royal tombs</div>
+      <div class="row"><span class="sw" style="background:#9ba6b0"></span>Mekong family tombs</div>
+      <div class="row"><span class="sw" style="background:#c27a53"></span>Khmer stupa gardens</div>
+      <div class="row"><span class="sw" style="background:#6c7a92"></span>Catholic cemeteries</div>
+      <div class="row"><span class="sw" style="background:#4f7f86"></span>Coastal shrines</div>
+      <div class="row"><span class="sw" style="background:#6e8264"></span>Oc Eo mounds</div>
+    </div>
+  </div>
+  <div id="cemeteryMap"></div>
+</section>
+
+<!-- LENS / ESSAY -->
+<section class="lens-section">
+  <div class="lens-inner">
+    <div class="section-label">Lens · A reading of Vietnamese landscape</div>
+    <h2>Where the dead<br>are kept in plain sight.</h2>
+
+    <div class="lens-curator">
+      <div class="portrait"></div>
+      <div class="meta">
+        <div class="name">Architect Thy Dang</div>
+        <div class="role">Curator of the Cemetery lens · Community Mode</div>
+      </div>
+    </div>
+
+    <p class="lead">Tôi lớn lên ở Mekong. Mỗi buổi chiều, bố tôi đi ra ruộng — và đi ngang qua mộ ông nội. Không ai nghĩ đó là chuyện lạ. Mộ ở đó, trên một ô đất nhỏ giữa ruộng, cùng với cái bàn thờ bằng đá, cái bình hoa nhựa đã phai. Người sống đi làm lúa. Người mất ngồi trong đất. Cả hai cùng chung một cảnh quan.</p>
+
+    <p>Đây là điều mà nhiều khách nước ngoài đến Việt Nam lần đầu không quen: nghĩa trang không tách ra. Không có hàng rào cao, không có cổng đóng. Mộ nằm trong vườn rau, trên bờ kênh, giữa ruộng lúa. Ở Đồng bằng sông Cửu Long, nơi nước dâng nửa năm, mộ được xây cao — như một hòn đảo nhỏ cho người đã khuất trong biển ruộng ngập.</p>
+
+    <p>Với con mắt kiến trúc, đây là một hiện tượng đáng học: cảnh quan Việt Nam không phân mảnh người sống và người chết. Nó là một bề mặt duy nhất, với nhiều lớp ý nghĩa chồng lên nhau. Cái ruộng cũng là cái mộ. Cái vườn cũng là cái đền. Cái chùa cũng là cái nghĩa trang.</p>
+
+    <blockquote>
+      <p>"Cảnh quan không quên. Đất đã ôm được một thế kỷ người chết, một thế kỷ người sống, và vẫn là cảnh quan của cả hai."</p>
+      <cite>— Thy Dang · Lens essay draft · May 2026</cite>
+    </blockquote>
+
+    <h3>Sáu mô hình, một nguyên lý</h3>
+    <p>Sáu typology ở trên — từ lăng Huế đến mộ ruộng Mekong, từ vườn tháp Khmer đến gò Óc Eo — khác nhau về vật liệu, niên đại, tín ngưỡng. Nhưng chia chung một nguyên lý: <em>nghĩa trang là một phần của cảnh quan sống</em>. Không có cái nào trong sáu mô hình đó là "khu cách ly." Ngay cả nghĩa trang Công giáo, với lưới bàn cờ châu Âu, cũng mở cửa cho người sống ghé vào mỗi tuần, mỗi lễ.</p>
+
+    <h3>Người chết như một dòng chảy</h3>
+    <p>Người chết ở Việt Nam không đi đâu xa. Họ trở về đất — đất nuôi ruộng, ruộng nuôi người sống. Vòng quay hoàn thành. Nghĩa trang không phải là một điểm dừng mà là một phần của chu trình sinh thái, có sự tham gia của người sống mỗi ngày.</p>
+
+    <p>Với người đọc đến từ một nền văn hóa có ranh giới rõ ràng giữa người sống và người mất — đây là lời mời đọc cảnh quan khác với cách bạn quen. Không phải để so sánh tốt hơn hay xấu hơn, mà để nhìn thấy một phần khác của câu trả lời cho cùng một câu hỏi: chúng ta giữ người mất thế nào trong đất đai mà chúng ta đang sống?</p>
+
+    <div class="draft-note">
+      <strong>Editorial note (mapme).</strong> Bản lens essay này là bản nháp thay cho một bản thực tế do Architect Thy Dang viết. Trước khi xuất bản công khai, nội dung sẽ được cô biên tập lại từ đầu. Hình ảnh minh họa và các site cụ thể cần ảnh thực địa có consent. Đây là khung — không phải câu trả lời cuối cùng.
+    </div>
+  </div>
+</section>
+
+<!-- CASES -->
+<section class="cases">
+  <div class="section-label">Case studies · 6 representative sites</div>
+  <h2>Sáu di tích — sáu câu chuyện khác nhau.</h2>
+  <p class="sub">Mỗi site dưới đây đại diện cho một typology. Chúng không phải là "những cái đẹp nhất" — chúng là những di tích đủ giàu để đặt câu hỏi.</p>
+
+  <div class="case-grid">
+    <a class="case-card" href="#">
+      <div class="where">Mekong family · An Giang</div>
+      <h4>Tomb fields of Vĩnh Thạnh</h4>
+      <div class="vn">Ruộng mộ Vĩnh Thạnh</div>
+      <p>Một cánh đồng lúa ở xã Vĩnh Thạnh (huyện Thoại Sơn) có hơn 40 mộ gia đình rải rác giữa ruộng, mỗi cái một hòn đảo nhỏ đắp cao 60–80cm. Mùa lũ, ruộng thành biển, mộ thành đảo. Kiến trúc Mekong thuần.</p>
+      <div class="attributes"><span class="attr">Typology 01</span><span class="attr">Sensory</span><span class="attr">Waterlogged landscape</span></div>
+    </a>
+
+    <a class="case-card" href="#">
+      <div class="where">Huế royal · Thừa Thiên Huế</div>
+      <h4>Lăng Minh Mạng</h4>
+      <div class="vn">Hiếu Lăng · 1840–1843</div>
+      <p>40 công trình trải trên 28 hecta, một trục trung tâm qua hồ, cầu, và đình. Có lẽ công trình lăng tẩm hoàn chỉnh nhất trong văn hóa Nguyễn. Được UNESCO công nhận từ 1993.</p>
+      <div class="attributes"><span class="attr">Typology 02</span><span class="attr">UNESCO site</span><span class="attr">Landscape-scale</span></div>
+    </a>
+
+    <a class="case-card" href="#">
+      <div class="where">Khmer · Sóc Trăng</div>
+      <h4>Vườn tháp Chùa Dơi</h4>
+      <div class="vn">Wat Serey Tro Meas</div>
+      <p>Chùa Khmer 400 năm tuổi với vườn tháp mộ trong sân sau. Tháp vàng đứng giữa cây cổ thụ — một bioregion mini của riêng chùa. Cộng đồng Khmer vẫn đưa tro cốt vào đây hàng năm.</p>
+      <div class="attributes"><span class="attr">Typology 03</span><span class="attr">Active site</span><span class="attr">Sacred grove</span></div>
+    </a>
+
+    <a class="case-card" href="#">
+      <div class="where">Catholic · Tiền Giang</div>
+      <h4>Nghĩa trang Mỹ Tho</h4>
+      <div class="vn">Cimetière de Mỹ Tho</div>
+      <p>Nghĩa trang Công giáo lâu đời của vùng Mỹ Tho. Gồm cả mộ của linh mục Pháp, giáo dân Việt, và những thủy thủ buôn thương từ TK XIX. Bản giao thoa văn hóa hiện hình trong đá.</p>
+      <div class="attributes"><span class="attr">Typology 04</span><span class="attr">Colonial trace</span><span class="attr">Bilingual inscriptions</span></div>
+    </a>
+
+    <a class="case-card" href="#">
+      <div class="where">Coastal · Bến Tre</div>
+      <h4>Lăng Ông Nam Hải Bình Thắng</h4>
+      <div class="vn">Whale shrine · Bình Đại</div>
+      <p>Trên vùng biển Bình Đại, lăng Ông Nam Hải thờ xương cá voi được ngư dân chôn cất năm 1907. Một cấu trúc ba lớp: mộ cá + đình tế + sân lễ hội Nghinh Ông. Ngư dân vẫn ra khơi sau khi thắp hương.</p>
+      <div class="attributes"><span class="attr">Typology 05</span><span class="attr">Oral tradition</span><span class="attr">Fisher livelihoods</span></div>
+    </a>
+
+    <a class="case-card" href="#">
+      <div class="where">Oc Eo · An Giang</div>
+      <h4>Khu mộ cổ Gò Cây Thị</h4>
+      <div class="vn">Oc Eo archaeological mounds</div>
+      <p>Một trong những lớp chôn cất sớm nhất ở Mekong, thuộc văn hóa Phù Nam (TK I–VI). Gò đất đỏ với gạch nung, vàng lá, hạt thủy tinh. Tiền-Việt. Tiền-Khmer. Một câu trả lời cho câu hỏi "ai đến trước đất này?"</p>
+      <div class="attributes"><span class="attr">Typology 06</span><span class="attr">Archaeological</span><span class="attr">Pre-Vietnamese</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- HOW TO READ THIS LAYER -->
+<section class="howto">
+  <div class="section-label">How to read this layer</div>
+  <h2>Cảnh quan không đọc nhanh được.</h2>
+  <p class="sub">Cemetery-as-landscape là một cách đọc đất. Bắt đầu từ typology, đến bản đồ, và — nếu bạn đến Việt Nam — mang câu hỏi theo khi đi qua ruộng, vườn, và sân chùa.</p>
+
+  <div class="phase-grid">
+    <div class="phase">
+      <div class="stage">Start here</div>
+      <h3>Đọc typology trước</h3>
+      <p class="when">~10 phút</p>
+      <ul>
+        <li>Sáu typology ở phía trên — mỗi loại một vật liệu, một vùng, một tín ngưỡng</li>
+        <li>Chú ý: không có loại nào tách biệt với đời sống người còn</li>
+        <li>So sánh với cảnh quan nghĩa trang ở nơi bạn lớn lên</li>
+      </ul>
+    </div>
+
+    <div class="phase">
+      <div class="stage">Then map</div>
+      <h3>Đi qua 24 điểm trên bản đồ</h3>
+      <p class="when">~20 phút</p>
+      <ul>
+        <li>Từ lăng tẩm Huế đến mộ ruộng Mekong</li>
+        <li>Từ vườn tháp Khmer đến gò cổ Óc Eo</li>
+        <li>Bấm vào pin để xem chú thích kiến trúc</li>
+        <li>Tìm xem vùng bạn đang tìm hiểu có loại nào</li>
+      </ul>
+    </div>
+
+    <div class="phase">
+      <div class="stage">If you travel</div>
+      <h3>Khi đi qua đất Việt</h3>
+      <p class="when">On the ground</p>
+      <ul>
+        <li>Mộ hiện ra trên ruộng, trong vườn, cạnh đường — đừng bất ngờ</li>
+        <li>Chụp cảnh quan có mộ, không chụp cận cảnh cá nhân</li>
+        <li>Không vào sân nhà/vườn tư nhân không hỏi</li>
+        <li>Vườn tháp Khmer trong chùa mở cho công chúng đến ngắm và cầu</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- RELATED -->
+<section class="related">
+  <h2>Layer liên quan</h2>
+  <div class="related-grid">
+    <a class="rel-card" href="mapme-prototype.html">
+      <div class="t">Community · People</div>
+      <h4>Làng nghề Việt Nam</h4>
+      <p>Nhiều mộ Typology 01 nằm ngay trong phần đất các làng nghề. Context bổ sung.</p>
+    </a>
+    <a class="rel-card" href="mapme-app.html#circular">
+      <div class="t">Community · Planet</div>
+      <h4>Kinh tế tuần hoàn Mekong</h4>
+      <p>Chu trình vật chất quay vòng. Một cách đọc sinh thái khác của đất Việt — người sống + người mất cùng một đất.</p>
+    </a>
+    <a class="rel-card" href="mapme-app.html#advanced">
+      <div class="t">Science · Land + People</div>
+      <h4>Advanced Mode · 6 layers</h4>
+      <p>Dữ liệu mật độ dân số, sử dụng đất, accessibility — đối chiếu với phân bố mộ.</p>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p><b style="color:var(--paper-dim)">Cemetery as Landscape</b> · mapme Community Mode · Curator lens</p>
+  <p>Curator: Architect Thy Dang · Data Keeper: mapme editorial · License: CC BY-NC 4.0 (draft)</p>
+  <p><a href="mapme-app.html#community">← Quay lại Cộng đồng</a> · <a href="#">Đóng góp lens của bạn</a></p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+const map = L.map('cemeteryMap',{zoomControl:true,scrollWheelZoom:false}).setView([15.5,107.0],6);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+  subdomains:'abcd',maxZoom:19,attribution:'© OpenStreetMap · © CARTO Voyager'
+}).addTo(map);
+
+const SITES = [
+  // Mekong family
+  {name:'Tomb fields of Vĩnh Thạnh', type:'family', lat:10.45, lng:105.30, region:'An Giang'},
+  {name:'Mộ gia đình Cái Bè', type:'family', lat:10.37, lng:105.96, region:'Tiền Giang'},
+  {name:'Mộ ruộng Thoại Sơn', type:'family', lat:10.26, lng:105.27, region:'An Giang'},
+  {name:'Mộ vườn Bến Tre', type:'family', lat:10.24, lng:106.37, region:'Bến Tre'},
+  // Huế royal
+  {name:'Lăng Minh Mạng', type:'royal', lat:16.41, lng:107.54, region:'Huế'},
+  {name:'Lăng Tự Đức', type:'royal', lat:16.43, lng:107.57, region:'Huế'},
+  {name:'Lăng Khải Định', type:'royal', lat:16.38, lng:107.57, region:'Huế'},
+  {name:'Lăng Gia Long', type:'royal', lat:16.36, lng:107.51, region:'Huế'},
+  // Khmer
+  {name:'Vườn tháp Chùa Dơi', type:'khmer', lat:9.585, lng:105.983, region:'Sóc Trăng'},
+  {name:'Chùa Kh\'leang stupa garden', type:'khmer', lat:9.602, lng:105.974, region:'Sóc Trăng'},
+  {name:'Chùa Âng Trà Vinh', type:'khmer', lat:9.932, lng:106.342, region:'Trà Vinh'},
+  {name:'Chùa Hang An Giang', type:'khmer', lat:10.415, lng:104.995, region:'An Giang'},
+  // Catholic
+  {name:'Nghĩa trang Mỹ Tho', type:'catholic', lat:10.361, lng:106.359, region:'Tiền Giang'},
+  {name:'Nghĩa trang Gò Công', type:'catholic', lat:10.367, lng:106.665, region:'Tiền Giang'},
+  {name:'Nghĩa trang Cha Tam', type:'catholic', lat:10.750, lng:106.653, region:'TP.HCM'},
+  {name:'Nghĩa trang Hạnh Thông Tây', type:'catholic', lat:10.840, lng:106.664, region:'TP.HCM'},
+  // Coastal
+  {name:'Lăng Ông Nam Hải Bình Thắng', type:'coastal', lat:10.168, lng:106.692, region:'Bến Tre'},
+  {name:'Lăng Ông Vàm Láng', type:'coastal', lat:10.304, lng:106.752, region:'Tiền Giang'},
+  {name:'Lăng Ông Thắng Tam Vũng Tàu', type:'coastal', lat:10.347, lng:107.078, region:'Bà Rịa–Vũng Tàu'},
+  {name:'Lăng Ông Cà Mau', type:'coastal', lat:8.766, lng:105.110, region:'Cà Mau'},
+  // Oc Eo
+  {name:'Khu mộ Gò Cây Thị', type:'ancient', lat:10.263, lng:105.146, region:'An Giang'},
+  {name:'Di tích Gò Óc Eo', type:'ancient', lat:10.267, lng:105.149, region:'An Giang'},
+  {name:'Gò Tháp Mười', type:'ancient', lat:10.683, lng:105.825, region:'Đồng Tháp'},
+  {name:'Di chỉ Óc Eo Kiên Giang', type:'ancient', lat:10.086, lng:104.856, region:'Kiên Giang'},
+];
+
+SITES.forEach(s => {
+  const el = document.createElement('div');
+  el.className = 'cem-marker '+s.type;
+  L.marker([s.lat, s.lng], {
+    icon: L.divIcon({ className:'', html:el.outerHTML, iconSize:[12,12], iconAnchor:[6,6] })
+  })
+  .addTo(map)
+  .bindPopup(`<div style="font-weight:500;font-size:13px;color:#1a1a1a">${s.name}</div><div style="font-size:11.5px;color:#666;margin-top:3px">${s.region} · Typology: ${s.type}</div>`);
+});
+</script>
+
+</body>
+</html>

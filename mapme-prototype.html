@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>mapme · Bản đồ làng nghề Việt Nam (Prototype)</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+  :root{
+    --bg:#0a0a0b;
+    --bg-elev:#131315;
+    --bg-elev-2:#1b1b1f;
+    --border:#26262b;
+    --text:#f3f2ef;
+    --text-dim:#a2a0a6;
+    --text-mute:#6b6a71;
+    --accent:#b894ff;
+    --accent-2:#7c5cff;
+    --food:#e39a4b;
+    --bamboo:#7fb069;
+    --textile:#d46a9d;
+    --metal:#6aa7c2;
+    --wood:#a37358;
+    --ceramic:#c7704e;
+    --paper:#5ec1c0;
+    --other:#8a8790;
+    --active:#7fb069;
+    --recognized:#b894ff;
+    --revival:#e39a4b;
+    --declining:#e06b6b;
+    --ring:rgba(184,148,255,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Manrope","SF Pro Text","Segoe UI",system-ui,sans-serif;
+    font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+
+  /* header */
+  header{
+    display:flex;align-items:center;gap:16px;padding:12px 20px;
+    border-bottom:1px solid var(--border);background:var(--bg);
+    position:sticky;top:0;z-index:500;
+  }
+  .logo{display:flex;align-items:center;gap:8px;font-weight:600;letter-spacing:-.01em}
+  .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent)}
+  .logo em{color:var(--accent);font-style:normal}
+  .hdr-divider{width:1px;height:22px;background:var(--border)}
+  .phase{font-size:11px;color:var(--text-mute);padding:3px 8px;border:1px solid var(--border);border-radius:999px;letter-spacing:.02em}
+  .persona-switcher{display:flex;gap:4px;background:var(--bg-elev);border:1px solid var(--border);border-radius:999px;padding:3px;margin-left:auto}
+  .persona-btn{background:transparent;border:0;color:var(--text-dim);padding:6px 12px;border-radius:999px;font-size:12.5px;white-space:nowrap}
+  .persona-btn[aria-pressed="true"]{background:var(--accent);color:#0a0a0b;font-weight:600}
+  .persona-btn:hover:not([aria-pressed="true"]){color:var(--text)}
+
+  /* layout */
+  main{display:grid;grid-template-columns:340px 1fr 0px;height:calc(100vh - 57px);transition:grid-template-columns .25s ease}
+  main.detail-open{grid-template-columns:340px 1fr 400px}
+
+  /* sidebar */
+  aside.sidebar{border-right:1px solid var(--border);overflow-y:auto;padding:16px;background:var(--bg)}
+  .persona-note{font-size:12px;color:var(--text-dim);padding:10px 12px;background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;line-height:1.5}
+  .persona-note strong{color:var(--text)}
+
+  .search{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;margin-bottom:14px}
+  .search input{background:transparent;border:0;color:var(--text);flex:1;outline:0;font-size:13.5px}
+  .search input::placeholder{color:var(--text-mute)}
+  .search svg{color:var(--text-mute);flex-shrink:0}
+
+  .section-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-mute);margin:18px 0 8px}
+
+  .filter-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+  .chip{background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim);padding:6px 10px;border-radius:999px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
+  .chip .dot{width:8px;height:8px;border-radius:50%}
+  .chip[aria-pressed="true"]{background:var(--bg-elev-2);border-color:#3a3a40;color:var(--text)}
+  .chip.all[aria-pressed="true"]{background:var(--accent);color:#0a0a0b;border-color:var(--accent)}
+
+  select.province{width:100%;background:var(--bg-elev);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:10px;font-size:13px}
+
+  .stat-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-dim);margin:14px 0 6px}
+  .stat-row strong{color:var(--text)}
+
+  /* featured artisan card */
+  .featured{margin-top:18px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--bg-elev)}
+  .featured .meta{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);padding:12px 14px 0}
+  .featured .hero{margin:10px 0 0;aspect-ratio:16/10;background:
+    linear-gradient(135deg,#3d2a1f 0%,#5c3e2b 30%,#8a5a3c 70%,#c09574 100%);
+    position:relative;overflow:hidden;display:flex;align-items:flex-end}
+  .featured .hero::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 30% 40%,rgba(255,240,210,.25) 0,transparent 40%),
+    radial-gradient(circle at 80% 70%,rgba(0,0,0,.35) 0,transparent 50%)}
+  .featured .hero .label{position:relative;padding:12px 14px;font-size:10.5px;color:#e8dbc9;text-shadow:0 1px 2px rgba(0,0,0,.5);letter-spacing:.02em}
+  .featured .body{padding:12px 14px 14px}
+  .featured h3{margin:0 0 4px;font-size:15px;letter-spacing:-.01em}
+  .featured p{margin:0;font-size:12.5px;color:var(--text-dim)}
+  .featured .jump{display:inline-block;margin-top:10px;font-size:12px;color:var(--accent);cursor:pointer}
+  .featured .jump:hover{text-decoration:underline}
+
+  /* hung big buttons */
+  .hung-actions{display:grid;gap:10px;margin-top:8px}
+  .hung-btn{display:flex;align-items:center;gap:14px;padding:18px 16px;background:var(--bg-elev);border:1px solid var(--border);border-radius:14px;color:var(--text);font-size:16px;text-align:left}
+  .hung-btn .ico{width:38px;height:38px;border-radius:10px;background:var(--bg-elev-2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .hung-btn small{display:block;color:var(--text-mute);font-size:12px;margin-top:2px;font-weight:400}
+  .hung-btn strong{font-weight:500;letter-spacing:-.005em}
+
+  /* linh project card */
+  .project-card{background:linear-gradient(135deg,#1f1b2e 0%,#2a2240 100%);border:1px solid #3a2f55;border-radius:12px;padding:14px;margin-bottom:14px}
+  .project-card .label{font-size:10.5px;color:#b894ff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  .project-card h4{margin:0 0 6px;font-size:14px}
+  .project-card p{margin:0;font-size:12px;color:var(--text-dim);line-height:1.5}
+
+  /* thao stats grid */
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .stat-card{background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+  .stat-card .v{font-size:22px;font-weight:500;letter-spacing:-.02em;line-height:1.1}
+  .stat-card .k{font-size:11px;color:var(--text-mute);margin-top:2px}
+  .stat-card.alert{border-color:#5a3a3a}
+  .stat-card.alert .v{color:#e06b6b}
+
+  /* map area */
+  .map-area{position:relative;background:#0e0e10}
+  #map{position:absolute;inset:0;background:#0e0e10}
+  .legend{position:absolute;bottom:18px;left:18px;background:rgba(10,10,11,.86);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:12px;padding:12px 14px;z-index:400;max-width:240px}
+  .legend h5{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-mute);font-weight:500}
+  .legend-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);margin:4px 0}
+  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .scope-note{position:absolute;top:18px;left:18px;background:rgba(10,10,11,.86);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:999px;padding:7px 14px;font-size:11.5px;color:var(--text-dim);z-index:400}
+  .scope-note b{color:var(--text);font-weight:500}
+
+  /* custom markers */
+  .marker{width:12px;height:12px;border-radius:50%;border:2px solid #0a0a0b;box-shadow:0 0 0 0 var(--ring);transition:box-shadow .25s, transform .2s}
+  .marker:hover{transform:scale(1.35);box-shadow:0 0 0 6px var(--ring)}
+  .marker.muted{opacity:.22}
+  .marker.ring{box-shadow:0 0 0 2px rgba(184,148,255,.5),0 0 10px rgba(184,148,255,.4)}
+  .marker.home{width:22px;height:22px;border-width:3px;border-color:var(--accent);box-shadow:0 0 0 5px rgba(184,148,255,.2),0 0 18px rgba(184,148,255,.5)}
+
+  /* detail panel */
+  aside.detail{border-left:1px solid var(--border);overflow-y:auto;background:var(--bg);padding:0}
+  .detail-inner{padding:20px 22px 32px}
+  .detail-close{background:transparent;border:0;color:var(--text-dim);font-size:20px;line-height:1;padding:4px 8px;border-radius:6px;position:sticky;top:12px;float:right}
+  .detail-close:hover{color:var(--text);background:var(--bg-elev)}
+  .detail .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:0 0 6px}
+  .detail h2{margin:0 0 8px;font-size:22px;font-weight:500;letter-spacing:-.015em;line-height:1.2}
+  .detail .sub{font-size:13px;color:var(--text-dim);margin:0 0 16px}
+  .detail .hero-img{aspect-ratio:16/10;border-radius:12px;margin:14px 0;background:linear-gradient(135deg,#2a2a2f,#1b1b1f);display:flex;align-items:center;justify-content:center;color:var(--text-mute);font-size:12px;border:1px dashed #2f2f35}
+  .detail dl{margin:0;display:grid;grid-template-columns:120px 1fr;gap:8px 16px;font-size:13px}
+  .detail dt{color:var(--text-mute)}
+  .detail dd{margin:0;color:var(--text)}
+  .detail .status-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;background:var(--bg-elev);border:1px solid var(--border)}
+  .detail h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-mute);margin:22px 0 10px;font-weight:500}
+  .detail p{margin:0 0 10px;color:var(--text);font-size:14px;line-height:1.6}
+  .detail .cta{display:block;width:100%;text-align:center;padding:12px;background:var(--accent);color:#0a0a0b;border:0;border-radius:12px;font-weight:600;margin-top:16px;font-size:14px}
+  .detail .cta.sec{background:transparent;color:var(--text);border:1px solid var(--border);font-weight:500;margin-top:8px}
+  .detail .cta:hover{opacity:.9}
+  .detail .cite{background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:"SF Mono",Menlo,monospace;font-size:11.5px;color:var(--text-dim);white-space:pre-wrap;word-break:break-word;margin-top:6px}
+  .detail .badge-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
+  .detail .badge{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim)}
+  .detail .badge.ok{color:#9cc98a;border-color:#2f4a2d}
+  .detail .badge.wait{color:#e3c574;border-color:#4a422d}
+
+  /* leaflet overrides */
+  .leaflet-container{background:#0e0e10;font:inherit}
+  .leaflet-control-attribution{background:rgba(10,10,11,.7)!important;color:var(--text-mute)!important;font-size:10px}
+  .leaflet-control-attribution a{color:var(--text-dim)!important}
+  .leaflet-control-zoom{border:1px solid var(--border)!important;overflow:hidden;border-radius:10px!important;box-shadow:none!important}
+  .leaflet-control-zoom a{background:var(--bg-elev)!important;color:var(--text)!important;border-color:var(--border)!important}
+  .leaflet-control-zoom a:hover{background:var(--bg-elev-2)!important}
+
+  /* small screen: stack */
+  @media (max-width:900px){
+    main{grid-template-columns:1fr!important}
+    aside.sidebar{display:none}
+    aside.detail{position:fixed;inset:auto 0 0 0;height:70vh;border-left:0;border-top:1px solid var(--border);z-index:600}
+  }
+</style>
+</head>
+<body data-persona="public">
+<header>
+  <div class="logo"><svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="mapme" style="width:26px;height:26px;flex-shrink:0"><path d="M50 52 L88 31 L88 71 L50 92 Z" fill="#7B3FEB"/><path d="M12 31 L50 52 L50 92 L12 71 Z" fill="#A370F7"/><path d="M50 8 L88 31 L50 52 L12 31 Z" fill="#6E9834"/><path d="M50 8 Q70 16 88 31 Q66 24 50 32 Q34 24 12 31 Q30 16 50 8 Z" fill="#B6D86E"/><path d="M12 66 Q25 58 38 66 T62 66 T88 62" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg>map<em>me</em></div>
+  <div class="hdr-divider"></div>
+  <span class="phase" id="phase">MVP · Công chúng</span>
+  <div class="persona-switcher" role="tablist" aria-label="Persona">
+    <button class="persona-btn" data-persona="public" aria-pressed="true">Công chúng</button>
+    <button class="persona-btn" data-persona="minh" aria-pressed="false">Minh · Researcher</button>
+    <button class="persona-btn" data-persona="hung" aria-pressed="false">Bác Hùng · Artisan</button>
+    <button class="persona-btn" data-persona="linh" aria-pressed="false">Linh · Designer</button>
+    <button class="persona-btn" data-persona="thao" aria-pressed="false">Chị Thảo · Cán bộ</button>
+  </div>
+</header>
+
+<main id="main">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="map-area">
+    <div class="scope-note">Đang hiển thị <b id="countVisible">—</b> trong <b>90</b> làng nghề · 12 tỉnh thành</div>
+    <div id="map"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <aside class="detail" id="detail"></aside>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script id="data-json" type="application/json">[{"id":"1","name":"Nhang Bình Đức","type":"Truyền thống","product":"Nhang (hương) thắp","province":"An Giang","location":"Phường Bình Đức, TP Long Xuyên","when":"Từ ~1940","status":"Hoạt động","lat":10.383,"lng":105.432,"family":"Ẩm thực"},{"id":"2","name":"Lưỡi câu Mỹ Hòa","type":"Truyền thống","product":"Lưỡi câu, ngư cụ","province":"An Giang","location":"Phường Mỹ Hòa, TP Long Xuyên","when":"Từ giữa TK XX","status":"Hoạt động","lat":10.389,"lng":105.435,"family":"Kim khí"},{"id":"3","name":"Bánh tráng Mỹ Khánh","type":"Truyền thống","product":"Bánh tráng","province":"An Giang","location":"Xã Mỹ Khánh, TP Long Xuyên","when":">50 năm","status":"Hoạt động","lat":10.36,"lng":105.44,"family":"Ẩm thực"},{"id":"4","name":"Dệt thổ cẩm Chăm Châu Phong","type":"Truyền thống","product":"Vải thổ cẩm Chăm","province":"An Giang","location":"Xã Châu Phong, TX Tân Châu","when":"Hàng trăm năm","status":"Hoạt động","lat":10.81,"lng":105.19,"family":"Dệt may"},{"id":"5","name":"Tơ lụa Tân Châu (Lãnh Mỹ A)","type":"Truyền thống","product":"Lụa, vải tơ tằm","province":"An Giang","location":"Phường Long Hưng, TX Tân Châu","when":">100 năm","status":"Hoạt động","lat":10.812,"lng":105.192,"family":"Dệt may"},{"id":"6","name":"Rập chuột An Châu","type":"Truyền thống","product":"Rập chuột, lồng bẫy","province":"An Giang","location":"TT An Châu, H. Châu Thành","when":"Từ ~1957","status":"Hoạt động","lat":10.49,"lng":105.34,"family":"Tre nứa mây"},{"id":"7","name":"May mùng mền Bình Hòa","type":"Truyền thống","product":"Màn, chăn, gối","province":"An Giang","location":"Xã Bình Hòa, H. Châu Thành","when":"Trước 2000","status":"Hoạt động","lat":10.48,"lng":105.33,"family":"Dệt may"},{"id":"8","name":"Lợp lươn Cần Đăng","type":"Truyền thống","product":"Lợp/lọp bắt lươn","province":"An Giang","location":"Xã Cần Đăng, H. Châu Thành","when":"Lâu năm","status":"Hoạt động","lat":10.5,"lng":105.28,"family":"Kim khí"},{"id":"9","name":"Bó chổi cọng dừa Vĩnh Chánh","type":"Truyền thống","product":"Chổi cọng dừa","province":"An Giang","location":"Xã Vĩnh Chánh, H. Thoại Sơn","when":"Trước 2000","status":"Hoạt động","lat":10.35,"lng":105.35,"family":"Tre nứa mây"},{"id":"10","name":"Lợp cua Mỹ Đức","type":"Truyền thống","product":"Lợp cua/bẫy cua","province":"An Giang","location":"Xã Mỹ Đức, H. Châu Phú","when":"Lâu năm","status":"Hoạt động","lat":10.56,"lng":105.12,"family":"Tre nứa mây"},{"id":"11","name":"Rèn Phú Mỹ","type":"Truyền thống","product":"Dao, cuốc, nông cụ","province":"An Giang","location":"TT Phú Mỹ, H. Phú Tân","when":">100 năm","status":"Hoạt động","lat":10.65,"lng":105.38,"family":"Kim khí"},{"id":"12","name":"Bánh phồng Phú Mỹ","type":"Truyền thống","product":"Bánh phồng nếp","province":"An Giang","location":"TT Phú Mỹ, H. Phú Tân","when":"~100 năm","status":"Hoạt động","lat":10.651,"lng":105.381,"family":"Ẩm thực"},{"id":"13","name":"Bó chổi bông sậy Cần Nhỏ","type":"Truyền thống","product":"Chổi bông sậy","province":"An Giang","location":"Ấp Cần Nhỏ, H. Phú Tân","when":"Trước 2000","status":"Hoạt động","lat":10.66,"lng":105.39,"family":"Tre nứa mây"},{"id":"14","name":"Dệt thổ cẩm Khmer Văn Giáo","type":"Truyền thống","product":"Thổ cẩm Khmer","province":"An Giang","location":"Xã Văn Giáo, TX Tịnh Biên","when":"Hàng trăm năm","status":"Hoạt động","lat":10.58,"lng":104.87,"family":"Dệt may"},{"id":"15","name":"Đường thốt nốt An Phú","type":"Truyền thống","product":"Đường thốt nốt","province":"An Giang","location":"Phường An Phú, TX Tịnh Biên","when":"Lâu đời","status":"Hoạt động","lat":10.57,"lng":104.86,"family":"Ẩm thực"},{"id":"16","name":"Đường thốt nốt Châu Lăng","type":"Truyền thống","product":"Đường thốt nốt","province":"An Giang","location":"Xã Châu Lăng, H. Tri Tôn","when":"Lâu đời","status":"Hoạt động","lat":10.44,"lng":104.97,"family":"Ẩm thực"},{"id":"17","name":"Đan đát Long Giang","type":"Truyền thống","product":"Rổ, thúng, đồ đan tre","province":"An Giang","location":"Xã Long Giang, H. Chợ Mới","when":"~100 năm","status":"Hoạt động","lat":10.48,"lng":105.49,"family":"Tre nứa mây"},{"id":"18","name":"Đóng xuồng ghe Mỹ Hiệp","type":"Truyền thống","product":"Xuồng, ghe gỗ","province":"An Giang","location":"Xã Mỹ Hiệp, H. Chợ Mới","when":"Lâu đời","status":"Hoạt động","lat":10.47,"lng":105.5,"family":"Mộc & đóng thuyền"},{"id":"19","name":"Mộc gia dụng Tấn Mỹ","type":"Truyền thống","product":"Đồ gỗ gia dụng","province":"An Giang","location":"Xã Tấn Mỹ, H. Chợ Mới","when":"Trước 2000","status":"Hoạt động","lat":10.46,"lng":105.48,"family":"Mộc & đóng thuyền"},{"id":"20","name":"Mộc Chợ Thủ (Long Điền A)","type":"Truyền thống","product":"Đồ gỗ trang trí","province":"An Giang","location":"Xã Long Điền A, H. Chợ Mới","when":"Lâu đời","status":"Hoạt động","lat":10.455,"lng":105.475,"family":"Mộc & đóng thuyền"},{"id":"21","name":"Chằm nón lá Hòa Bình","type":"Truyền thống","product":"Nón lá","province":"An Giang","location":"Xã Hòa Bình, H. Chợ Mới","when":"~100 năm","status":"Hoạt động","lat":10.472,"lng":105.46,"family":"Tre nứa mây"},{"id":"22","name":"Đan giỏ nylon Tấn Mỹ","type":"Hiện đại","product":"Giỏ nhựa nylon","province":"An Giang","location":"Xã Tấn Mỹ, H. Chợ Mới","when":"Sau 2000","status":"Hoạt động","lat":10.46,"lng":105.483,"family":"Tre nứa mây"},{"id":"30","name":"Bánh tráng An Ngãi","type":"Truyền thống","product":"Bánh tráng gạo","province":"Bà Rịa–Vũng Tàu","location":"Xã An Ngãi, Long Điền","when":">100 năm; Di sản VHPVT 2025","status":"Được công nhận","lat":10.55,"lng":107.39,"family":"Ẩm thực"},{"id":"31","name":"Bánh hỏi An Nhứt","type":"Truyền thống","product":"Bánh hỏi","province":"Bà Rịa–Vũng Tàu","location":"Xã An Nhứt, Long Đất","when":"Từ TK XVII–XVIII; Di sản 2025","status":"Được công nhận","lat":10.52,"lng":107.4,"family":"Ẩm thực"},{"id":"32","name":"Muối An Ngãi","type":"Truyền thống","product":"Muối biển","province":"Bà Rịa–Vũng Tàu","location":"Cánh đồng muối An Ngãi","when":"~200 năm","status":"Hoạt động","lat":10.553,"lng":107.392,"family":"Ẩm thực"},{"id":"33","name":"Bún Long Kiên","type":"Truyền thống","product":"Bún tươi","province":"Bà Rịa–Vũng Tàu","location":"Phường Phước Nguyên, TP Bà Rịa","when":"Nhiều thế hệ; CN 2013","status":"Được công nhận","lat":10.497,"lng":107.176,"family":"Ẩm thực"},{"id":"34","name":"Rượu Hòa Long","type":"Truyền thống","product":"Rượu gạo","province":"Bà Rịa–Vũng Tàu","location":"Xã Hòa Long, TP Bà Rịa","when":"Từ ~1960; CN 2016","status":"Được công nhận","lat":10.49,"lng":107.17,"family":"Ẩm thực"},{"id":"35","name":"Sò ốc mỹ nghệ Vũng Tàu","type":"Truyền thống","product":"Đồ mỹ nghệ vỏ sò ốc","province":"Bà Rịa–Vũng Tàu","location":"TP Vũng Tàu","when":"~40 năm; CN 2018","status":"Được công nhận","lat":10.345,"lng":107.085,"family":"Thủ công khác"},{"id":"36","name":"Bánh đa nem Thổ Hà","type":"Truyền thống","product":"Bánh đa nem","province":"Bắc Giang","location":"Làng Thổ Hà, Việt Yên","when":"Từ thời Nguyễn; Di sản 2019","status":"Được công nhận","lat":21.37,"lng":106.14,"family":"Ẩm thực"},{"id":"37","name":"Mây tre đan Tăng Tiến","type":"Truyền thống","product":"Đồ mây tre đan","province":"Bắc Giang","location":"Xã Tăng Tiến, Việt Yên","when":">300 năm","status":"Hoạt động","lat":21.36,"lng":106.15,"family":"Tre nứa mây"},{"id":"38","name":"Bún Đa Mai","type":"Truyền thống","product":"Bún tươi","province":"Bắc Giang","location":"Phường Đa Mai, TP Bắc Giang","when":"~400 năm","status":"Hoạt động","lat":21.274,"lng":106.198,"family":"Ẩm thực"},{"id":"39","name":"Hương Linh Sơn","type":"Hỗn hợp","product":"Hương thảo mộc","province":"Bắc Giang","location":"Thôn Tam Hiệp–An Lập, Bắc Giang","when":"Từ ~2005","status":"Hoạt động","lat":21.29,"lng":106.21,"family":"Ẩm thực"},{"id":"40","name":"Bánh đa Kế","type":"Truyền thống","product":"Bánh đa (bánh tráng dày)","province":"Bắc Giang","location":"Phường Dĩnh Kế, TP Bắc Giang","when":"Lâu đời","status":"Hoạt động","lat":21.272,"lng":106.202,"family":"Ẩm thực"},{"id":"41","name":"Mì Chũ","type":"Truyền thống","product":"Mì gạo khô","province":"Bắc Giang","location":"Xã Nam Dương, H. Lục Ngạn","when":">50 năm","status":"Hoạt động","lat":21.47,"lng":106.55,"family":"Ẩm thực"},{"id":"42","name":"Dâu tằm Mai Đình / ươm tơ Mai Thượng","type":"Truyền thống","product":"Tơ tằm, vải lụa","province":"Bắc Giang","location":"Xã Mai Đình, H. Hiệp Hòa","when":">100 năm","status":"Hoạt động","lat":21.41,"lng":106.02,"family":"Dệt may"},{"id":"43","name":"Rượu làng Vân","type":"Truyền thống","product":"Rượu nếp cái hoa vàng","province":"Bắc Giang","location":"Thôn Yên Viên, xã Vân Hà, Việt Yên","when":"Hàng trăm năm","status":"Hoạt động","lat":21.373,"lng":106.135,"family":"Ẩm thực"},{"id":"44","name":"Mộc Bãi Ổi","type":"Truyền thống","product":"Đồ gỗ dân dụng & mỹ nghệ","province":"Bắc Giang","location":"Thôn Bãi Ổi, xã Dĩnh Trì, TP Bắc Giang","when":"Từ 1958; CN 2010","status":"Được công nhận","lat":21.268,"lng":106.195,"family":"Mộc & đóng thuyền"},{"id":"45","name":"Gốm làng Ngòi","type":"Truyền thống","product":"Gốm gia dụng & trang trí","province":"Bắc Giang","location":"Xã Tư Mại, H. Yên Dũng","when":"Từ thời Trần; phục hồi gần đây","status":"Phục hồi","lat":21.27,"lng":106.33,"family":"Gốm sứ"},{"id":"49","name":"Miến dong Nà Viến","type":"Truyền thống","product":"Miến dong","province":"Bắc Kạn","location":"Thôn Nà Viến, xã Yến Dương, H. Ba Bể","when":"Lâu đời","status":"Hoạt động","lat":22.41,"lng":105.81,"family":"Thủ công khác"},{"id":"56","name":"Miến dong Côn Minh","type":"Truyền thống","product":"Miến dong OCOP 5 sao","province":"Bắc Kạn","location":"Xã Côn Minh, H. Na Rì","when":"CN làng nghề 2024","status":"Được công nhận","lat":22.22,"lng":106.07,"family":"Thủ công khác"},{"id":"84","name":"Muối Bạc Liêu","type":"Truyền thống","product":"Muối biển","province":"Bạc Liêu","location":"Ven biển H. Đông Hải & Hòa Bình","when":">100 năm; Di sản 2020","status":"Được công nhận","lat":9.29,"lng":105.73,"family":"Ẩm thực"},{"id":"85","name":"Đan đát ấp Mỹ I","type":"Truyền thống","product":"Cần xé, thúng, rổ tre","province":"Bạc Liêu","location":"Xã Vĩnh Phú Đông, H. Phước Long","when":"CN 2009","status":"Được công nhận","lat":9.59,"lng":105.64,"family":"Tre nứa mây"},{"id":"86","name":"Dệt chiếu Ngan Dừa","type":"Truyền thống","product":"Chiếu lác","province":"Bạc Liêu","location":"TT Ngan Dừa, H. Hồng Dân","when":"CN 2014","status":"Được công nhận","lat":9.49,"lng":105.52,"family":"Dệt may"},{"id":"88","name":"Rèn Ngan Dừa","type":"Truyền thống","product":"Dao, cuốc, nông cụ rèn","province":"Bạc Liêu","location":"TT Ngan Dừa, H. Hồng Dân","when":"Lâu đời","status":"Hoạt động","lat":9.488,"lng":105.518,"family":"Kim khí"},{"id":"95","name":"Tranh dân gian Đông Hồ","type":"Truyền thống","product":"Tranh dân gian","province":"Bắc Ninh","location":"Xã Song Hồ, H. Thuận Thành","when":">400 năm","status":"Hoạt động","lat":21.05,"lng":106.04,"family":"Giấy & tranh"},{"id":"96","name":"Gốm Phù Lãng","type":"Truyền thống","product":"Gốm sành","province":"Bắc Ninh","location":"Xã Phù Lãng, H. Quế Võ","when":">700 năm","status":"Hoạt động","lat":21.18,"lng":106.22,"family":"Gốm sứ"},{"id":"97","name":"Đúc đồng Đại Bái","type":"Truyền thống","product":"Đồ đồng, tượng","province":"Bắc Ninh","location":"Xã Đại Bái, H. Gia Bình","when":"Lâu đời","status":"Hoạt động","lat":21.04,"lng":106.19,"family":"Kim khí"},{"id":"98","name":"Gỗ mỹ nghệ Đồng Kỵ","type":"Hỗn hợp","product":"Đồ gỗ nội thất cao cấp","province":"Bắc Ninh","location":"Phường Đồng Kỵ, TP Từ Sơn","when":"Truyền thống + bùng nổ sau Đổi mới","status":"Hoạt động","lat":21.07,"lng":105.98,"family":"Kim khí"},{"id":"99","name":"Tre trúc Xuân Lai","type":"Truyền thống","product":"Sản phẩm tre hun khói","province":"Bắc Ninh","location":"Xã Xuân Lai, H. Gia Bình","when":"~200 năm; Di sản 2016","status":"Được công nhận","lat":21.05,"lng":106.2,"family":"Tre nứa mây"},{"id":"122","name":"Kẹo dừa Bến Tre","type":"Truyền thống","product":"Kẹo dừa","province":"Bến Tre","location":"Tỉnh Bến Tre (nhiều điểm)","when":"Lâu đời","status":"Hoạt động","lat":10.23,"lng":106.38,"family":"Tre nứa mây"},{"id":"123","name":"Đan giỏ cọng dừa Hưng Phong","type":"Truyền thống","product":"Giỏ cọng dừa","province":"Bến Tre","location":"Xã Hưng Phong, H. Giồng Trôm","when":"Từ 1992","status":"Hoạt động","lat":10.16,"lng":106.44,"family":"Tre nứa mây"},{"id":"125","name":"Dệt chiếu Nhơn Thạnh","type":"Truyền thống","product":"Chiếu cói","province":"Bến Tre","location":"Xã Nhơn Thạnh, Bến Tre","when":">300 năm","status":"Hoạt động","lat":10.22,"lng":106.37,"family":"Dệt may"},{"id":"130","name":"Bánh tráng Mỹ Lồng","type":"Truyền thống","product":"Bánh tráng","province":"Bến Tre","location":"Xã Mỹ Lồng, H. Giồng Trôm","when":"Lâu đời","status":"Hoạt động","lat":10.17,"lng":106.43,"family":"Ẩm thực"},{"id":"131","name":"Bánh phồng Sơn Đốc","type":"Truyền thống","product":"Bánh phồng","province":"Bến Tre","location":"Xã Hưng Nhượng, H. Giồng Trôm","when":">100 năm","status":"Hoạt động","lat":10.155,"lng":106.445,"family":"Ẩm thực"},{"id":"134","name":"Rượu Phú Lễ","type":"Truyền thống","product":"Rượu nếp","province":"Bến Tre","location":"Xã Phú Lễ, H. Ba Tri","when":"~200 năm; CN 2018","status":"Được công nhận","lat":10.07,"lng":106.59,"family":"Ẩm thực"},{"id":"136","name":"Cá khô An Thủy","type":"Truyền thống","product":"Cá khô biển","province":"Bến Tre","location":"Xã An Thủy, H. Ba Tri","when":"CN 2007","status":"Được công nhận","lat":10.04,"lng":106.63,"family":"Ẩm thực"},{"id":"138","name":"Muối Bảo Thạnh","type":"Truyền thống","product":"Muối biển sạch OCOP","province":"Bến Tre","location":"Xã Bảo Thạnh, H. Ba Tri","when":"Lâu đời","status":"Hoạt động","lat":10.02,"lng":106.64,"family":"Ẩm thực"},{"id":"140","name":"Cây giống Vĩnh Thành – Cái Mơn","type":"Truyền thống","product":"Cây giống ăn trái, hoa kiểng","province":"Bến Tre","location":"Xã Vĩnh Thành, H. Chợ Lách","when":"~100 năm","status":"Hoạt động","lat":10.2,"lng":106.25,"family":"Ẩm thực"},{"id":"153","name":"Tiện gỗ Nhạn Tháp","type":"Truyền thống","product":"Đồ gỗ mỹ nghệ","province":"Bình Định","location":"Thôn Nhạn Tháp, Nhơn Hậu, An Nhơn","when":"Lâu đời","status":"Hoạt động","lat":13.87,"lng":108.99,"family":"Mộc & đóng thuyền"},{"id":"154","name":"Bánh tráng Trường Cửu","type":"Truyền thống","product":"Bánh tráng có mè","province":"Bình Định","location":"Thôn Trường Cửu, Nhơn Lộc, An Nhơn","when":"Lâu đời","status":"Hoạt động","lat":13.88,"lng":108.98,"family":"Ẩm thực"},{"id":"155","name":"Đúc đồng Bằng Châu","type":"Truyền thống","product":"Chuông, lư, đồ thờ","province":"Bình Định","location":"Phường Đập Đá, TX An Nhơn","when":"Lâu đời","status":"Hoạt động","lat":13.876,"lng":109.0,"family":"Kim khí"},{"id":"156","name":"Nón ngựa Phú Gia","type":"Truyền thống","product":"Nón ngựa tinh xảo","province":"Bình Định","location":"Làng Phú Gia, xã Cát Tường, H. Phù Cát","when":"Lâu đời","status":"Hoạt động","lat":13.97,"lng":109.02,"family":"Tre nứa mây"},{"id":"157","name":"Rèn Tây Phương Danh","type":"Truyền thống","product":"Dao, rựa, nông cụ","province":"Bình Định","location":"Phường Đập Đá, TX An Nhơn","when":"Lâu đời","status":"Hoạt động","lat":13.877,"lng":108.999,"family":"Kim khí"},{"id":"161","name":"Rượu Bàu Đá","type":"Truyền thống","product":"Rượu Bàu Đá","province":"Bình Định","location":"Thôn Cù Lâm, Nhơn Lộc, An Nhơn","when":"CN 2007","status":"Được công nhận","lat":13.882,"lng":108.977,"family":"Ẩm thực"},{"id":"163","name":"Dệt thổ cẩm Hà Ri","type":"Truyền thống","product":"Thổ cẩm Ba Na","province":"Bình Định","location":"Làng Hà Ri, H. Vĩnh Thạnh","when":"Truyền thống dân tộc","status":"Hoạt động","lat":14.18,"lng":108.84,"family":"Dệt may"},{"id":"164","name":"Dệt chiếu Hoài Châu","type":"Truyền thống","product":"Chiếu cói","province":"Bình Định","location":"Xã Hoài Châu, TX Hoài Nhơn","when":"Lâu đời","status":"Hoạt động","lat":14.51,"lng":109.04,"family":"Dệt may"},{"id":"172","name":"Nước mắm Đề Gi","type":"Truyền thống","product":"Nước mắm cá cơm","province":"Bình Định","location":"Xã Cát Khánh, H. Phù Cát","when":">100 năm; CN 2016","status":"Được công nhận","lat":13.94,"lng":109.17,"family":"Ẩm thực"},{"id":"184","name":"Sơn mài Tương Bình Hiệp","type":"Truyền thống","product":"Tranh sơn mài, đồ mỹ nghệ","province":"Bình Dương","location":"Phường Tương Bình Hiệp, TP Thủ Dầu Một","when":">100 năm; Di sản 2016","status":"Được công nhận","lat":10.98,"lng":106.66,"family":"Giấy & tranh"},{"id":"185","name":"Gốm Lái Thiêu","type":"Truyền thống","product":"Gốm gia dụng & mỹ nghệ","province":"Bình Dương","location":"TP Thuận An (Lái Thiêu)","when":"Từ ~1860; Di sản 2021","status":"Được công nhận","lat":10.9,"lng":106.7,"family":"Gốm sứ"},{"id":"186","name":"Gốm Tân Phước Khánh","type":"Truyền thống","product":"Gốm sứ, chậu hoa","province":"Bình Dương","location":"Phường Tân Phước Khánh, TP Tân Uyên","when":"Trước 2000","status":"Hoạt động","lat":10.93,"lng":106.78,"family":"Gốm sứ"},{"id":"188","name":"Chạm trổ điêu khắc gỗ Thủ Dầu Một","type":"Truyền thống","product":"Tượng gỗ, đồ thờ","province":"Bình Dương","location":"TP Thủ Dầu Một","when":">200 năm","status":"Hoạt động","lat":10.98,"lng":106.652,"family":"Kim khí"},{"id":"189","name":"Mây tre đan Tân Uyên","type":"Truyền thống","product":"Đồ mây tre nội thất","province":"Bình Dương","location":"TP/TX Tân Uyên","when":"Lâu đời","status":"Hoạt động","lat":10.92,"lng":106.79,"family":"Tre nứa mây"},{"id":"190","name":"Guốc Phú Thọ – Bình Nhâm","type":"Truyền thống","product":"Guốc mộc & sơn","province":"Bình Dương","location":"Phường Phú Thọ & Bình Nhâm","when":">100 năm","status":"Hoạt động","lat":10.91,"lng":106.68,"family":"Mộc & đóng thuyền"},{"id":"191","name":"Nhang Dĩ An","type":"Truyền thống","product":"Nhang que & khoanh","province":"Bình Dương","location":"TP Dĩ An","when":">100 năm","status":"Hoạt động","lat":10.9,"lng":106.76,"family":"Ẩm thực"},{"id":"192","name":"Bánh tráng Phú An","type":"Truyền thống","product":"Bánh tráng gạo","province":"Bình Dương","location":"Xã Phú An, TX Bến Cát","when":"Hàng trăm năm","status":"Hoạt động","lat":11.1,"lng":106.62,"family":"Ẩm thực"},{"id":"193","name":"Heo đất Lái Thiêu","type":"Truyền thống","product":"Heo đất đồ chơi gốm","province":"Bình Dương","location":"Phường Lái Thiêu, TP Thuận An","when":"~50 năm","status":"Hoạt động","lat":10.899,"lng":106.699,"family":"Gốm sứ"},{"id":"199","name":"Nước mắm Phan Thiết","type":"Truyền thống","product":"Nước mắm cá cơm","province":"Bình Thuận","location":"TP Phan Thiết","when":">300 năm","status":"Hoạt động","lat":10.93,"lng":108.1,"family":"Ẩm thực"},{"id":"200","name":"Bánh tráng Chợ Lầu","type":"Truyền thống","product":"Bánh tráng phơi sương","province":"Bình Thuận","location":"TT Chợ Lầu, H. Bắc Bình","when":"Trước 1945","status":"Hoạt động","lat":11.3,"lng":108.44,"family":"Ẩm thực"},{"id":"201","name":"Gốm Gò Bình Đức – Chăm Phan Hiệp","type":"Truyền thống","product":"Gốm Chăm","province":"Bình Thuận","location":"Xã Phan Hiệp, H. Bắc Bình","when":"Chăm lâu đời","status":"Hoạt động","lat":11.26,"lng":108.41,"family":"Gốm sứ"},{"id":"202","name":"Dệt thổ cẩm Chăm Bình Thuận","type":"Truyền thống","product":"Thổ cẩm Chăm","province":"Bình Thuận","location":"Phan Thanh/Phan Hiệp, Bắc Bình","when":">100 năm","status":"Hoạt động","lat":11.25,"lng":108.42,"family":"Dệt may"},{"id":"208","name":"Dệt chiếu Tân Thành – Tân Duyệt","type":"Truyền thống","product":"Chiếu lác, chiếu hoa","province":"Cà Mau","location":"Tân Thành, Đầm Dơi, Thới Bình","when":"Nhiều thế hệ","status":"Hoạt động","lat":9.17,"lng":105.15,"family":"Dệt may"},{"id":"209","name":"Mắm ba khía","type":"Truyền thống","product":"Mắm ba khía, mắm cá","province":"Cà Mau","location":"Vùng Rạch Gốc – U Minh","when":"Lâu đời","status":"Hoạt động","lat":8.67,"lng":104.85,"family":"Ẩm thực"},{"id":"211","name":"Dưa bồn bồn","type":"Truyền thống","product":"Dưa bồn bồn lên men","province":"Cà Mau","location":"Đầm Dơi, Cái Nước","when":"Truyền thống","status":"Hoạt động","lat":8.97,"lng":105.13,"family":"Thủ công khác"},{"id":"212","name":"Gác kèo ong U Minh Hạ","type":"Truyền thống","product":"Mật ong rừng","province":"Cà Mau","location":"Rừng tràm U Minh Hạ","when":"Lâu đời","status":"Hoạt động","lat":9.38,"lng":104.97,"family":"Thủ công khác"},{"id":"223","name":"Đan lọp Thới Long","type":"Truyền thống","product":"Lọp, rọ, ngư cụ","province":"Cần Thơ","location":"Phường Thới Long, Q. Ô Môn","when":"Nhiều thập kỷ","status":"Hoạt động","lat":10.07,"lng":105.74,"family":"Tre nứa mây"},{"id":"224","name":"Bánh tráng Thuận Hưng","type":"Truyền thống","product":"Bánh tráng gạo","province":"Cần Thơ","location":"Phường Thuận Hưng, Q. Thốt Nốt","when":">100 năm","status":"Hoạt động","lat":10.32,"lng":105.56,"family":"Ẩm thực"},{"id":"225","name":"Hoa kiểng Phó Thọ – Bà Bộ","type":"Truyền thống","product":"Hoa kiểng, cây cảnh","province":"Cần Thơ","location":"Phường Long Tuyền – Long Hòa, Q. Bình Thủy","when":"Từ ~1960","status":"Hoạt động","lat":10.05,"lng":105.73,"family":"Ẩm thực"},{"id":"228","name":"Bánh kẹo Ba Rích","type":"Truyền thống","product":"Bánh kẹo truyền thống","province":"Cần Thơ","location":"KP Thới Hòa, P. Thới An, Q. Ô Môn","when":">60 năm; CN 2015","status":"Được công nhận","lat":10.08,"lng":105.73,"family":"Ẩm thực"},{"id":"229","name":"Dệt chiếu Cái Chanh","type":"Truyền thống","product":"Chiếu hoa, chiếu trơn","province":"Cần Thơ","location":"Phường Thường Thạnh, Q. Cái Răng","when":"~100 năm (đang mai một)","status":"Đang mai một","lat":10.01,"lng":105.79,"family":"Dệt may"},{"id":"232","name":"Cơm rượu Trung Thạnh","type":"Truyền thống","product":"Cơm rượu nếp","province":"Cần Thơ","location":"Ấp Thạnh Phước, xã Trung Thạnh, H. Cờ Đỏ","when":"Từ ~1950; OCOP","status":"Hoạt động","lat":10.19,"lng":105.63,"family":"Ẩm thực"}]</script>
+<script>
+const VILLAGES = JSON.parse(document.getElementById('data-json').textContent);
+
+const FAMILIES = [
+  {key:'Ẩm thực',       color:'var(--food)',    hex:'#e39a4b'},
+  {key:'Tre nứa mây',   color:'var(--bamboo)',  hex:'#7fb069'},
+  {key:'Dệt may',       color:'var(--textile)', hex:'#d46a9d'},
+  {key:'Kim khí',       color:'var(--metal)',   hex:'#6aa7c2'},
+  {key:'Mộc & đóng thuyền', color:'var(--wood)', hex:'#a37358'},
+  {key:'Gốm sứ',        color:'var(--ceramic)', hex:'#c7704e'},
+  {key:'Giấy & tranh',  color:'var(--paper)',   hex:'#5ec1c0'},
+  {key:'Thủ công khác', color:'var(--other)',   hex:'#8a8790'},
+];
+const STATUSES = [
+  {key:'Hoạt động',      color:'#7fb069', label:'Đang hoạt động'},
+  {key:'Được công nhận', color:'#b894ff', label:'Di sản / CN'},
+  {key:'Phục hồi',       color:'#e39a4b', label:'Đang phục hồi'},
+  {key:'Đang mai một',   color:'#e06b6b', label:'Đang mai một'},
+];
+const famHex = Object.fromEntries(FAMILIES.map(f=>[f.key,f.hex]));
+const stHex  = Object.fromEntries(STATUSES.map(s=>[s.key,s.color]));
+const PROVINCES = [...new Set(VILLAGES.map(v=>v.province))].sort();
+
+/* --- Featured artisan (editorial placeholder) --- */
+const FEATURED = {
+  name:'Bác Hùng',
+  craft:'Rèn Phú Mỹ',
+  villageId:'11',
+  quote:'Bác làm dao từ năm 16 tuổi. Giờ 68 tuổi rồi, lò vẫn đỏ lửa mỗi sáng.',
+  region:'An Giang · H. Phú Tân',
+};
+
+/* --- Simulated persona-only fields (for demo) --- */
+function seed(n){let x=n*9301+49297;return ()=>{x=(x*9301+49297)%233280;return x/233280;}}
+VILLAGES.forEach(v=>{
+  const r = seed(Number(v.id)||1);
+  v.docDensity = Math.floor(r()*4);   // Minh: 0–3
+  v.materialAvail = r() > 0.45;        // Linh
+  v.acceptingOrders = r() > 0.6;       // Linh
+});
+
+/* --- Map init --- */
+const map = L.map('map',{zoomControl:true,worldCopyJump:true}).setView([16.2,107.5],6);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{
+  subdomains:'abcd', maxZoom:19,
+  attribution:'&copy; OpenStreetMap contributors · &copy; CARTO'
+}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{
+  subdomains:'abcd', maxZoom:19, pane:'shadowPane'
+}).addTo(map);
+
+/* --- State --- */
+let persona = 'public';
+let activeFamilies = new Set(FAMILIES.map(f=>f.key));
+let activeStatuses = new Set(STATUSES.map(s=>s.key));
+let activeProvince = 'all';
+let searchText = '';
+let markers = {};
+
+/* --- Build markers --- */
+function buildMarkers(){
+  Object.values(markers).forEach(m=>m.remove());
+  markers = {};
+  VILLAGES.forEach(v=>{
+    const color = persona==='thao' ? stHex[v.status] : famHex[v.family];
+    const isHome = persona==='hung' && v.id===FEATURED.villageId;
+    const ringed = persona==='minh' && v.docDensity===0;
+    const el = document.createElement('div');
+    el.className = 'marker'+(isHome?' home':'')+(ringed?' ring':'');
+    el.style.background = color;
+    const icon = L.divIcon({className:'',html:el.outerHTML,iconSize:[12,12],iconAnchor:[6,6]});
+    const m = L.marker([v.lat,v.lng],{icon}).on('click',()=>openDetail(v));
+    markers[v.id] = m;
+  });
+  applyFilters();
+}
+
+/* --- Filters --- */
+function applyFilters(){
+  let visible = 0;
+  VILLAGES.forEach(v=>{
+    const m = markers[v.id]; if(!m) return;
+    const famOk = persona==='thao' ? activeStatuses.has(v.status) : activeFamilies.has(v.family);
+    const provOk = activeProvince==='all' || v.province===activeProvince;
+    const textOk = !searchText ||
+      v.name.toLowerCase().includes(searchText) ||
+      v.product.toLowerCase().includes(searchText) ||
+      v.province.toLowerCase().includes(searchText) ||
+      v.location.toLowerCase().includes(searchText);
+    const hungRadius = persona!=='hung' ||
+      (Math.abs(v.lat - 10.65) < 1.2 && Math.abs(v.lng - 105.38) < 1.2);
+    const show = famOk && provOk && textOk && hungRadius;
+    if(show){ m.addTo(map); visible++; } else { m.remove(); }
+  });
+  document.getElementById('countVisible').textContent = visible;
+}
+
+/* --- Sidebar rendering per persona --- */
+function renderSidebar(){
+  const s = document.getElementById('sidebar');
+  const notes = {
+    public:'<strong>MVP · Công chúng.</strong> Khám phá làng nghề thủ công Việt Nam. Không cần đăng nhập. Nhấp vào một điểm để đọc câu chuyện.',
+    minh:'<strong>V2 · Minh.</strong> Vòng sáng quanh điểm = chưa được tư liệu hóa. Hữu ích cho ưu tiên nghiên cứu. Có thể xuất trích dẫn.',
+    hung:'<strong>V2 · Bác Hùng.</strong> Giao diện đơn giản, chữ lớn. Chỉ hiển thị làng của tôi và các làng lân cận. Ba nút lớn để đăng tải.',
+    linh:'<strong>V2 · Linh.</strong> Bộ lọc theo nguyên liệu & nghệ nhân nhận đặt hàng. Lưu làng vào dự án đang làm.',
+    thao:'<strong>V2 · Chị Thảo.</strong> Màu theo trạng thái hoạt động. Bảng điều khiển quận/huyện. Xem nhanh nơi cần can thiệp.',
+  };
+  let html = `<div class="persona-note">${notes[persona]}</div>`;
+
+  if(persona==='hung'){
+    html += `
+      <div class="section-label">Hôm nay bác muốn làm gì?</div>
+      <div class="hung-actions">
+        <button class="hung-btn"><span class="ico">📷</span><span><strong>Chia sẻ một tấm ảnh</strong><small>Công việc hôm nay</small></span></button>
+        <button class="hung-btn"><span class="ico">🎤</span><span><strong>Kể một câu chuyện</strong><small>Ghi âm lại</small></span></button>
+        <button class="hung-btn"><span class="ico">📦</span><span><strong>Đăng tin</strong><small>Nguyên liệu, sản phẩm, nhu cầu</small></span></button>
+      </div>
+      <div class="section-label">Làng của tôi</div>
+      <button class="hung-btn" onclick="openDetail(VILLAGES.find(v=>v.id==='${FEATURED.villageId}'))">
+        <span class="ico">🏠</span><span><strong>Rèn Phú Mỹ, An Giang</strong><small>Xem hồ sơ làng của tôi</small></span>
+      </button>
+    `;
+    s.innerHTML = html; return;
+  }
+
+  // search
+  html += `
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.35-4.35"/></svg>
+      <input id="q" type="text" placeholder="Tìm làng nghề, sản phẩm, địa phương…" />
+    </div>
+  `;
+
+  if(persona==='linh'){
+    html += `
+      <div class="project-card">
+        <div class="label">Dự án đang thực hiện</div>
+        <h4>Bộ sưu tập Xuân 2026</h4>
+        <p>Tìm kiếm: tơ tằm, thổ cẩm tự nhiên, chiếu cói, gỗ tái sử dụng.</p>
+      </div>
+    `;
+  }
+
+  if(persona==='thao'){
+    const counts = {};
+    STATUSES.forEach(s=>counts[s.key]=VILLAGES.filter(v=>v.status===s.key).length);
+    html += `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="v">${counts['Hoạt động']}</div><div class="k">Đang hoạt động</div></div>
+        <div class="stat-card"><div class="v">${counts['Được công nhận']}</div><div class="k">Được công nhận</div></div>
+        <div class="stat-card"><div class="v">${counts['Phục hồi']||0}</div><div class="k">Đang phục hồi</div></div>
+        <div class="stat-card alert"><div class="v">${counts['Đang mai một']||0}</div><div class="k">Đang mai một</div></div>
+      </div>
+      <div class="section-label">Lọc theo trạng thái</div>
+      <div class="filter-chips" id="statusChips"></div>
+    `;
+  } else {
+    html += `
+      <div class="section-label">Nghề thủ công</div>
+      <div class="filter-chips" id="famChips">
+        <button class="chip all" data-family="__all__" aria-pressed="true">Tất cả</button>
+      </div>
+    `;
+  }
+
+  html += `
+    <div class="section-label">Tỉnh thành</div>
+    <select class="province" id="province">
+      <option value="all">Tất cả (12)</option>
+      ${PROVINCES.map(p=>`<option value="${p}">${p}</option>`).join('')}
+    </select>
+  `;
+
+  if(persona==='minh'){
+    html += `
+      <div class="section-label">Bộ lọc nghiên cứu</div>
+      <div class="filter-chips">
+        <button class="chip" data-minh="undoc">Chưa được tư liệu hóa</button>
+        <button class="chip" data-minh="oldest">Cổ xưa nhất</button>
+      </div>
+    `;
+  }
+
+  if(persona==='public'){
+    html += `
+      <div class="featured" onclick="openDetail(VILLAGES.find(v=>v.id==='${FEATURED.villageId}'))" style="cursor:pointer">
+        <div class="meta">Nghệ nhân tuần này</div>
+        <div class="hero"><span class="label">Ảnh · Bác Hùng bên lò rèn</span></div>
+        <div class="body">
+          <h3>${FEATURED.name} · ${FEATURED.craft}</h3>
+          <p>"${FEATURED.quote}"</p>
+          <span class="jump">Đọc câu chuyện →</span>
+        </div>
+      </div>
+    `;
+  }
+
+  s.innerHTML = html;
+
+  // bind
+  const q = document.getElementById('q');
+  if(q) q.addEventListener('input',e=>{searchText=e.target.value.trim().toLowerCase();applyFilters();});
+
+  const provSel = document.getElementById('province');
+  if(provSel) provSel.addEventListener('change',e=>{activeProvince=e.target.value;applyFilters();});
+
+  const famWrap = document.getElementById('famChips');
+  if(famWrap){
+    FAMILIES.forEach(f=>{
+      const b = document.createElement('button');
+      b.className='chip'; b.dataset.family=f.key; b.setAttribute('aria-pressed','true');
+      b.innerHTML = `<span class="dot" style="background:${f.hex}"></span>${f.key}`;
+      famWrap.appendChild(b);
+    });
+    famWrap.addEventListener('click',e=>{
+      const btn = e.target.closest('.chip'); if(!btn) return;
+      const f = btn.dataset.family;
+      if(f==='__all__'){
+        activeFamilies = new Set(FAMILIES.map(x=>x.key));
+        famWrap.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed','true'));
+      } else {
+        if(activeFamilies.has(f)) activeFamilies.delete(f); else activeFamilies.add(f);
+        btn.setAttribute('aria-pressed', activeFamilies.has(f)?'true':'false');
+        const allBtn = famWrap.querySelector('.chip.all');
+        allBtn.setAttribute('aria-pressed', activeFamilies.size===FAMILIES.length?'true':'false');
+      }
+      applyFilters();
+    });
+  }
+
+  const stWrap = document.getElementById('statusChips');
+  if(stWrap){
+    STATUSES.forEach(s=>{
+      const b = document.createElement('button');
+      b.className='chip'; b.dataset.status=s.key; b.setAttribute('aria-pressed','true');
+      b.innerHTML = `<span class="dot" style="background:${s.color}"></span>${s.label}`;
+      stWrap.appendChild(b);
+    });
+    stWrap.addEventListener('click',e=>{
+      const btn = e.target.closest('.chip'); if(!btn) return;
+      const k = btn.dataset.status;
+      if(activeStatuses.has(k)) activeStatuses.delete(k); else activeStatuses.add(k);
+      btn.setAttribute('aria-pressed', activeStatuses.has(k)?'true':'false');
+      applyFilters();
+    });
+  }
+}
+
+/* --- Legend --- */
+function renderLegend(){
+  const l = document.getElementById('legend');
+  if(persona==='thao'){
+    l.innerHTML = `<h5>Trạng thái làng nghề</h5>` +
+      STATUSES.map(s=>`<div class="legend-row"><span class="legend-dot" style="background:${s.color}"></span>${s.label}</div>`).join('');
+  } else {
+    l.innerHTML = `<h5>Nghề thủ công</h5>` +
+      FAMILIES.map(f=>`<div class="legend-row"><span class="legend-dot" style="background:${f.hex}"></span>${f.key}</div>`).join('');
+    if(persona==='minh'){
+      l.innerHTML += `<h5 style="margin-top:10px">Tư liệu hóa</h5>
+        <div class="legend-row"><span class="legend-dot" style="background:transparent;box-shadow:0 0 0 2px rgba(184,148,255,.8)"></span>Chưa được tư liệu hóa</div>`;
+    }
+  }
+}
+
+/* --- Detail panel --- */
+function openDetail(v){
+  if(!v) return;
+  const d = document.getElementById('detail');
+  document.getElementById('main').classList.add('detail-open');
+
+  const famColor = famHex[v.family];
+  const statusColor = stHex[v.status]||'#888';
+
+  let extras = '';
+  if(persona==='public'){
+    extras = `
+      <h3>Câu chuyện</h3>
+      <p>Làng ${v.name.toLowerCase().includes('rèn')?'rèn':'nghề'} ở ${v.location}, ${v.province}. Thành lập ${v.when.toLowerCase()}. ${v.family==='Kim khí'?'Thế hệ thợ trẻ đang tiếp nối.':''}</p>
+      <p style="color:var(--text-mute);font-size:12.5px;font-style:italic">Câu chuyện đầy đủ sẽ được biên tập bởi đội ngũ mapme. Đây là mô tả tóm tắt.</p>
+      ${v.id==='11' ? '<a class="cta" href="village-ren-phu-my.html" target="_blank" rel="noopener" style="text-decoration:none;display:block;box-sizing:border-box">Xem hồ sơ đầy đủ →</a>' : ''}
+      <button class="cta${v.id==='11'?' sec':''}">Liên hệ về làng nghề này</button>
+      <button class="cta sec">Chia sẻ liên kết</button>
+    `;
+  }
+  if(persona==='minh'){
+    const level = ['Chưa có','Sơ sài','Trung bình','Đầy đủ'][v.docDensity];
+    extras = `
+      <h3>Thông tin nghiên cứu</h3>
+      <dl>
+        <dt>Mức tư liệu hóa</dt><dd>${level}</dd>
+        <dt>Thời kỳ</dt><dd>${v.when}</dd>
+        <dt>Tọa độ</dt><dd>${v.lat}, ${v.lng}</dd>
+      </dl>
+      <h3>Trích dẫn</h3>
+      <div class="cite">mapme (2026). "${v.name}", ${v.location}, ${v.province}. Retrieved from mapme.vn/v/${v.id}</div>
+      <button class="cta">Xuất BibTeX / APA</button>
+      <button class="cta sec">Thêm vào dự án điền dã</button>
+    `;
+  }
+  if(persona==='hung'){
+    extras = `
+      <h3>Hành động</h3>
+      <button class="cta" style="font-size:16px;padding:16px">📷 Đăng ảnh mới</button>
+      <button class="cta sec" style="font-size:15px;padding:14px">🎤 Gửi tin nhắn thoại</button>
+      <button class="cta sec" style="font-size:15px;padding:14px">📞 Gọi người giúp</button>
+    `;
+  }
+  if(persona==='linh'){
+    extras = `
+      <h3>Khả năng cung cấp</h3>
+      <div class="badge-row">
+        ${v.materialAvail?'<span class="badge ok">✓ Còn nguyên liệu</span>':'<span class="badge wait">Hết mùa</span>'}
+        ${v.acceptingOrders?'<span class="badge ok">✓ Nhận đặt hàng</span>':'<span class="badge wait">Chưa nhận đặt</span>'}
+        <span class="badge">✓ Đã xác minh</span>
+      </div>
+      <h3>Gắn với dự án</h3>
+      <p style="color:var(--text-dim);font-size:13px">Dự án đang thực hiện: <strong style="color:var(--text)">Bộ sưu tập Xuân 2026</strong></p>
+      <button class="cta">Thêm vào brief dự án</button>
+      <button class="cta sec">Lưu vào moodboard</button>
+    `;
+  }
+  if(persona==='thao'){
+    extras = `
+      <h3>Hành chính</h3>
+      <dl>
+        <dt>Trạng thái</dt><dd><span class="status-badge" style="border-color:${statusColor};color:${statusColor}">${v.status}</span></dd>
+        <dt>Lần cập nhật</dt><dd>26/03/2026</dd>
+        <dt>Cán bộ phụ trách</dt><dd>—</dd>
+      </dl>
+      <button class="cta">Xác thực hồ sơ</button>
+      <button class="cta sec">Gắn cờ để xem xét</button>
+      <button class="cta sec">Xuất báo cáo làng</button>
+    `;
+  }
+
+  d.innerHTML = `
+    <div class="detail-inner">
+      <button class="detail-close" onclick="closeDetail()">×</button>
+      <p class="kicker" style="color:${famColor}">${v.family}</p>
+      <h2>${v.name}</h2>
+      <p class="sub">${v.location} · ${v.province}</p>
+      <div class="hero-img">Ảnh làng nghề (placeholder)</div>
+      <dl>
+        <dt>Sản phẩm</dt><dd>${v.product}</dd>
+        <dt>Thời kỳ</dt><dd>${v.when}</dd>
+        <dt>Trạng thái</dt><dd><span class="status-badge" style="border-color:${statusColor};color:${statusColor}">${v.status}</span></dd>
+      </dl>
+      ${extras}
+    </div>
+  `;
+  map.flyTo([v.lat,v.lng],9,{duration:.6});
+}
+function closeDetail(){
+  document.getElementById('main').classList.remove('detail-open');
+}
+
+/* --- Persona switching --- */
+document.querySelectorAll('.persona-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.persona-btn').forEach(b=>b.setAttribute('aria-pressed','false'));
+    btn.setAttribute('aria-pressed','true');
+    persona = btn.dataset.persona;
+    document.body.setAttribute('data-persona',persona);
+    const label = {public:'MVP · Công chúng',minh:'V2 · Nghiên cứu',hung:'V2 · Nghệ nhân',linh:'V2 · Thiết kế',thao:'V2 · Quản lý di sản'}[persona];
+    document.getElementById('phase').textContent = label;
+    closeDetail();
+    renderSidebar();
+    renderLegend();
+    buildMarkers();
+    // Hung view: zoom to his village
+    if(persona==='hung'){
+      const v = VILLAGES.find(x=>x.id===FEATURED.villageId);
+      if(v) map.flyTo([v.lat,v.lng],8,{duration:.8});
+    } else {
+      map.flyTo([16.2,107.5],6,{duration:.8});
+    }
+  });
+});
+
+/* --- Init --- */
+renderSidebar();
+renderLegend();
+buildMarkers();
+</script>
+</body>
+</html>

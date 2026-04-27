@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>mapme — Signup Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* === MAPME BRAND === */
+  :root{
+    /* Base — matches mapme-app.html */
+    --bg:#0a0a0b;
+    --bg-1:#101012;
+    --bg-2:#16161a;
+    --bg-3:#1d1d22;
+    --bg-4:#262631;
+    --border:rgba(245,236,222,.08);
+    --border-2:rgba(245,236,222,.2);
+    --text:#f3f2ef;
+    --text-dim:#b4b1a8;
+    --text-mute:#706d66;
+
+    /* Linh's path — purple (mapme default accent) */
+    --p:#b894ff;
+    --p-2:#9071d4;
+    --p-soft:rgba(184,148,255,.14);
+    --p-glow:rgba(184,148,255,.35);
+
+    /* Chú Vũ's path — copper (heritage, grounded) */
+    --v:#d4a86d;
+    --v-2:#e3b881;
+    --v-soft:rgba(212,168,109,.14);
+    --v-glow:rgba(212,168,109,.3);
+    --v-deep:#a57340;
+
+    /* Semantic */
+    --success:#7fb069;
+    --error:#e06b6b;
+
+    /* Fonts */
+    --fs:"Manrope",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --fd:"Fraunces",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--fs);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+  body[data-path="vu"]{}
+  a{color:var(--p);text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+
+  /* === HEADER === */
+  header.app{display:flex;align-items:center;gap:14px;padding:12px 20px;background:rgba(10,10,11,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+  .logo{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;letter-spacing:-.01em;color:var(--text);text-decoration:none}
+  .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--p);box-shadow:0 0 14px var(--p-glow)}
+  .logo em{color:var(--p);font-style:normal}
+  .beta{font-size:10px;padding:2px 8px;border:1px solid var(--border-2);border-radius:999px;color:var(--text-dim);letter-spacing:.08em}
+  .hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .lang-toggle{display:flex;background:var(--bg-2);border:1px solid var(--border);border-radius:999px;padding:3px}
+  .lang-toggle button{background:transparent;border:0;padding:4px 11px;border-radius:999px;color:var(--text-mute);font-size:12px;font-weight:500}
+  .lang-toggle button.active{background:var(--bg-3);color:var(--text)}
+  .hdr-link{color:var(--text-mute);font-size:12.5px;padding:6px 12px;border-radius:999px;border:0;background:transparent;font-family:inherit;cursor:pointer}
+  .hdr-link:hover{color:var(--text);background:var(--bg-2)}
+
+  /* === MAIN CONTAINER === */
+  main{max-width:960px;margin:0 auto;padding:0 24px 48px;position:relative}
+  main::before{content:"";position:fixed;top:-100px;left:-10%;right:-10%;height:480px;background:
+    radial-gradient(ellipse at 25% 40%,var(--glow-left,var(--p-glow)) 0,transparent 55%),
+    radial-gradient(ellipse at 75% 60%,var(--glow-right,rgba(212,168,109,.18)) 0,transparent 55%);
+    pointer-events:none;z-index:-1;opacity:.6}
+  body[data-path="linh"] main::before{--glow-left:var(--p-glow);--glow-right:rgba(184,148,255,.12)}
+  body[data-path="vu"] main::before{--glow-left:var(--v-glow);--glow-right:rgba(212,168,109,.12)}
+
+  main > section.screen{display:none;animation:slideIn .35s cubic-bezier(.2,.8,.2,1)}
+  main > section.screen.active{display:block}
+  @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* === SHARED === */
+  .progress-bar{display:flex;align-items:center;gap:4px;padding:18px 0 4px;max-width:520px;margin:0 auto}
+  .progress-bar .step{flex:1;height:3px;background:var(--bg-3);border-radius:999px;transition:background .3s}
+  .progress-bar .step.done{background:var(--p)}
+  .progress-bar .step.current{background:linear-gradient(90deg,var(--p),var(--p-2))}
+  body[data-path="vu"] .progress-bar .step.done{background:var(--v)}
+  body[data-path="vu"] .progress-bar .step.current{background:linear-gradient(90deg,var(--v),var(--v-2))}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--text-mute);font-size:13px;margin:10px 0 16px;cursor:pointer;background:transparent;border:0;padding:0;font-family:inherit}
+  .back-link:hover{color:var(--text)}
+  .skip-row{text-align:center;padding:16px 0 4px}
+  .skip-link{color:var(--text-mute);font-size:13.5px;background:transparent;border:0;cursor:pointer;padding:8px 16px;border-radius:999px;font-family:inherit}
+  .skip-link:hover{background:var(--bg-2);color:var(--text-dim)}
+
+  /* === WELCOME (fork chooser) === */
+  .welcome{padding:72px 24px 40px;text-align:center;max-width:720px;margin:0 auto}
+  .kicker-chip{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--p);padding:5px 14px;border:1px solid var(--p-soft);background:var(--p-soft);border-radius:999px;margin-bottom:22px;font-weight:600}
+  .welcome h1{font-family:var(--fd);font-weight:300;font-size:clamp(40px,5.5vw,64px);line-height:1.05;letter-spacing:-.025em;margin:0 0 16px;color:var(--text)}
+  .welcome h1 em{font-style:italic;font-weight:400;background:linear-gradient(100deg,var(--p) 0%,var(--v) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .welcome .sub{font-family:var(--fd);font-size:clamp(17px,2vw,20px);font-weight:300;color:var(--text-dim);margin:0 0 40px;line-height:1.45}
+  .fork{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+  .fork-card{background:var(--bg-2);border:1px solid var(--border);border-radius:18px;padding:30px 26px 26px;text-align:left;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;gap:10px;min-height:260px;color:inherit;text-decoration:none;position:relative;overflow:hidden}
+  .fork-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 0%,var(--card-glow,var(--p-glow)) 0,transparent 55%);pointer-events:none;opacity:0;transition:opacity .3s}
+  .fork-card:hover::before{opacity:.8}
+  .fork-card.linh{--card-glow:var(--p-glow)}
+  .fork-card.vu{--card-glow:var(--v-glow)}
+  .fork-card:hover{transform:translateY(-3px)}
+  .fork-card.linh:hover{border-color:var(--p)}
+  .fork-card.vu:hover{border-color:var(--v)}
+  .fork-card > *{position:relative;z-index:1}
+  .fork-icon{font-size:30px;margin-bottom:6px;filter:grayscale(.15)}
+  .fork-card h3{margin:0;font-family:var(--fd);font-size:24px;font-weight:500;letter-spacing:-.01em;color:var(--text);line-height:1.15}
+  .fork-card .en-alt{color:var(--text-mute);font-size:12.5px;font-weight:500;font-style:italic}
+  .fork-card p{margin:8px 0 0;color:var(--text-dim);font-size:14px;line-height:1.55}
+  .fork-card .mini{font-size:11px;color:var(--text-mute);text-transform:uppercase;letter-spacing:.12em;margin-top:auto;padding-top:14px;border-top:1px solid var(--border);font-weight:600}
+  .fork-card.linh .mini{color:var(--p)}
+  .fork-card.vu .mini{color:var(--v)}
+  .login-hint{margin-top:22px;font-size:13.5px;color:var(--text-mute)}
+  .login-hint a{color:var(--p);border-bottom:1px solid var(--p-soft)}
+  @media (max-width:640px){.fork{grid-template-columns:1fr}.fork-card{min-height:auto}}
+
+  /* === CARD (shared) === */
+  .card{background:var(--bg-2);border:1px solid var(--border);border-radius:16px;padding:32px 32px 28px;max-width:520px;margin:20px auto}
+  .card.wide{max-width:680px}
+  .card h2{font-family:var(--fd);font-size:28px;font-weight:400;letter-spacing:-.02em;margin:0 0 8px;line-height:1.15}
+  .card .dek{color:var(--text-dim);font-size:14.5px;margin:0 0 24px;line-height:1.55}
+
+  /* === BUTTONS === */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:12px;font-size:14.5px;font-weight:500;border:0;transition:all .2s;cursor:pointer;font-family:inherit;text-decoration:none;min-height:48px}
+  .btn.full{width:100%}
+  .btn.primary{background:var(--p);color:var(--bg)}
+  .btn.primary:hover{background:var(--p-2);color:var(--text)}
+  body[data-path="vu"] .btn.primary{background:var(--v);color:var(--bg)}
+  body[data-path="vu"] .btn.primary:hover{background:var(--v-deep);color:var(--text)}
+  .btn.secondary{background:var(--bg-3);color:var(--text);border:1px solid var(--border-2)}
+  .btn.secondary:hover{background:var(--bg-4)}
+  .btn.outline{background:transparent;color:var(--text);border:1px solid var(--border-2)}
+  .btn.outline:hover{background:var(--bg-2);border-color:var(--text-dim)}
+  .btn.oauth{background:var(--bg-3);color:var(--text);border:1px solid var(--border-2);justify-content:flex-start;padding-left:18px}
+  .btn.oauth:hover{background:var(--bg-4);border-color:var(--text-dim)}
+  .btn.oauth .oauth-icon{width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--bg)}
+  .btn.zalo{background:#0068FF;color:#fff;border:0}
+  .btn.zalo:hover{background:#0051cc}
+  .btn.artisan{min-height:56px;font-size:16px}
+
+  .divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--text-mute);font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+
+  /* === FORM === */
+  .field{margin-bottom:18px}
+  .field label{display:block;font-size:13px;font-weight:500;color:var(--text-dim);margin-bottom:6px}
+  .field .hint{font-size:12px;color:var(--text-mute);margin-top:6px}
+  .field .input,.field textarea,.field select{width:100%;padding:13px 14px;border:1px solid var(--border-2);border-radius:10px;font-size:14.5px;background:var(--bg-1);color:var(--text);font-family:inherit;transition:border-color .15s}
+  .field .input:focus,.field textarea:focus,.field select:focus{outline:0;border-color:var(--p)}
+  body[data-path="vu"] .field .input:focus,body[data-path="vu"] .field textarea:focus{border-color:var(--v)}
+  .field textarea{min-height:100px;resize:vertical;font-family:inherit}
+  .field.artisan label{font-size:14.5px;font-weight:500;color:var(--text)}
+  .field.artisan .input,.field.artisan textarea{padding:15px 16px;font-size:16px;min-height:54px;border-radius:12px}
+
+  /* === CHIPS === */
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 10px}
+  .chip{background:var(--bg-1);border:1px solid var(--border-2);color:var(--text-dim);padding:9px 14px;border-radius:999px;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit}
+  .chip:hover{border-color:var(--p);color:var(--text)}
+  .chip.selected{background:var(--p);color:var(--bg);border-color:var(--p)}
+
+  /* === ROLE CARDS === */
+  .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 14px}
+  .role-opt{background:var(--bg-1);border:1px solid var(--border-2);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s;text-align:left;font-family:inherit;color:var(--text)}
+  .role-opt:hover{border-color:var(--p);background:var(--bg-3)}
+  .role-opt.selected{border-color:var(--p);background:var(--p-soft)}
+  .role-opt .ro-ic{font-size:22px;margin-bottom:8px;opacity:.9}
+  .role-opt .ro-t{font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px;letter-spacing:-.005em}
+  .role-opt .ro-s{font-size:12px;color:var(--text-mute)}
+  @media (max-width:540px){.role-grid{grid-template-columns:1fr}}
+
+  /* === CRAFT CATEGORY === */
+  .craft-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:8px 0 14px}
+  .craft-opt{background:var(--bg-1);border:1px solid var(--border-2);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;font-family:inherit;text-align:left;min-height:62px;color:var(--text)}
+  .craft-opt:hover{border-color:var(--v);background:var(--bg-3)}
+  .craft-opt.selected{border-color:var(--v);background:var(--v-soft)}
+  .craft-opt .c-ic{font-size:22px;flex-shrink:0;opacity:.9}
+  .craft-opt .c-txt{font-size:14px;font-weight:500;color:var(--text)}
+  @media (max-width:540px){.craft-grid{grid-template-columns:1fr}}
+
+  /* === SEARCH LISTING === */
+  .search-input{display:flex;align-items:center;gap:10px;border:1px solid var(--border-2);border-radius:12px;padding:4px 4px 4px 16px;background:var(--bg-1);margin-bottom:12px;transition:border-color .2s}
+  .search-input:focus-within{border-color:var(--v)}
+  .search-input svg{color:var(--text-mute);flex-shrink:0}
+  .search-input input{flex:1;border:0;outline:0;background:transparent;font-size:15px;padding:12px 0;font-family:inherit;color:var(--text)}
+  .search-input .go{background:var(--v);color:var(--bg);border:0;padding:10px 18px;border-radius:10px;font-weight:500;font-size:13px;cursor:pointer;font-family:inherit}
+  .search-results{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;background:var(--bg-1)}
+  .search-result{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center;cursor:pointer;transition:background .15s}
+  .search-result:last-child{border-bottom:0}
+  .search-result:hover{background:var(--bg-3)}
+  .search-result .thumb{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--v-deep),#5c3d1a);flex-shrink:0;border:1px solid var(--border-2)}
+  .search-result .info{flex:1;min-width:0}
+  .search-result .info .name{font-family:var(--fd);font-weight:500;font-size:15px;color:var(--text);margin-bottom:2px}
+  .search-result .info .addr{font-size:12px;color:var(--text-mute)}
+  .search-result .action{font-size:11px;color:var(--v);font-weight:600;padding:5px 12px;border:1px solid var(--v-soft);background:var(--v-soft);border-radius:999px;flex-shrink:0;letter-spacing:.03em}
+
+  /* === LOCATION MOCK MAP === */
+  .location-mock{aspect-ratio:16/10;background:
+    radial-gradient(circle at 60% 40%,rgba(212,168,109,.25),transparent 30%),
+    radial-gradient(circle at 40% 70%,rgba(127,176,105,.18),transparent 30%),
+    linear-gradient(135deg,#1a1814,#2a2620);
+    border-radius:12px;position:relative;margin:12px 0;border:1px solid var(--border-2);overflow:hidden}
+  .location-mock::after{content:"📍";position:absolute;top:40%;left:60%;transform:translate(-50%,-50%);font-size:30px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.5))}
+  .location-mock .loc-hint{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(10,10,11,.85);backdrop-filter:blur(8px);padding:9px 14px;border-radius:8px;font-size:12.5px;color:var(--text-dim);text-align:center;border:1px solid var(--border-2)}
+
+  /* === PHOTO UPLOAD === */
+  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+  .photo-slot{aspect-ratio:1;background:var(--bg-1);border:1px dashed var(--border-2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text-mute);font-size:22px;cursor:pointer;transition:all .15s}
+  .photo-slot:hover{border-color:var(--v);color:var(--v);background:var(--bg-3)}
+  .photo-slot.has{border-style:solid;background:linear-gradient(135deg,var(--v-deep) 20%,#3a2a1a 80%);color:rgba(255,255,255,.3);border-color:transparent}
+
+  /* === VOICE NOTE === */
+  .voice-rec{background:var(--v-soft);border:1px solid rgba(212,168,109,.3);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin:10px 0;cursor:pointer;transition:background .15s}
+  .voice-rec:hover{background:rgba(212,168,109,.2)}
+  .voice-rec .mic{width:40px;height:40px;border-radius:50%;background:var(--v);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .voice-rec .v-text strong{font-size:13.5px;color:var(--text);display:block;margin-bottom:2px;font-weight:500}
+  .voice-rec .v-text small{font-size:12px;color:var(--text-dim)}
+
+  /* === INTEGRATION CARDS === */
+  .integ-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 14px}
+  .integ-card{background:var(--bg-1);border:1px solid var(--border-2);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;font-family:inherit;text-align:left;color:var(--text)}
+  .integ-card:hover{border-color:var(--v);background:var(--bg-3)}
+  .integ-card.selected{border-color:var(--v);background:var(--v-soft)}
+  .integ-card .integ-ic{font-size:22px;flex-shrink:0;opacity:.9}
+  .integ-card .integ-txt{font-size:13.5px;font-weight:500;color:var(--text)}
+  .integ-card .integ-sub{font-size:11.5px;color:var(--text-mute);margin-top:1px}
+  @media (max-width:540px){.integ-grid{grid-template-columns:1fr}}
+
+  /* === VERIFICATION === */
+  .verify-option{background:var(--bg-1);border:1px solid var(--border-2);border-radius:12px;padding:16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:10px;cursor:pointer;transition:all .15s;width:100%;text-align:left;font-family:inherit;color:var(--text)}
+  .verify-option:hover{border-color:var(--v);background:var(--bg-3)}
+  .verify-option .v-ic{width:40px;height:40px;border-radius:10px;background:var(--v-soft);color:var(--v);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;border:1px solid rgba(212,168,109,.3)}
+  .verify-option h4{margin:0 0 4px;font-family:var(--fd);font-size:17px;font-weight:500;color:var(--text);letter-spacing:-.005em}
+  .verify-option p{margin:0;font-size:13px;color:var(--text-dim);line-height:1.5}
+  .verify-option.skip{border-style:dashed}
+  .verify-option.skip .v-ic{background:var(--bg-3);color:var(--text-mute);border-color:var(--border)}
+
+  /* === SUCCESS === */
+  .success-wrap{text-align:center;padding:24px 16px}
+  .success-badge{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--p-2));color:var(--bg);font-size:38px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 0 40px var(--p-glow)}
+  body[data-path="vu"] .success-badge{background:linear-gradient(135deg,var(--v),var(--v-deep));box-shadow:0 0 40px var(--v-glow)}
+  .success-wrap h2{font-family:var(--fd);font-size:32px;font-weight:400;letter-spacing:-.02em;margin:0 0 10px;line-height:1.15}
+  .success-wrap p.dek{font-size:15px;color:var(--text-dim);max-width:440px;margin:0 auto 24px;line-height:1.55}
+
+  /* === MAP PREVIEW (Linh landing) === */
+  .map-preview{background:
+    radial-gradient(circle at 30% 30%,rgba(127,176,105,.25) 0,transparent 12%),
+    radial-gradient(circle at 60% 40%,rgba(184,148,255,.3) 0,transparent 10%),
+    radial-gradient(circle at 50% 70%,rgba(212,168,109,.28) 0,transparent 13%),
+    radial-gradient(circle at 75% 65%,rgba(127,176,105,.25) 0,transparent 10%),
+    radial-gradient(circle at 25% 75%,rgba(212,168,109,.22) 0,transparent 11%),
+    linear-gradient(155deg,#141316,#1e1a24);
+    aspect-ratio:16/10;border-radius:16px;position:relative;margin:16px 0 20px;border:1px solid var(--border-2);overflow:hidden}
+  .map-tooltip{position:absolute;top:16px;left:16px;right:16px;background:rgba(10,10,11,.85);backdrop-filter:blur(8px);padding:12px 16px;border-radius:10px;font-size:13px;color:var(--text-dim);text-align:center;border:1px solid var(--border-2)}
+  .map-tooltip strong{color:var(--text)}
+
+  /* === DASHBOARD (Chú Vũ landing) === */
+  .dashboard{padding:24px;background:var(--bg-2);border:1px solid var(--border);border-radius:16px;max-width:600px;margin:20px auto}
+  .dash-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+  .dash-header .avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--v),var(--v-deep));color:var(--bg);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:500;font-size:22px}
+  .dash-header .info strong{font-family:var(--fd);font-size:18px;font-weight:500;display:block;color:var(--text);letter-spacing:-.005em}
+  .dash-header .info small{font-size:12.5px;color:var(--text-mute)}
+  .badge-pending{background:var(--bg-3);color:var(--text-mute);padding:4px 10px;border-radius:999px;font-size:10.5px;font-weight:600;margin-left:auto;border:1px solid var(--border-2);text-transform:uppercase;letter-spacing:.08em}
+  .dash-title{font-size:11px;font-weight:600;color:var(--text-mute);margin-bottom:12px;text-transform:uppercase;letter-spacing:.12em}
+  .check-list{display:flex;flex-direction:column;gap:8px}
+  .check-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg-1);border-radius:12px;border:1px solid var(--border);transition:all .15s}
+  .check-item:hover{border-color:var(--v-soft)}
+  .check-item.done{background:rgba(127,176,105,.05);border-color:rgba(127,176,105,.2)}
+  .check-item .ci-box{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;border:1.5px solid var(--border-2);color:transparent}
+  .check-item.done .ci-box{background:var(--success);border-color:var(--success);color:var(--bg)}
+  .check-item .ci-txt{flex:1;font-size:14px;color:var(--text);font-weight:500}
+  .check-item.done .ci-txt{color:var(--text-mute);text-decoration:line-through}
+  .check-item .ci-skip{font-size:11.5px;color:var(--text-mute);background:transparent;border:0;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:inherit}
+  .check-item .ci-skip:hover{background:var(--bg-3);color:var(--text-dim)}
+  .dash-secondary{text-align:center;margin-top:22px;padding-top:18px;border-top:1px solid var(--border);font-size:13px;color:var(--text-mute)}
+  .dash-secondary a{color:var(--v);font-weight:500;border-bottom:1px solid var(--v-soft)}
+
+  /* === HELPER BUBBLE === */
+  .helper-bubble{position:fixed;bottom:24px;right:24px;background:var(--bg-2);border:1px solid var(--border-2);border-radius:14px;padding:12px 16px;box-shadow:0 10px 40px rgba(0,0,0,.4);display:none;align-items:center;gap:10px;font-size:13px;color:var(--text-dim);max-width:280px;z-index:50}
+  .helper-bubble.show{display:flex}
+  .helper-bubble .help-ic{width:34px;height:34px;border-radius:50%;background:var(--v);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;font-weight:700}
+  .helper-bubble strong{display:block;font-weight:600;color:var(--text);font-size:13.5px;margin-bottom:1px}
+  .helper-bubble small{font-size:11.5px;color:var(--text-mute)}
+
+  /* === OVERVIEW === */
+  .overview{max-width:960px;margin:40px auto;padding:0 24px 40px}
+  .overview h2{font-family:var(--fd);font-size:32px;font-weight:400;margin:0 0 8px;letter-spacing:-.015em}
+  .overview > p{color:var(--text-dim);margin:0 0 26px;font-size:15px;max-width:600px;line-height:1.55}
+  .path-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+  .path{background:var(--bg-2);border:1px solid var(--border);border-radius:16px;padding:22px 24px}
+  .path.linh{border-top:3px solid var(--p)}
+  .path.vu{border-top:3px solid var(--v)}
+  .path h3{font-family:var(--fd);font-size:19px;font-weight:500;margin:0 0 4px;letter-spacing:-.005em}
+  .path .sub{font-size:12px;color:var(--text-mute);margin-bottom:14px}
+  .path ol{list-style:none;padding:0;margin:0;counter-reset:step}
+  .path li{counter-increment:step;display:flex;gap:12px;padding:9px 10px 9px 8px;font-size:13.5px;color:var(--text-dim);cursor:pointer;align-items:center;border-radius:8px;margin-left:-8px;transition:background .15s}
+  .path li:hover{background:var(--bg-3);color:var(--text)}
+  .path li::before{content:counter(step);width:22px;height:22px;border-radius:50%;background:var(--bg-3);color:var(--text-dim);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .path.linh li::before{background:var(--p-soft);color:var(--p)}
+  .path.vu li::before{background:var(--v-soft);color:var(--v)}
+  .brand-swatch-card{background:var(--bg-2);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin-top:18px}
+  .brand-swatch-card h3{font-family:var(--fd);font-size:17px;font-weight:500;margin:0 0 8px;letter-spacing:-.005em}
+  .brand-swatch-card p{font-size:13px;color:var(--text-dim);margin:0 0 12px;line-height:1.55}
+  .sw-row{display:flex;gap:8px;flex-wrap:wrap}
+  .sw{width:38px;height:38px;border-radius:8px;border:1px solid var(--border)}
+  @media (max-width:780px){.path-row{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body data-path="linh">
+
+<header class="app">
+  <a class="logo" href="mapme-app.html"><svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="mapme" style="width:26px;height:26px;flex-shrink:0"><path d="M50 52 L88 31 L88 71 L50 92 Z" fill="#7B3FEB"/><path d="M12 31 L50 52 L50 92 L12 71 Z" fill="#A370F7"/><path d="M50 8 L88 31 L50 52 L12 31 Z" fill="#6E9834"/><path d="M50 8 Q70 16 88 31 Q66 24 50 32 Q34 24 12 31 Q30 16 50 8 Z" fill="#B6D86E"/><path d="M12 66 Q25 58 38 66 T62 66 T88 62" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg>map<em>me</em></a>
+  <span class="beta">BETA</span>
+  <div class="hdr-right">
+    <div class="lang-toggle" role="group">
+      <button class="active" data-lang="vi">VN</button>
+      <button data-lang="en">EN</button>
+    </div>
+    <button class="hdr-link" onclick="go('overview')" data-vi="Flow map" data-en="Flow map">Flow map</button>
+    <a class="hdr-link" href="mapme-app.html" data-vi="Về app" data-en="Back to app">Về app</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ WELCOME / FORK ============ -->
+<section class="screen active" id="welcome">
+  <div class="welcome">
+    <span class="kicker-chip" data-vi="mapme · signup" data-en="mapme · signup">mapme · signup</span>
+    <h1 data-vi="Chào mừng đến với <em>mapme</em>" data-en="Welcome to <em>mapme</em>">Chào mừng đến với <em>mapme</em></h1>
+    <p class="sub" data-vi="Bạn muốn bắt đầu như thế nào?" data-en="How would you like to begin?">Bạn muốn bắt đầu như thế nào?</p>
+    <div class="fork">
+      <a class="fork-card linh" href="#linh-auth">
+        <div class="fork-icon">🔍</div>
+        <h3 data-vi="Tôi muốn khám phá" data-en="I want to explore">Tôi muốn khám phá</h3>
+        <div class="en-alt" data-vi="Nhà thiết kế, nghiên cứu, du khách" data-en="Designers, researchers, curious travelers">Nhà thiết kế, nghiên cứu, du khách</div>
+        <p data-vi="Tìm làng nghề, chất liệu, nghệ nhân — lưu, học, liên hệ." data-en="Discover villages, materials, artisans — save, learn, reach out.">Tìm làng nghề, chất liệu, nghệ nhân — lưu, học, liên hệ.</p>
+        <div class="mini" data-vi="~ 60 giây · 2–3 bước" data-en="~ 60 seconds · 2–3 steps">~ 60 giây · 2–3 bước</div>
+      </a>
+
+      <a class="fork-card vu" href="#vu-auth">
+        <div class="fork-icon">🏛️</div>
+        <h3 data-vi="Tôi có một nơi cần đăng ký" data-en="I have a place to add">Tôi có một nơi cần đăng ký</h3>
+        <div class="en-alt" data-vi="Nghệ nhân, chủ xưởng, làng nghề" data-en="Artisans, workshop owners, craft villages">Nghệ nhân, chủ xưởng, làng nghề</div>
+        <p data-vi="Đăng ký — xác minh — kết nối sản phẩm từ Shopee, Lazada, hoặc trang web của bạn." data-en="Register — verify — link products from Shopee, Lazada, or your website.">Đăng ký — xác minh — kết nối sản phẩm từ Shopee, Lazada, hoặc trang web của bạn.</p>
+        <div class="mini" data-vi="~ 10–15 phút · 5–7 bước" data-en="~ 10–15 min · 5–7 steps">~ 10–15 phút · 5–7 bước</div>
+      </a>
+    </div>
+    <p class="login-hint"><span data-vi="Đã có tài khoản?" data-en="Already have an account?">Đã có tài khoản?</span> <a href="#welcome" data-vi="Đăng nhập" data-en="Log in">Đăng nhập</a></p>
+  </div>
+</section>
+
+<!-- ============ LINH STEP 1: AUTH ============ -->
+<section class="screen" id="linh-auth">
+  <div class="progress-bar"><div class="step current"></div><div class="step"></div><div class="step"></div></div>
+  <button class="back-link" onclick="go('welcome')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Đăng nhập để bắt đầu" data-en="Sign in to start">Đăng nhập để bắt đầu</h2>
+    <p class="dek" data-vi="Dùng tài khoản có sẵn để vào nhanh, không cần tạo mật khẩu mới." data-en="Use an existing account — no new password required.">Dùng tài khoản có sẵn để vào nhanh, không cần tạo mật khẩu mới.</p>
+
+    <button class="btn oauth full" onclick="go('linh-role')" style="margin-bottom:10px">
+      <span class="oauth-icon" style="background:#fff;color:#000;border:1px solid rgba(255,255,255,.2);font-size:14px">G</span>
+      <span data-vi="Tiếp tục với Google" data-en="Continue with Google">Tiếp tục với Google</span>
+    </button>
+    <button class="btn oauth full" onclick="go('linh-role')" style="margin-bottom:10px">
+      <span class="oauth-icon" style="background:#fff;color:#000">🍎</span>
+      <span data-vi="Tiếp tục với Apple" data-en="Continue with Apple">Tiếp tục với Apple</span>
+    </button>
+
+    <div class="divider" data-vi="hoặc" data-en="or">hoặc</div>
+
+    <button class="btn outline full" onclick="go('linh-role')" data-vi="Dùng email" data-en="Use email instead">Dùng email</button>
+
+    <p style="font-size:11.5px;color:var(--text-mute);text-align:center;margin:24px 0 0;line-height:1.55">
+      <span data-vi="Khi tiếp tục, bạn đồng ý với" data-en="By continuing, you agree to our">Khi tiếp tục, bạn đồng ý với</span>
+      <a href="#" style="color:var(--text-dim);border-bottom:1px solid var(--border)"><span data-vi="Điều khoản" data-en="Terms">Điều khoản</span></a>
+      <span data-vi="và" data-en="and">và</span>
+      <a href="#" style="color:var(--text-dim);border-bottom:1px solid var(--border)"><span data-vi="Chính sách bảo mật" data-en="Privacy policy">Chính sách bảo mật</span></a>.
+    </p>
+  </div>
+</section>
+
+<!-- ============ LINH STEP 2: ROLE ============ -->
+<section class="screen" id="linh-role">
+  <div class="progress-bar"><div class="step done"></div><div class="step current"></div><div class="step"></div></div>
+  <button class="back-link" onclick="go('linh-auth')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Điều gì đưa bạn đến mapme?" data-en="What brings you to mapme?">Điều gì đưa bạn đến mapme?</h2>
+    <p class="dek" data-vi="Chúng tôi sẽ hiển thị nội dung phù hợp với bạn. Có thể đổi sau." data-en="We'll show content that fits you. You can change this later.">Chúng tôi sẽ hiển thị nội dung phù hợp với bạn. Có thể đổi sau.</p>
+
+    <div class="role-grid">
+      <button class="role-opt" onclick="selectRole(this)">
+        <div class="ro-ic">🎨</div>
+        <div class="ro-t" data-vi="Nhà thiết kế / Sáng tạo" data-en="Designer / Creative">Nhà thiết kế / Sáng tạo</div>
+        <div class="ro-s" data-vi="Sản phẩm, nội thất, thời trang" data-en="Product, interior, fashion">Sản phẩm, nội thất, thời trang</div>
+      </button>
+      <button class="role-opt" onclick="selectRole(this)">
+        <div class="ro-ic">📚</div>
+        <div class="ro-t" data-vi="Nhà nghiên cứu / Sinh viên" data-en="Researcher / Student">Nhà nghiên cứu / Sinh viên</div>
+        <div class="ro-s" data-vi="Điền dã, luận án, dự án" data-en="Fieldwork, thesis, projects">Điền dã, luận án, dự án</div>
+      </button>
+      <button class="role-opt" onclick="selectRole(this)">
+        <div class="ro-ic">🎒</div>
+        <div class="ro-t" data-vi="Khách du lịch tò mò" data-en="Curious traveler">Khách du lịch tò mò</div>
+        <div class="ro-s" data-vi="Khám phá làng nghề, văn hóa" data-en="Explore villages, culture">Khám phá làng nghề, văn hóa</div>
+      </button>
+      <button class="role-opt" onclick="selectRole(this)">
+        <div class="ro-ic">✨</div>
+        <div class="ro-t" data-vi="Khác" data-en="Something else">Khác</div>
+        <div class="ro-s" data-vi="Nhà báo, giáo viên, người yêu thủ công" data-en="Journalist, teacher, craft lover">Nhà báo, giáo viên, người yêu thủ công</div>
+      </button>
+    </div>
+
+    <button class="btn primary full" onclick="go('linh-interests')" data-vi="Tiếp tục" data-en="Continue">Tiếp tục</button>
+    <div class="skip-row"><button class="skip-link" onclick="go('linh-interests')" data-vi="Để sau" data-en="Skip for now">Để sau</button></div>
+  </div>
+</section>
+
+<!-- ============ LINH STEP 3: INTERESTS ============ -->
+<section class="screen" id="linh-interests">
+  <div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step current"></div></div>
+  <button class="back-link" onclick="go('linh-role')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Bạn quan tâm điều gì?" data-en="What interests you?">Bạn quan tâm điều gì?</h2>
+    <p class="dek" data-vi="Chọn bất cứ điều gì bạn muốn khám phá — bản đồ sẽ lọc theo lựa chọn." data-en="Pick anything you'd like to explore — the map will filter by your choices.">Chọn bất cứ điều gì bạn muốn khám phá — bản đồ sẽ lọc theo lựa chọn.</p>
+
+    <div class="field">
+      <label data-vi="Chất liệu" data-en="Materials">Chất liệu</label>
+      <div class="chips">
+        <button class="chip" onclick="toggleChip(this)">🎋 <span data-vi="Tre" data-en="Bamboo">Tre</span></button>
+        <button class="chip" onclick="toggleChip(this)">🧵 <span data-vi="Lụa" data-en="Silk">Lụa</span></button>
+        <button class="chip" onclick="toggleChip(this)">🎨 <span data-vi="Sơn mài" data-en="Lacquer">Sơn mài</span></button>
+        <button class="chip" onclick="toggleChip(this)">🌿 <span data-vi="Mây" data-en="Rattan">Mây</span></button>
+        <button class="chip" onclick="toggleChip(this)">🌾 <span data-vi="Cói" data-en="Sedge">Cói</span></button>
+        <button class="chip" onclick="toggleChip(this)">🏺 <span data-vi="Gốm" data-en="Ceramics">Gốm</span></button>
+        <button class="chip" onclick="toggleChip(this)">🪵 <span data-vi="Gỗ" data-en="Wood">Gỗ</span></button>
+        <button class="chip" onclick="toggleChip(this)">🌺 <span data-vi="Nhuộm tự nhiên" data-en="Natural dyes">Nhuộm tự nhiên</span></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label data-vi="Vùng miền" data-en="Regions">Vùng miền</label>
+      <div class="chips">
+        <button class="chip" onclick="toggleChip(this)"><span data-vi="Miền Bắc" data-en="North">Miền Bắc</span></button>
+        <button class="chip" onclick="toggleChip(this)"><span data-vi="Miền Trung" data-en="Central">Miền Trung</span></button>
+        <button class="chip" onclick="toggleChip(this)"><span data-vi="Miền Nam" data-en="South">Miền Nam</span></button>
+      </div>
+    </div>
+
+    <button class="btn primary full" onclick="go('linh-success')" data-vi="Đi đến bản đồ" data-en="Go to the map">Đi đến bản đồ</button>
+    <div class="skip-row"><button class="skip-link" onclick="go('linh-success')" data-vi="Bỏ qua — lọc sau" data-en="Skip — filter later">Bỏ qua — lọc sau</button></div>
+  </div>
+</section>
+
+<!-- ============ LINH SUCCESS ============ -->
+<section class="screen" id="linh-success">
+  <div class="card wide">
+    <div class="success-wrap">
+      <div class="success-badge">✓</div>
+      <h2 data-vi="Chào mừng! Bản đồ của bạn đã sẵn sàng." data-en="Welcome! Your map is ready.">Chào mừng! Bản đồ của bạn đã sẵn sàng.</h2>
+      <p class="dek" data-vi="Chạm vào điểm đánh dấu để khám phá. Lưu lại những nơi bạn thích." data-en="Tap any pin to explore. Save your favorites.">Chạm vào điểm đánh dấu để khám phá. Lưu lại những nơi bạn thích.</p>
+    </div>
+
+    <div class="map-preview">
+      <div class="map-tooltip">
+        <span data-vi="Ở đây là" data-en="Here are">Ở đây là</span>
+        <strong> 5 <span data-vi="làng nghề" data-en="villages">làng nghề</span> </strong>
+        <span data-vi="phù hợp với bạn — chạm vào để xem chi tiết" data-en="matching your interests — tap to explore">phù hợp với bạn — chạm vào để xem chi tiết</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <a class="btn primary full" href="mapme-prototype.html" data-vi="Mở bản đồ" data-en="Open map">Mở bản đồ</a>
+      <a class="btn outline full" href="mapme-app.html#community" data-vi="Xem Community Mode" data-en="Browse Community Mode">Xem Community Mode</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CHÚ VŨ PATH ========== -->
+
+<!-- ============ VU STEP 1: AUTH ============ -->
+<section class="screen" id="vu-auth">
+  <div class="progress-bar"><div class="step current"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
+  <button class="back-link" onclick="go('welcome')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Đăng ký xưởng của bạn" data-en="Register your workshop">Đăng ký xưởng của bạn</h2>
+    <p class="dek" data-vi="Đưa nghề truyền thống của bạn đến với thế giới. Chọn cách đăng nhập dễ nhất cho bạn." data-en="Bring your traditional craft to the world. Pick whichever sign-in is easiest.">Đưa nghề truyền thống của bạn đến với thế giới. Chọn cách đăng nhập dễ nhất cho bạn.</p>
+
+    <button class="btn zalo artisan full" onclick="go('vu-search')" style="margin-bottom:12px">
+      💬 <span data-vi="Đăng nhập bằng Zalo" data-en="Sign in with Zalo">Đăng nhập bằng Zalo</span>
+    </button>
+    <button class="btn outline artisan full" onclick="go('vu-search')" style="margin-bottom:12px">
+      📱 <span data-vi="Đăng nhập bằng số điện thoại" data-en="Sign in with phone">Đăng nhập bằng số điện thoại</span>
+    </button>
+    <button class="btn outline artisan full" onclick="go('vu-search')">
+      ✉️ <span data-vi="Đăng nhập bằng email" data-en="Sign in with email">Đăng nhập bằng email</span>
+    </button>
+
+    <div style="margin-top:22px;padding:14px 16px;background:var(--v-soft);border:1px solid rgba(212,168,109,.3);border-radius:12px;font-size:13px;color:var(--text-dim);line-height:1.55">
+      <strong style="color:var(--v);font-weight:600">💡 <span data-vi="Cần hỗ trợ?" data-en="Need help?">Cần hỗ trợ?</span></strong>
+      <span data-vi="Gọi đường dây hỗ trợ hoặc để con/cháu giúp bạn đăng ký." data-en="Call our support line — or let a family member help you sign up."> Gọi đường dây hỗ trợ hoặc để con/cháu giúp bạn đăng ký.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VU STEP 2: SEARCH ============ -->
+<section class="screen" id="vu-search">
+  <div class="progress-bar"><div class="step done"></div><div class="step current"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
+  <button class="back-link" onclick="go('vu-auth')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Xưởng của bạn đã có trên mapme chưa?" data-en="Is your workshop already on mapme?">Xưởng của bạn đã có trên mapme chưa?</h2>
+    <p class="dek" data-vi="Tìm kiếm trước khi thêm — để tránh trùng lặp và giữ tên xưởng của bạn." data-en="Search first — to avoid duplicates and protect your workshop's name.">Tìm kiếm trước khi thêm — để tránh trùng lặp và giữ tên xưởng của bạn.</p>
+
+    <div class="search-input">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.35-4.35"/></svg>
+      <input id="vuSearch" placeholder="Chiếu Long Định" oninput="searchListings(this.value)" />
+      <button class="go" data-vi="Tìm" data-en="Search">Tìm</button>
+    </div>
+
+    <div class="search-results" id="searchResults">
+      <div class="search-result" onclick="go('vu-info')">
+        <div class="thumb"></div>
+        <div class="info">
+          <div class="name">Chiếu Long Định</div>
+          <div class="addr">Long Cang · Long An · <span data-vi="chưa được xác nhận" data-en="unclaimed">chưa được xác nhận</span></div>
+        </div>
+        <div class="action" data-vi="Đây là của tôi" data-en="Claim">Đây là của tôi</div>
+      </div>
+      <div class="search-result">
+        <div class="thumb"></div>
+        <div class="info">
+          <div class="name">Chiếu Long Hòa</div>
+          <div class="addr">Long Cang · Long An</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn outline artisan full" onclick="go('vu-info')" data-vi="Không tìm thấy — Thêm xưởng mới" data-en="Can't find it — Add a new workshop">Không tìm thấy — Thêm xưởng mới</button>
+  </div>
+</section>
+
+<!-- ============ VU STEP 3: BUSINESS INFO ============ -->
+<section class="screen" id="vu-info">
+  <div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step current"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
+  <button class="back-link" onclick="go('vu-search')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Cho chúng tôi biết về xưởng của bạn" data-en="Tell us about your workshop">Cho chúng tôi biết về xưởng của bạn</h2>
+    <p class="dek" data-vi="Những thông tin cơ bản — có thể sửa sau." data-en="Basic info — you can edit later.">Những thông tin cơ bản — có thể sửa sau.</p>
+
+    <div class="field artisan">
+      <label data-vi="Xưởng của bạn tên gì?" data-en="What is your workshop's name?">Xưởng của bạn tên gì?</label>
+      <input class="input" value="Chiếu Long Định" />
+    </div>
+
+    <div class="field artisan">
+      <label data-vi="Bạn làm gì?" data-en="What do you make?">Bạn làm gì?</label>
+      <div class="craft-grid">
+        <button class="craft-opt selected" onclick="selectCraft(this)"><span class="c-ic">🌾</span><span class="c-txt" data-vi="Dệt chiếu cói" data-en="Sedge mats">Dệt chiếu cói</span></button>
+        <button class="craft-opt" onclick="selectCraft(this)"><span class="c-ic">🎋</span><span class="c-txt" data-vi="Đan lát tre" data-en="Bamboo weaving">Đan lát tre</span></button>
+        <button class="craft-opt" onclick="selectCraft(this)"><span class="c-ic">🧵</span><span class="c-txt" data-vi="Dệt lụa" data-en="Silk weaving">Dệt lụa</span></button>
+        <button class="craft-opt" onclick="selectCraft(this)"><span class="c-ic">🏺</span><span class="c-txt" data-vi="Gốm sứ" data-en="Ceramics">Gốm sứ</span></button>
+        <button class="craft-opt" onclick="selectCraft(this)"><span class="c-ic">🎨</span><span class="c-txt" data-vi="Sơn mài" data-en="Lacquer">Sơn mài</span></button>
+        <button class="craft-opt" onclick="selectCraft(this)"><span class="c-ic">✨</span><span class="c-txt" data-vi="Khác" data-en="Other">Khác</span></button>
+      </div>
+    </div>
+
+    <div class="field artisan">
+      <label data-vi="Giới thiệu ngắn (tùy chọn)" data-en="Short tagline (optional)">Giới thiệu ngắn (tùy chọn)</label>
+      <input class="input" placeholder="Ví dụ: Chiếu cói thủ công — 3 đời giữ nghề Long Cang" />
+    </div>
+
+    <button class="btn primary artisan full" onclick="go('vu-location')" data-vi="Tiếp tục" data-en="Continue">Tiếp tục</button>
+  </div>
+</section>
+
+<!-- ============ VU STEP 4: LOCATION ============ -->
+<section class="screen" id="vu-location">
+  <div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step current"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
+  <button class="back-link" onclick="go('vu-info')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Xưởng của bạn ở đâu?" data-en="Where is your workshop?">Xưởng của bạn ở đâu?</h2>
+    <p class="dek" data-vi="Chọn vị trí trên bản đồ và nhập địa chỉ đầy đủ. Vị trí chính xác giúp khách hàng và du khách tìm đến bạn." data-en="Pick a point on the map and enter your full address. An accurate location helps customers and travelers find you.">Chọn vị trí trên bản đồ và nhập địa chỉ đầy đủ.</p>
+
+    <div class="location-mock">
+      <div class="loc-hint" data-vi="Kéo và thả để điều chỉnh vị trí chính xác" data-en="Drag to adjust the exact pin location">Kéo và thả để điều chỉnh vị trí chính xác</div>
+    </div>
+
+    <div class="field artisan">
+      <label data-vi="Địa chỉ đầy đủ" data-en="Full address">Địa chỉ đầy đủ</label>
+      <input class="input" value="Ấp 3, Xã Long Cang, Huyện Cần Đước, Long An" />
+      <div class="hint" data-vi="Đặt địa chỉ ở cấp thôn/ấp nếu có — dễ tìm nhất" data-en="Use hamlet-level detail if possible — easiest to find">Đặt địa chỉ ở cấp thôn/ấp nếu có — dễ tìm nhất</div>
+    </div>
+
+    <button class="btn primary artisan full" onclick="go('vu-story')" data-vi="Tiếp tục" data-en="Continue">Tiếp tục</button>
+  </div>
+</section>
+
+<!-- ============ VU STEP 5: STORY ============ -->
+<section class="screen" id="vu-story">
+  <div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step current"></div><div class="step"></div><div class="step"></div></div>
+  <button class="back-link" onclick="go('vu-location')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Kể câu chuyện của bạn" data-en="Tell your story">Kể câu chuyện của bạn</h2>
+    <p class="dek" data-vi="Thêm ảnh, kể về xưởng của bạn, và để mọi người biết cách liên hệ." data-en="Add photos, tell people about your workshop, and let them know how to reach you.">Thêm ảnh, kể về xưởng của bạn, và để mọi người biết cách liên hệ.</p>
+
+    <div class="field artisan">
+      <label data-vi="Ảnh xưởng (1–10 ảnh)" data-en="Workshop photos (1–10)">Ảnh xưởng (1–10 ảnh)</label>
+      <div class="photo-grid">
+        <div class="photo-slot has"></div>
+        <div class="photo-slot has"></div>
+        <div class="photo-slot has"></div>
+        <div class="photo-slot">📷</div>
+        <div class="photo-slot">+</div>
+        <div class="photo-slot">+</div>
+      </div>
+      <div class="hint" data-vi="Nên có: sản phẩm, người đang làm, không gian xưởng" data-en="Recommended: products, people at work, workshop space">Nên có: sản phẩm, người đang làm, không gian xưởng</div>
+    </div>
+
+    <div class="field artisan">
+      <label data-vi="Câu chuyện xưởng của bạn" data-en="Your workshop's story">Câu chuyện xưởng của bạn</label>
+      <textarea placeholder="Xưởng Chiếu Long Định được ông cố tôi khởi dựng những năm 1950..."></textarea>
+      <div class="voice-rec">
+        <div class="mic">🎤</div>
+        <div class="v-text">
+          <strong data-vi="Ghi âm thay vì viết" data-en="Record instead of type">Ghi âm thay vì viết</strong>
+          <small data-vi="Dễ hơn — tự động chuyển thành văn bản" data-en="Easier — auto-transcribed">Dễ hơn — tự động chuyển thành văn bản</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="field artisan">
+      <label data-vi="Liên hệ" data-en="Contact">Liên hệ</label>
+      <input class="input" placeholder="📞 Số điện thoại" value="0903 xxx xxx" style="margin-bottom:8px" />
+      <input class="input" placeholder="💬 Zalo" value="0903xxxxxx" style="margin-bottom:8px" />
+      <input class="input" placeholder="🌐 Website (tùy chọn)" value="chieulongdinh.vn" />
+    </div>
+
+    <button class="btn primary artisan full" onclick="go('vu-products')" data-vi="Tiếp tục" data-en="Continue">Tiếp tục</button>
+  </div>
+</section>
+
+<!-- ============ VU STEP 6: PRODUCTS ============ -->
+<section class="screen" id="vu-products">
+  <div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step current"></div><div class="step"></div></div>
+  <button class="back-link" onclick="go('vu-story')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Kết nối sản phẩm (tùy chọn)" data-en="Link your products (optional)">Kết nối sản phẩm (tùy chọn)</h2>
+    <p class="dek" data-vi="Nếu bạn đã bán trên Shopee, Lazada, hoặc có trang web — mapme có thể tự hiển thị sản phẩm. Không cần tải lại." data-en="If you already sell on Shopee, Lazada, or have a website — mapme auto-displays your products. No re-upload.">Nếu bạn đã bán trên Shopee, Lazada, hoặc có trang web — mapme có thể tự hiển thị sản phẩm. Không cần tải lại.</p>
+
+    <div class="integ-grid">
+      <button class="integ-card" onclick="selectIntegration(this)">
+        <div class="integ-ic">🛍️</div>
+        <div>
+          <div class="integ-txt" data-vi="Kết nối Shopee" data-en="Connect Shopee">Kết nối Shopee</div>
+          <div class="integ-sub" data-vi="Tự đồng bộ mỗi ngày" data-en="Auto-sync daily">Tự đồng bộ mỗi ngày</div>
+        </div>
+      </button>
+      <button class="integ-card" onclick="selectIntegration(this)">
+        <div class="integ-ic">🛒</div>
+        <div>
+          <div class="integ-txt" data-vi="Kết nối Lazada" data-en="Connect Lazada">Kết nối Lazada</div>
+          <div class="integ-sub" data-vi="Tự đồng bộ mỗi ngày" data-en="Auto-sync daily">Tự đồng bộ mỗi ngày</div>
+        </div>
+      </button>
+      <button class="integ-card" onclick="selectIntegration(this)">
+        <div class="integ-ic">🌐</div>
+        <div>
+          <div class="integ-txt" data-vi="Thêm trang web" data-en="Add your website">Thêm trang web</div>
+          <div class="integ-sub" data-vi="Dán link — tự lấy thông tin" data-en="Paste link — auto-fetch">Dán link — tự lấy thông tin</div>
+        </div>
+      </button>
+      <button class="integ-card" onclick="selectIntegration(this)">
+        <div class="integ-ic">✍️</div>
+        <div>
+          <div class="integ-txt" data-vi="Thêm sản phẩm thủ công" data-en="Add products manually">Thêm sản phẩm thủ công</div>
+          <div class="integ-sub" data-vi="Nếu chưa bán online" data-en="If not selling online yet">Nếu chưa bán online yet</div>
+        </div>
+      </button>
+    </div>
+
+    <button class="btn primary artisan full" onclick="go('vu-verify')" data-vi="Tiếp tục" data-en="Continue">Tiếp tục</button>
+    <div class="skip-row"><button class="skip-link" onclick="go('vu-verify')" data-vi="Để sau" data-en="Skip for now">Để sau</button></div>
+  </div>
+</section>
+
+<!-- ============ VU STEP 7: VERIFICATION ============ -->
+<section class="screen" id="vu-verify">
+  <div class="progress-bar"><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step done"></div><div class="step current"></div></div>
+  <button class="back-link" onclick="go('vu-products')">← <span data-vi="Quay lại" data-en="Back">Quay lại</span></button>
+  <div class="card">
+    <h2 data-vi="Nhận huy hiệu uy tín" data-en="Get your trust badge">Nhận huy hiệu uy tín</h2>
+    <p class="dek" data-vi="Xưởng đã xác minh được ưu tiên hiển thị — dễ được tìm thấy, tin tưởng hơn." data-en="Verified workshops get priority visibility — easier to find, more trusted.">Xưởng đã xác minh được ưu tiên hiển thị — dễ được tìm thấy, tin tưởng hơn.</p>
+
+    <button class="verify-option" onclick="go('vu-dashboard')">
+      <div class="v-ic">📄</div>
+      <div>
+        <h4 data-vi="Tải lên giấy tờ đăng ký" data-en="Upload business registration">Tải lên giấy tờ đăng ký</h4>
+        <p data-vi="Chụp ảnh giấy phép kinh doanh hoặc chứng nhận làng nghề. Xét duyệt 1–3 ngày." data-en="Photo of business license or craft village certificate. Reviewed in 1–3 days.">Chụp ảnh giấy phép kinh doanh hoặc chứng nhận làng nghề. Xét duyệt 1–3 ngày.</p>
+      </div>
+    </button>
+
+    <button class="verify-option" onclick="go('vu-dashboard')">
+      <div class="v-ic">🏘️</div>
+      <div>
+        <h4 data-vi="Xin xác nhận từ làng nghề" data-en="Request village authority confirmation">Xin xác nhận từ làng nghề</h4>
+        <p data-vi="mapme liên hệ với lãnh đạo làng/xã của bạn để xác nhận. Không cần giấy tờ." data-en="mapme contacts your village/commune leader to confirm. No paperwork needed.">mapme liên hệ với lãnh đạo làng/xã của bạn để xác nhận. Không cần giấy tờ.</p>
+      </div>
+    </button>
+
+    <button class="verify-option skip" onclick="go('vu-dashboard')">
+      <div class="v-ic">⏱</div>
+      <div>
+        <h4 data-vi="Để sau — tiếp tục với huy hiệu chờ" data-en="Skip for now — continue with pending badge">Để sau — tiếp tục với huy hiệu chờ</h4>
+        <p data-vi="Xưởng vẫn hiển thị nhưng có nhãn 'Chưa xác minh'. Có thể nâng cấp bất kỳ lúc nào." data-en="Workshop is visible with 'Unverified' label. You can upgrade anytime.">Xưởng vẫn hiển thị nhưng có nhãn 'Chưa xác minh'. Có thể nâng cấp bất kỳ lúc nào.</p>
+      </div>
+    </button>
+  </div>
+</section>
+
+<!-- ============ VU DASHBOARD ============ -->
+<section class="screen" id="vu-dashboard">
+  <div class="success-wrap" style="padding-top:32px">
+    <div class="success-badge">✓</div>
+    <h2 data-vi="Xưởng của bạn đã sẵn sàng!" data-en="Your workshop is ready!">Xưởng của bạn đã sẵn sàng!</h2>
+    <p class="dek" data-vi="Còn vài việc nhỏ để xưởng trở nên hoàn chỉnh. Mỗi bước đều có thể để sau." data-en="A few small tasks left to complete your listing. Each can be done later.">Còn vài việc nhỏ để xưởng trở nên hoàn chỉnh. Mỗi bước đều có thể để sau.</p>
+  </div>
+
+  <div class="dashboard">
+    <div class="dash-header">
+      <div class="avatar">V</div>
+      <div class="info">
+        <strong>Chiếu Long Định</strong>
+        <small>Long Cang · Long An · Dệt chiếu cói</small>
+      </div>
+      <span class="badge-pending" data-vi="Đang chờ" data-en="Pending">Đang chờ</span>
+    </div>
+
+    <div class="dash-title" data-vi="Hoàn tất hồ sơ xưởng của bạn" data-en="Complete your workshop profile">Hoàn tất hồ sơ xưởng của bạn</div>
+
+    <div class="check-list">
+      <div class="check-item done"><div class="ci-box">✓</div><div class="ci-txt" data-vi="Đã tạo tài khoản" data-en="Account created">Đã tạo tài khoản</div></div>
+      <div class="check-item done"><div class="ci-box">✓</div><div class="ci-txt" data-vi="Đã nhập thông tin cơ bản" data-en="Basic info added">Đã nhập thông tin cơ bản</div></div>
+      <div class="check-item done"><div class="ci-box">✓</div><div class="ci-txt" data-vi="Đã đánh dấu vị trí" data-en="Location pinned">Đã đánh dấu vị trí</div></div>
+      <div class="check-item"><div class="ci-box"></div><div class="ci-txt" data-vi="Thêm ảnh xưởng" data-en="Add workshop photos">Thêm ảnh xưởng</div><button class="ci-skip" data-vi="Để sau" data-en="Skip">Để sau</button></div>
+      <div class="check-item"><div class="ci-box"></div><div class="ci-txt" data-vi="Viết câu chuyện của bạn" data-en="Write your story">Viết câu chuyện của bạn</div><button class="ci-skip" data-vi="Để sau" data-en="Skip">Để sau</button></div>
+      <div class="check-item"><div class="ci-box"></div><div class="ci-txt" data-vi="Kết nối sản phẩm (Shopee / Lazada / website)" data-en="Connect products (Shopee / Lazada / website)">Kết nối sản phẩm (Shopee / Lazada / website)</div><button class="ci-skip" data-vi="Để sau" data-en="Skip">Để sau</button></div>
+      <div class="check-item"><div class="ci-box"></div><div class="ci-txt" data-vi="Gửi xác minh" data-en="Submit for verification">Gửi xác minh</div><button class="ci-skip" data-vi="Để sau" data-en="Skip">Để sau</button></div>
+    </div>
+
+    <div class="dash-secondary">
+      <span data-vi="Bạn có thể về trang chính hoặc tiếp tục làm sau." data-en="You can go to the main site or continue later.">Bạn có thể về trang chính hoặc tiếp tục làm sau.</span>
+      <br><a href="mapme-app.html" data-vi="Về trang chính mapme →" data-en="Go to mapme homepage →">Về trang chính mapme →</a>
+    </div>
+  </div>
+
+  <div class="helper-bubble show">
+    <div class="help-ic">?</div>
+    <div>
+      <strong data-vi="Cần hỗ trợ?" data-en="Need help?">Cần hỗ trợ?</strong>
+      <small data-vi="Gọi 1900-xxxx miễn phí" data-en="Free call 1900-xxxx">Gọi 1900-xxxx miễn phí</small>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OVERVIEW ============ -->
+<section class="screen" id="overview">
+  <div class="overview">
+    <button class="back-link" onclick="go('welcome')">← <span data-vi="Quay lại welcome" data-en="Back to welcome">Quay lại welcome</span></button>
+    <h2 data-vi="Sơ đồ luồng đăng ký" data-en="Signup flow overview">Sơ đồ luồng đăng ký</h2>
+    <p data-vi="Hai đường dẫn người dùng. Nhấp vào bất kỳ bước nào để nhảy thẳng đến màn hình đó." data-en="Two user paths. Click any step to jump directly to that screen.">Hai đường dẫn người dùng. Nhấp vào bất kỳ bước nào để nhảy thẳng đến màn hình đó.</p>
+
+    <div class="path-row">
+      <div class="path linh">
+        <h3 data-vi="Linh — Explorer" data-en="Linh — Explorer">Linh — Explorer</h3>
+        <p class="sub" data-vi="~ 60 giây · Google/Apple auth · không cần xác minh" data-en="~ 60 seconds · Google/Apple auth · no verification">~ 60 giây · Google/Apple auth · không cần xác minh</p>
+        <ol>
+          <li onclick="go('welcome')">Welcome · fork chooser</li>
+          <li onclick="go('linh-auth')">Auth (Google / Apple / Email)</li>
+          <li onclick="go('linh-role')">Role selection</li>
+          <li onclick="go('linh-interests')">Interests picker</li>
+          <li onclick="go('linh-success')">Success → Map view</li>
+        </ol>
+      </div>
+
+      <div class="path vu">
+        <h3 data-vi="Chú Vũ — Place Owner" data-en="Chú Vũ — Place Owner">Chú Vũ — Place Owner</h3>
+        <p class="sub" data-vi="~ 10–15 phút · Zalo auth · xác minh có phần thưởng" data-en="~ 10–15 min · Zalo auth · verification rewarded">~ 10–15 phút · Zalo auth · xác minh có phần thưởng</p>
+        <ol>
+          <li onclick="go('welcome')">Welcome · fork chooser</li>
+          <li onclick="go('vu-auth')">Auth (Zalo / Phone / Email)</li>
+          <li onclick="go('vu-search')">Search existing listings</li>
+          <li onclick="go('vu-info')">Business info</li>
+          <li onclick="go('vu-location')">Location + address</li>
+          <li onclick="go('vu-story')">Story, photos, contact</li>
+          <li onclick="go('vu-products')">Product linking</li>
+          <li onclick="go('vu-verify')">Verification</li>
+          <li onclick="go('vu-dashboard')">Dashboard + checklist</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="brand-swatch-card">
+      <h3 data-vi="Brand đã căn chỉnh với mapme" data-en="Brand aligned with mapme">Brand đã căn chỉnh với mapme</h3>
+      <p data-vi="Dark theme (matches app). Fraunces cho heading, Manrope cho UI. Logo 'mapme' chữ thường với dấu chấm tím. Linh path dùng purple accent (mapme default). Chú Vũ path dùng copper accent (heritage)." data-en="Dark theme (matches the app). Fraunces for headings, Manrope for UI. 'mapme' lowercase logo with purple dot. Linh path uses purple (default mapme accent). Chú Vũ path uses copper (heritage).">Dark theme (matches app). Fraunces cho heading, Manrope cho UI. Logo 'mapme' chữ thường với dấu chấm tím. Linh path dùng purple accent (mapme default). Chú Vũ path dùng copper accent (heritage).</p>
+      <div class="sw-row">
+        <div class="sw" style="background:var(--p)" title="Linh purple #b894ff"></div>
+        <div class="sw" style="background:var(--v)" title="Chú Vũ copper #d4a86d"></div>
+        <div class="sw" style="background:var(--success)" title="Success #7fb069"></div>
+        <div class="sw" style="background:var(--bg)" title="bg"></div>
+        <div class="sw" style="background:var(--bg-2)" title="bg-2"></div>
+        <div class="sw" style="background:var(--bg-3)" title="bg-3"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+  const SCREENS = ['welcome','linh-auth','linh-role','linh-interests','linh-success','vu-auth','vu-search','vu-info','vu-location','vu-story','vu-products','vu-verify','vu-dashboard','overview'];
+
+  function go(id){
+    if(!SCREENS.includes(id)) id='welcome';
+    location.hash = id==='welcome' ? '' : id;
+  }
+
+  function render(){
+    const h = (location.hash||'').replace('#','') || 'welcome';
+    const target = SCREENS.includes(h) ? h : 'welcome';
+    document.querySelectorAll('main > section.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(target).classList.add('active');
+    // Switch body data-path for color theming
+    const isVu = target.startsWith('vu-');
+    const isLinh = target.startsWith('linh-');
+    document.body.setAttribute('data-path', isVu ? 'vu' : 'linh');
+    window.scrollTo({top:0,behavior:'instant'});
+  }
+  window.addEventListener('hashchange', render);
+
+  document.querySelectorAll('.lang-toggle button').forEach(b=>{
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.lang-toggle button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      const lang = b.dataset.lang;
+      document.querySelectorAll('[data-vi]').forEach(el => {
+        const t = el.getAttribute(lang === 'vi' ? 'data-vi' : 'data-en');
+        if (t !== null && t !== '') el.innerHTML = t;
+      });
+    });
+  });
+
+  function toggleChip(el){ el.classList.toggle('selected'); }
+  function selectRole(el){
+    el.parentElement.querySelectorAll('.role-opt').forEach(x=>x.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  function selectCraft(el){
+    el.parentElement.querySelectorAll('.craft-opt').forEach(x=>x.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  function selectIntegration(el){ el.classList.toggle('selected'); }
+  function searchListings(q){
+    const wrap = document.getElementById('searchResults');
+    if (!q) { wrap.style.display='block'; return; }
+    wrap.style.display = q.toLowerCase().includes('long') ? 'block' : 'none';
+  }
+
+  render();
+</script>
+
+</body>
+</html>

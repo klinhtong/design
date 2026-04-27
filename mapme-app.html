@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>mapme — Geo-intelligence for the Mekong</title>
+<meta name="description" content="mapme · Bản đồ Mekong · Từ dữ liệu khoa học đến câu chuyện cộng đồng." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+  :root{
+    --bg:#0a0a0b;
+    --bg-1:#101012;
+    --bg-2:#16161a;
+    --bg-3:#1d1d22;
+    --bg-4:#262631;
+    --border:rgba(245,236,222,.08);
+    --border-2:rgba(245,236,222,.18);
+    --text:#f3f2ef;
+    --text-dim:#b4b1a8;
+    --text-mute:#706d66;
+    --accent:#b894ff;
+    --accent-2:#9071d4;
+    --accent-soft:rgba(184,148,255,.12);
+
+    /* 6 science layers */
+    --root:#a96a38;        /* Biodiversity - brown */
+    --mekong:#3eac86;      /* River - teal */
+    --land:#9fb85a;        /* Socio-econ - olive */
+    --people:#6aa7c2;      /* Habitat - blue */
+    --air:#b894ff;         /* MapMe solution - purple */
+    --cloud:#d1ccc1;       /* Climate - grey */
+
+    /* 3P */
+    --people-p:#6aa7c2;
+    --planet-p:#7fb069;
+    --potential-p:#b894ff;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:"Manrope",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-size:14.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+  img{max-width:100%;display:block}
+
+  /* ====== GLOBAL HEADER ====== */
+  header.app{position:sticky;top:0;z-index:100;background:rgba(10,10,11,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:18px}
+  header.app .logo{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:15px;letter-spacing:-.01em;color:var(--text)}
+  header.app .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent)}
+  header.app .logo em{color:var(--accent);font-style:normal}
+  header.app .beta{font-size:10px;padding:2px 7px;border:1px solid var(--border-2);border-radius:999px;color:var(--text-dim);letter-spacing:.08em}
+  header.app .nav{display:flex;gap:4px;margin-left:20px}
+  header.app .nav a{font-size:13px;color:var(--text-dim);padding:6px 12px;border-radius:999px;transition:all .2s}
+  header.app .nav a:hover{color:var(--text);background:var(--bg-2)}
+  header.app .nav a.active{color:var(--text);background:var(--bg-3)}
+  header.app .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+  header.app .lang{font-size:12px;color:var(--text-dim);display:flex;gap:4px;align-items:center;padding:4px 10px;border:1px solid var(--border);border-radius:999px}
+  header.app .lang b{color:var(--text);font-weight:500}
+  header.app .bell{position:relative;width:32px;height:32px;border-radius:50%;background:var(--bg-2);display:flex;align-items:center;justify-content:center;color:var(--text-dim);border:1px solid var(--border);font-size:14px}
+  header.app .bell::after{content:"3";position:absolute;top:-3px;right:-3px;background:var(--accent);color:#0a0a0b;font-size:9.5px;font-weight:600;padding:1px 5px;border-radius:999px}
+  header.app .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a96a38,#3eac86)}
+
+  /* Page container */
+  main{min-height:calc(100vh - 56px)}
+  main > section.page{display:none}
+  main > section.page.active{display:block}
+
+  /* ====== HOME ====== */
+  .home-hero{padding:100px 24px 80px;max-width:1180px;margin:0 auto;text-align:center;position:relative;overflow:hidden}
+  .home-hero::before{content:"";position:absolute;inset:-200px -50% -100px -50%;background:
+    radial-gradient(ellipse at 30% 40%,rgba(184,148,255,.18) 0,transparent 55%),
+    radial-gradient(ellipse at 70% 60%,rgba(62,172,134,.13) 0,transparent 55%);
+    z-index:0;pointer-events:none}
+  .home-hero > *{position:relative;z-index:1}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-soft);background:var(--accent-soft);padding:5px 14px;border-radius:999px;margin-bottom:24px}
+  .home-hero h1{font-family:"Fraunces",Georgia,serif;font-weight:300;font-size:clamp(44px,6vw,76px);line-height:1.05;letter-spacing:-.025em;margin:0 0 20px;color:var(--text)}
+  .home-hero h1 em{font-style:italic;color:var(--accent);font-weight:400}
+  .home-hero .dek{font-family:"Fraunces",Georgia,serif;font-size:clamp(17px,2vw,21px);line-height:1.55;max-width:680px;margin:0 auto 40px;color:var(--text-dim);font-weight:300}
+  .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:999px;font-size:14px;font-weight:500;transition:all .2s;cursor:pointer;border:0;font-family:inherit}
+  .btn.primary{background:var(--accent);color:#0a0a0b}
+  .btn.primary:hover{background:var(--accent-2);color:var(--text)}
+  .btn.sec{background:transparent;color:var(--text);border:1px solid var(--border-2)}
+  .btn.sec:hover{background:var(--bg-2)}
+
+  /* 6-layer stack visual */
+  .stack{margin:64px auto 0;max-width:640px;height:340px;position:relative;perspective:1800px}
+  .stack-layer{position:absolute;left:50%;top:50%;width:420px;height:80px;transform-origin:center;transform:translate(-50%,-50%) rotateX(62deg) rotateZ(-42deg);border-radius:10px;display:flex;align-items:center;padding:0 20px;color:#fff;font-size:13px;font-weight:500;box-shadow:0 20px 40px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  .stack-layer .ll-num{font-family:"Fraunces",Georgia,serif;font-size:28px;font-weight:300;margin-right:14px;opacity:.7}
+  .stack-layer .ll-text{flex:1}
+  .stack-layer .ll-sub{display:block;font-size:11px;opacity:.7;font-weight:400;margin-top:1px}
+  .stack-layer:nth-child(1){background:var(--cloud);color:#1a1410;margin-top:-130px;z-index:6}
+  .stack-layer:nth-child(2){background:var(--air);margin-top:-78px;z-index:5}
+  .stack-layer:nth-child(3){background:var(--people);margin-top:-26px;z-index:4}
+  .stack-layer:nth-child(4){background:var(--land);color:#1a1410;margin-top:26px;z-index:3}
+  .stack-layer:nth-child(5){background:var(--mekong);margin-top:78px;z-index:2}
+  .stack-layer:nth-child(6){background:var(--root);margin-top:130px;z-index:1}
+  .stack:hover .stack-layer{transform:translate(-50%,-50%) rotateX(62deg) rotateZ(-42deg) translateX(0px)}
+  .stack .stack-layer:hover{transform:translate(-50%,-50%) rotateX(62deg) rotateZ(-42deg) translateZ(60px) scale(1.03)}
+
+  /* HOME sections */
+  .section{padding:80px 24px;max-width:1180px;margin:0 auto}
+  .section-label{font-family:"Manrope",sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px;font-weight:600}
+  .section h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(32px,4.5vw,48px);line-height:1.1;letter-spacing:-.02em;margin:0 0 16px;color:var(--text)}
+  .section > p.lede{font-family:"Fraunces",Georgia,serif;font-size:19px;line-height:1.55;color:var(--text-dim);max-width:700px;margin:0 0 48px;font-weight:300}
+
+  /* 3P grid */
+  .pppp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .pppp-card{background:var(--bg-2);border:1px solid var(--border);border-radius:18px;padding:28px 26px;position:relative;overflow:hidden}
+  .pppp-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,var(--ring,rgba(184,148,255,.14)) 0,transparent 60%);pointer-events:none}
+  .pppp-card.people{--ring:rgba(106,167,194,.18)}
+  .pppp-card.planet{--ring:rgba(127,176,105,.18)}
+  .pppp-card.potential{--ring:rgba(184,148,255,.18)}
+  .pppp-card h3{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;margin:0 0 6px;letter-spacing:-.015em}
+  .pppp-card.people h3{color:var(--people-p)}
+  .pppp-card.planet h3{color:var(--planet-p)}
+  .pppp-card.potential h3{color:var(--potential-p)}
+  .pppp-card .tag{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-mute);margin-bottom:10px}
+  .pppp-card p{margin:0 0 20px;color:var(--text-dim);font-size:14.5px;line-height:1.55}
+  .pppp-card ul{list-style:none;padding:0;margin:0;border-top:1px solid var(--border);padding-top:14px}
+  .pppp-card li{font-size:12.5px;color:var(--text-dim);padding:4px 0;display:flex;align-items:center;gap:8px}
+  .pppp-card li::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5}
+
+  /* How it works */
+  .hiw{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .hiw-step{background:var(--bg-2);border:1px solid var(--border);border-radius:16px;padding:24px}
+  .hiw-step .num{font-family:"Fraunces",Georgia,serif;font-size:48px;font-weight:300;color:var(--accent);line-height:1;margin-bottom:14px;letter-spacing:-.03em}
+  .hiw-step h4{margin:0 0 6px;font-size:17px;font-weight:500;letter-spacing:-.01em}
+  .hiw-step p{margin:0;color:var(--text-dim);font-size:13.5px;line-height:1.55}
+
+  /* Path cards (JTBDs) */
+  .paths{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:30px}
+  .path-card{background:linear-gradient(165deg,var(--bg-2) 0%,var(--bg-1) 100%);border:1px solid var(--border);border-radius:18px;padding:32px;display:flex;flex-direction:column;gap:14px;cursor:pointer;transition:all .25s;text-decoration:none;color:inherit}
+  .path-card:hover{border-color:var(--border-2);transform:translateY(-3px)}
+  .path-card .big{font-family:"Fraunces",Georgia,serif;font-weight:300;font-size:42px;letter-spacing:-.02em;line-height:1;color:var(--accent)}
+  .path-card h4{margin:0;font-size:21px;font-weight:500;letter-spacing:-.01em}
+  .path-card p{margin:0;color:var(--text-dim);font-size:14.5px;line-height:1.55}
+  .path-card .who{font-size:11.5px;color:var(--text-mute);text-transform:uppercase;letter-spacing:.09em;margin-top:auto;padding-top:14px;border-top:1px solid var(--border)}
+
+  /* ====== EXPLORE (mode chooser) ====== */
+  .explore{padding:72px 24px 100px;max-width:1180px;margin:0 auto}
+  .explore h1{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(36px,4.5vw,54px);letter-spacing:-.02em;margin:0 0 14px;line-height:1.1}
+  .explore > p.dek{font-family:"Fraunces",Georgia,serif;font-size:18px;font-weight:300;color:var(--text-dim);max-width:640px;margin:0 0 36px}
+  .search-bar{display:flex;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--border);border-radius:999px;padding:6px 6px 6px 22px;max-width:680px;margin:0 0 56px;transition:border-color .2s}
+  .search-bar:focus-within{border-color:var(--accent-soft)}
+  .search-bar svg{color:var(--text-mute);flex-shrink:0}
+  .search-bar input{flex:1;background:transparent;border:0;color:var(--text);outline:0;font-size:15px;padding:10px 0;font-family:inherit}
+  .search-bar input::placeholder{color:var(--text-mute)}
+  .search-bar .go{background:var(--accent);color:#0a0a0b;border:0;padding:9px 20px;border-radius:999px;font-weight:500;font-size:13.5px;cursor:pointer}
+  .suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-top:-40px;margin-bottom:60px;max-width:680px}
+  .sugg{font-size:12.5px;color:var(--text-dim);padding:6px 13px;border:1px solid var(--border);border-radius:999px;background:var(--bg-1);cursor:pointer;transition:all .2s}
+  .sugg:hover{color:var(--text);border-color:var(--border-2)}
+
+  .mode-title{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:28px;margin:56px 0 8px;letter-spacing:-.015em}
+  .mode-sub{color:var(--text-dim);margin:0 0 28px;font-size:14.5px}
+
+  .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .mode-card{position:relative;background:var(--bg-2);border:1px solid var(--border);border-radius:20px;padding:32px;overflow:hidden;cursor:pointer;transition:all .3s;text-decoration:none;color:inherit;display:flex;flex-direction:column;min-height:400px}
+  .mode-card:hover{transform:translateY(-4px);border-color:var(--border-2)}
+  .mode-card.advanced{background:linear-gradient(155deg,#1a1525 0%,#0f0c15 100%)}
+  .mode-card.advanced::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 10%,rgba(184,148,255,.16) 0,transparent 55%);pointer-events:none}
+  .mode-card.community{background:linear-gradient(155deg,#131a18 0%,#0b0f0d 100%)}
+  .mode-card.community::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 10%,rgba(62,172,134,.14) 0,transparent 55%);pointer-events:none}
+  .mode-card > *{position:relative;z-index:1}
+  .mode-card .kicker{font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:14px}
+  .mode-card.advanced .kicker{color:var(--accent)}
+  .mode-card.community .kicker{color:var(--mekong)}
+  .mode-card h3{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:38px;letter-spacing:-.015em;margin:0 0 12px;line-height:1.05}
+  .mode-card > p{font-size:15px;line-height:1.55;color:var(--text-dim);margin:0 0 22px}
+  .mode-card .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px}
+  .meta-chip{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--border-2);color:var(--text-dim)}
+  .mode-card .for{margin-top:auto;padding-top:18px;border-top:1px solid var(--border);font-size:12.5px;color:var(--text-mute)}
+  .mode-card .for b{color:var(--text);font-weight:500}
+  .mode-card .cta{margin-top:16px;display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:13.5px;font-weight:500}
+
+  /* Mini preview for advanced mode card */
+  .adv-preview{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-bottom:18px}
+  .adv-preview div{height:28px;border-radius:4px;opacity:.6}
+
+  /* ====== ADVANCED MODE ====== */
+  .advanced-layout{display:grid;grid-template-columns:320px 1fr 320px;height:calc(100vh - 56px);overflow:hidden}
+  .adv-left{border-right:1px solid var(--border);background:var(--bg-1);overflow-y:auto;padding:20px}
+  .adv-right{border-left:1px solid var(--border);background:var(--bg-1);overflow-y:auto;padding:20px}
+  .adv-center{position:relative;background:#0c0d0e}
+  #advMap{position:absolute;inset:0}
+  .adv-overlay{position:absolute;top:18px;left:18px;background:rgba(10,10,11,.88);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:12px;padding:12px 16px;z-index:400;max-width:340px}
+  .adv-overlay .title{font-size:13px;font-weight:500;margin-bottom:4px}
+  .adv-overlay .note{font-size:11.5px;color:var(--text-dim);line-height:1.4}
+  .adv-overlay b{color:var(--accent)}
+
+  .adv-section{margin-bottom:24px}
+  .adv-section .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-mute);margin-bottom:10px;font-weight:600}
+
+  .layer-toggle{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all .2s}
+  .layer-toggle:hover{border-color:var(--border-2)}
+  .layer-toggle.on{background:var(--bg-3);border-color:var(--border-2)}
+  .layer-toggle .lt-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .layer-toggle .lt-body{flex:1;min-width:0}
+  .layer-toggle .lt-name{font-size:13px;font-weight:500;margin-bottom:1px}
+  .layer-toggle .lt-sub{font-size:10.5px;color:var(--text-mute);line-height:1.3}
+  .layer-toggle .lt-switch{width:30px;height:17px;border-radius:999px;background:var(--bg-4);position:relative;flex-shrink:0;transition:background .2s}
+  .layer-toggle .lt-switch::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#808088;transition:all .2s}
+  .layer-toggle.on .lt-switch{background:var(--accent-soft)}
+  .layer-toggle.on .lt-switch::after{left:15px;background:var(--accent)}
+
+  .index-card{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
+  .index-card .ic-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+  .index-card h4{margin:0;font-size:13px;font-weight:500}
+  .index-card .score{font-family:"Fraunces",Georgia,serif;font-size:24px;font-weight:300;letter-spacing:-.02em;line-height:1}
+  .index-card.good .score{color:var(--mekong)}
+  .index-card.ok .score{color:var(--land)}
+  .index-card.warn .score{color:var(--root)}
+  .index-card .bar{height:5px;background:var(--bg-4);border-radius:999px;overflow:hidden;margin-bottom:10px}
+  .index-card .fill{height:100%;border-radius:999px;background:var(--accent)}
+  .index-card.good .fill{background:var(--mekong)}
+  .index-card.ok .fill{background:var(--land)}
+  .index-card.warn .fill{background:var(--root)}
+  .index-card .ic-note{font-size:11.5px;color:var(--text-dim);line-height:1.45;margin:0}
+
+  /* Advanced legend */
+  .adv-legend{position:absolute;bottom:18px;right:18px;background:rgba(10,10,11,.88);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:12px;padding:12px 14px;z-index:400;font-size:12px;color:var(--text-dim);max-width:240px}
+  .adv-legend b{color:var(--text);font-weight:500}
+  .adv-legend .row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:11.5px}
+  .adv-legend .sw{width:10px;height:10px;border-radius:50%}
+
+  /* ====== COMMUNITY MODE ====== */
+  .community{padding:56px 24px 100px;max-width:1180px;margin:0 auto}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--text-dim);font-size:13px;margin-bottom:20px;cursor:pointer;background:transparent;border:0;padding:0}
+  .back-link:hover{color:var(--text)}
+  .community h1{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(34px,4vw,46px);letter-spacing:-.02em;margin:0 0 12px}
+  .community > p.dek{font-family:"Fraunces",Georgia,serif;font-size:17px;font-weight:300;color:var(--text-dim);max-width:620px;margin:0 0 48px}
+
+  .solution-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .solution-card{background:var(--bg-2);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .3s;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+  .solution-card:hover{transform:translateY(-3px);border-color:var(--border-2)}
+  .solution-card .thumb{aspect-ratio:16/10;position:relative;overflow:hidden}
+  .solution-card .thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,.55) 100%)}
+  .solution-card.craft .thumb{background:
+    radial-gradient(circle at 30% 40%,#c58a55,transparent 60%),
+    radial-gradient(circle at 70% 70%,#8a4e2c,transparent 55%),
+    linear-gradient(135deg,#3d2315,#6b3d1f)}
+  .solution-card.circular .thumb{background:
+    radial-gradient(circle at 40% 50%,#5ec999,transparent 55%),
+    radial-gradient(circle at 70% 30%,#cdb95f,transparent 50%),
+    linear-gradient(135deg,#1e3a2a,#2f5239)}
+  .solution-card.cemetery .thumb{background:
+    radial-gradient(circle at 30% 35%,#b6c1cb,transparent 60%),
+    radial-gradient(circle at 75% 70%,#4f5b84,transparent 55%),
+    linear-gradient(160deg,#1f2229,#3a3f4a 60%,#6a7180)}
+  .solution-card.mines .thumb{background:
+    radial-gradient(circle at 30% 30%,#e19275,transparent 55%),
+    radial-gradient(circle at 75% 70%,#8a6254,transparent 55%),
+    linear-gradient(160deg,#1a110a,#3a2614 60%,#6b4028)}
+  .solution-card.literature .thumb{background:
+    radial-gradient(circle at 30% 35%,#d4a86d,transparent 55%),
+    radial-gradient(circle at 75% 65%,#4e8a8a,transparent 55%),
+    linear-gradient(160deg,#1a150b,#352816 50%,#6a5030)}
+  .solution-card.coming .thumb{background:
+    linear-gradient(135deg,#1d1d22,#0f0f12);
+    border-bottom:1px dashed var(--border-2)}
+  .solution-card .label{position:absolute;top:14px;left:14px;font-size:10.5px;padding:3px 10px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);border-radius:999px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;z-index:2}
+  .solution-card .label.live{color:#7fb069}
+  .solution-card .label.new{color:var(--accent)}
+  .solution-card .label.soon{color:var(--text-mute)}
+  .solution-card .body{padding:20px;display:flex;flex-direction:column;flex:1}
+  .solution-card h3{margin:0 0 6px;font-family:"Fraunces",Georgia,serif;font-size:22px;font-weight:500;letter-spacing:-.01em;line-height:1.15}
+  .solution-card p{margin:0 0 14px;font-size:13.5px;color:var(--text-dim);line-height:1.5;flex:1}
+  .solution-card .meta-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+  .solution-card .cta{margin-top:auto;font-size:13px;color:var(--accent);font-weight:500;display:inline-flex;align-items:center;gap:4px}
+  .solution-card.coming{opacity:.55;cursor:default}
+  .solution-card.coming:hover{transform:none;border-color:var(--border)}
+
+  /* ====== CIRCULAR ECONOMIES ====== */
+  .circ-hero{padding:72px 24px 40px;max-width:1180px;margin:0 auto}
+  .circ-hero h1{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(38px,5vw,60px);letter-spacing:-.02em;margin:0 0 16px;line-height:1.05}
+  .circ-hero h1 em{font-style:italic;color:var(--mekong)}
+  .circ-hero > p.dek{font-family:"Fraunces",Georgia,serif;font-size:19px;font-weight:300;color:var(--text-dim);max-width:700px;margin:0 0 32px;line-height:1.55}
+  .circ-facts{display:flex;gap:40px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:22px;margin-top:32px}
+  .circ-facts div{display:flex;flex-direction:column;gap:3px}
+  .circ-facts label{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-mute)}
+  .circ-facts strong{font-family:"Fraunces",Georgia,serif;font-weight:300;font-size:26px;letter-spacing:-.015em;color:var(--text)}
+
+  .circ-map-section{max-width:1180px;margin:0 auto;padding:0 24px 56px;display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
+  #circMap{width:100%;height:520px;border-radius:16px;background:#e8dfcf;border:1px solid var(--border)}
+  .circ-side h3{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:22px;margin:0 0 12px;letter-spacing:-.015em}
+  .circ-side > p{color:var(--text-dim);font-size:13.5px;line-height:1.6;margin:0 0 18px}
+  .circ-flow{display:flex;flex-direction:column;gap:10px}
+  .circ-flow .step{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:12px}
+  .circ-flow .ico{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(--bg-3)}
+  .circ-flow .ttl{font-size:13px;font-weight:500;margin-bottom:2px}
+  .circ-flow .txt{font-size:12px;color:var(--text-dim);line-height:1.45}
+
+  .circ-cases{max-width:1180px;margin:0 auto;padding:40px 24px}
+  .circ-cases h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:34px;letter-spacing:-.02em;margin:0 0 10px}
+  .circ-cases > p.sub{color:var(--text-dim);font-size:14.5px;margin:0 0 36px;max-width:660px;line-height:1.55}
+  .case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .case-card{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+  .case-card:hover{border-color:var(--border-2);transform:translateY(-2px)}
+  .case-card .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;background:var(--bg-3)}
+  .case-card h4{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:19px;letter-spacing:-.01em;margin:0 0 4px}
+  .case-card .place{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--mekong);margin-bottom:10px;font-weight:600}
+  .case-card > p{font-size:13.5px;color:var(--text-dim);line-height:1.55;margin:0 0 14px;flex:1}
+  .case-card .flow{font-size:11.5px;color:var(--text-mute);margin-bottom:10px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+  .case-card .flow span{color:var(--text-dim)}
+  .case-card .flow .arr{color:var(--accent);font-weight:600}
+  .case-card .tags{display:flex;flex-wrap:wrap;gap:5px;padding-top:12px;border-top:1px solid var(--border);margin-top:auto}
+  .case-card .tag{font-size:10.5px;padding:3px 8px;border-radius:999px;border:1px solid var(--border-2);color:var(--text-dim)}
+  .case-card .tag.tour{border-color:rgba(106,167,194,.35);color:var(--people)}
+  .case-card .tag.research{border-color:rgba(184,148,255,.4);color:var(--accent)}
+  .case-card .tag.create{border-color:rgba(127,176,105,.35);color:var(--planet-p)}
+
+  /* JTBD panels */
+  .jtbd{max-width:1180px;margin:56px auto 80px;padding:0 24px}
+  .jtbd h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;letter-spacing:-.02em;margin:0 0 10px}
+  .jtbd > p.sub{color:var(--text-dim);margin:0 0 32px;font-size:14.5px;line-height:1.55;max-width:640px}
+  .jtbd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .jtbd-card{background:var(--bg-2);border:1px solid var(--border);border-radius:16px;padding:26px 24px}
+  .jtbd-card .role{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:8px}
+  .jtbd-card.tour .role{color:var(--people)}
+  .jtbd-card.research .role{color:var(--accent)}
+  .jtbd-card.create .role{color:var(--planet-p)}
+  .jtbd-card h3{margin:0 0 8px;font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:22px;letter-spacing:-.01em}
+  .jtbd-card .job{font-style:italic;font-family:"Fraunces",Georgia,serif;color:var(--text);margin:0 0 18px;font-size:15px;line-height:1.5;padding:12px 14px;background:var(--bg-3);border-radius:10px}
+  .jtbd-card ul{list-style:none;padding:0;margin:0}
+  .jtbd-card li{font-size:13px;color:var(--text-dim);padding:7px 0;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;line-height:1.4}
+  .jtbd-card li:first-child{border-top:0;padding-top:0}
+  .jtbd-card li::before{content:"→";color:currentColor;opacity:.6;font-size:12px;flex-shrink:0}
+
+  /* Footer */
+  footer.app{text-align:center;padding:32px 24px 40px;color:var(--text-mute);border-top:1px solid var(--border);font-size:12.5px}
+  footer.app p{margin:4px 0}
+
+  /* Leaflet overrides */
+  .leaflet-container{background:#e8dfcf;font:inherit}
+  .leaflet-control-zoom{border:1px solid rgba(26,20,16,.2)!important;overflow:hidden;border-radius:8px!important;box-shadow:0 2px 8px rgba(0,0,0,.08)!important}
+  .leaflet-control-zoom a{background:#f5ecde!important;color:#1a1410!important;border-color:rgba(26,20,16,.15)!important}
+  .case-marker{width:14px;height:14px;border-radius:50%;background:#3eac86;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .case-marker.big{width:20px;height:20px;border-width:3px;box-shadow:0 0 0 5px rgba(62,172,134,.3),0 2px 8px rgba(0,0,0,.3)}
+  .adv-marker{width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid #0a0a0b;box-shadow:0 0 0 1px var(--accent-soft)}
+
+  /* Responsive */
+  @media (max-width:900px){
+    header.app .nav{display:none}
+    .pppp-grid,.hiw,.mode-grid,.paths,.solution-grid,.jtbd-grid,.case-grid{grid-template-columns:1fr!important}
+    .advanced-layout{grid-template-columns:1fr!important}
+    .adv-left,.adv-right{height:auto;max-height:360px;border-right:0;border-left:0;border-top:1px solid var(--border)}
+    .circ-map-section{grid-template-columns:1fr!important}
+    #circMap{height:380px}
+  }
+</style>
+</head>
+<body>
+
+<header class="app">
+  <a class="logo" href="#"><svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="mapme" style="width:26px;height:26px;flex-shrink:0"><path d="M50 52 L88 31 L88 71 L50 92 Z" fill="#7B3FEB"/><path d="M12 31 L50 52 L50 92 L12 71 Z" fill="#A370F7"/><path d="M50 8 L88 31 L50 52 L12 31 Z" fill="#6E9834"/><path d="M50 8 Q70 16 88 31 Q66 24 50 32 Q34 24 12 31 Q30 16 50 8 Z" fill="#B6D86E"/><path d="M12 66 Q25 58 38 66 T62 66 T88 62" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg>map<em>me</em></a>
+  <span class="beta">BETA · 2026</span>
+  <nav class="nav">
+    <a href="#" data-page="home">Trang chủ</a>
+    <a href="#explore" data-page="explore">Khám phá</a>
+    <a href="#advanced" data-page="advanced">Advanced</a>
+    <a href="#community" data-page="community">Cộng đồng</a>
+    <a href="projects.html">Dự án</a>
+    <a href="about-us.html">Về chúng tôi</a>
+  </nav>
+  <div class="right">
+    <span class="lang">🌐 <b>VN</b> · EN</span>
+    <div class="bell">🔔</div>
+    <a href="signup-flow.html" class="avatar" title="Đăng ký / Đăng nhập" style="display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px;text-decoration:none">+</a>
+  </div>
+</header>
+
+<main id="app">
+
+<!-- ==================== HOME ==================== -->
+<section class="page" id="page-home">
+  <div class="home-hero">
+    <span class="eyebrow">🌏 Mekong Delta Intelligence Platform</span>
+    <h1>Từ dữ liệu khoa học<br>đến <em>câu chuyện cộng đồng</em></h1>
+    <p class="dek">mapme là nền tảng bản đồ địa lý thông minh cho Đồng bằng sông Cửu Long. Sáu lớp dữ liệu khoa học, hai chế độ sử dụng — một không gian để khám phá, học hỏi, và kích hoạt tài nguyên bản địa.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="signup-flow.html">Bắt đầu khám phá →</a>
+      <a class="btn sec" href="#section-how">Tìm hiểu cách hoạt động</a>
+    </div>
+
+    <div class="stack" aria-hidden="true">
+      <div class="stack-layer"><span class="ll-num">1</span><span class="ll-text">Cloud<span class="ll-sub">Climate prediction</span></span></div>
+      <div class="stack-layer"><span class="ll-num">2</span><span class="ll-text">Air<span class="ll-sub">MapMe solution outputs</span></span></div>
+      <div class="stack-layer"><span class="ll-num">3</span><span class="ll-text">People<span class="ll-sub">Habitat</span></span></div>
+      <div class="stack-layer"><span class="ll-num">4</span><span class="ll-text">Land<span class="ll-sub">Socio-economics</span></span></div>
+      <div class="stack-layer"><span class="ll-num">5</span><span class="ll-text">Mekong<span class="ll-sub">Human-Nature</span></span></div>
+      <div class="stack-layer"><span class="ll-num">6</span><span class="ll-text">Root<span class="ll-sub">Biodiversity</span></span></div>
+    </div>
+  </div>
+
+  <div class="section" id="section-philosophy">
+    <div class="section-label">Triết lý</div>
+    <h2>Ba câu hỏi,<br>một mảnh đất.</h2>
+    <p class="lede">Mọi bản đồ ở mapme được đọc qua ba lăng kính — Con người, Hành tinh, Tiềm năng. Ba góc nhìn ghép lại cho ta hiểu: ai sống ở đây, đất này giữ điều gì, và tương lai nào đang mở ra.</p>
+    <div class="pppp-grid">
+      <div class="pppp-card people">
+        <div class="tag">Câu hỏi 1</div>
+        <h3>People</h3>
+        <p>Ai sống ở đây, và họ sống như thế nào?</p>
+        <ul>
+          <li>Lớp People (Habitat)</li>
+          <li>Hoạt động con người trên Land</li>
+          <li>Cộng đồng: Làng nghề</li>
+          <li>Cộng đồng: Kinh tế tuần hoàn</li>
+        </ul>
+      </div>
+      <div class="pppp-card planet">
+        <div class="tag">Câu hỏi 2</div>
+        <h3>Planet</h3>
+        <p>Đất và nước này giữ điều gì?</p>
+        <ul>
+          <li>Lớp Root (Đa dạng sinh học)</li>
+          <li>Lớp Mekong (Sông — con người)</li>
+          <li>Lớp Land (Sinh thái)</li>
+          <li>Lớp Cloud (Khí hậu)</li>
+        </ul>
+      </div>
+      <div class="pppp-card potential">
+        <div class="tag">Câu hỏi 3</div>
+        <h3>Potential</h3>
+        <p>Tương lai nào có thể mở ra ở đây?</p>
+        <ul>
+          <li>Lớp Air (Đầu ra MapMe)</li>
+          <li>Lớp Cloud (Dự báo)</li>
+          <li>Dashboards ở Advanced Mode</li>
+          <li>Góc nhìn Data Keeper</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="section-how">
+    <div class="section-label">Cách hoạt động</div>
+    <h2>Ba bước,<br>từ câu hỏi đến hành động.</h2>
+    <p class="lede">Dù bạn là nhà nghiên cứu, nhà thiết kế, hay du khách — con đường khám phá ở mapme đều bắt đầu từ một câu hỏi, và kết thúc ở một hành động cụ thể.</p>
+    <div class="hiw">
+      <div class="hiw-step"><div class="num">01</div><h4>Tìm kiếm</h4><p>Gõ một địa điểm, một câu hỏi, hoặc một chủ đề. mapme trả lại những bản đồ và giải pháp liên quan.</p></div>
+      <div class="hiw-step"><div class="num">02</div><h4>Chọn chế độ</h4><p>Advanced cho dữ liệu GIS chuyên sâu — hoặc Cộng đồng cho các giải pháp được biên tập quanh một chủ đề.</p></div>
+      <div class="hiw-step"><div class="num">03</div><h4>Khám phá · Hành động</h4><p>Đọc, ghi chú, tải dữ liệu, lên kế hoạch chuyến đi, đặt hợp tác, hoặc đóng góp ngược lại vào hệ thống.</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Hai con đường sử dụng</div>
+    <h2>Bạn muốn làm gì hôm nay?</h2>
+    <p class="lede">Hai nhóm nhu cầu chính trên mapme. Cả hai đều bắt đầu từ cùng một bản đồ.</p>
+    <div class="paths">
+      <a class="path-card" href="#explore">
+        <div class="big">01</div>
+        <h4>Explore &amp; Learn</h4>
+        <p>Tôi muốn hiểu một vùng đất — tự nhiên, con người, lịch sử. Đọc, xem, nghe, lưu lại làm tư liệu.</p>
+        <div class="who">Du khách · Nghiên cứu sinh · Học sinh · Nhà báo</div>
+      </a>
+      <a class="path-card" href="#explore">
+        <div class="big">02</div>
+        <h4>Explore &amp; Activate</h4>
+        <p>Tôi muốn tìm cơ hội — hợp tác với nghệ nhân, mua nguyên liệu bền vững, thiết kế dự án có đầu ra.</p>
+        <div class="who">Nhà thiết kế · Doanh nhân xã hội · NGO · Nhà hoạch định</div>
+      </a>
+    </div>
+  </div>
+
+  <footer class="app">
+    <p><b style="color:var(--text-dim)">mapme</b> — Geo-intelligence for the Mekong</p>
+    <p>Next.js + Mapbox GL + Supabase/PostGIS · Ra mắt Beta Q2/2026</p>
+  </footer>
+</section>
+
+<!-- ==================== EXPLORE (MODE CHOOSER) ==================== -->
+<section class="page" id="page-explore">
+  <div class="explore">
+    <button class="back-link" onclick="go('home')">← Trang chủ</button>
+    <h1>Khám phá Mekong</h1>
+    <p class="dek">Gõ một câu hỏi, một địa điểm, hoặc chọn một chế độ. mapme sẽ đưa bạn đến đúng nơi bạn cần.</p>
+
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.35-4.35"/></svg>
+      <input type="text" id="exploreSearch" placeholder="Ví dụ: 'Làng nghề An Giang', 'Dừa Bến Tre', 'Ngập lụt Cần Thơ'…" />
+      <button class="go">Tìm</button>
+    </div>
+    <div class="suggestions">
+      <span class="sugg" onclick="go('community')">🧵 Làng nghề thủ công</span>
+      <span class="sugg" onclick="go('circular')">🌱 Kinh tế tuần hoàn</span>
+      <span class="sugg" onclick="go('advanced')">🌊 Dữ liệu ngập lụt Mekong</span>
+      <span class="sugg" onclick="go('advanced')">🌾 Đất nông nghiệp &amp; dân cư</span>
+      <span class="sugg" onclick="go('community')">☕ Du lịch cộng đồng</span>
+    </div>
+
+    <h2 class="mode-title">Hoặc chọn chế độ phù hợp với bạn</h2>
+    <p class="mode-sub">Cùng một nền dữ liệu. Hai cách đọc.</p>
+
+    <div class="mode-grid">
+      <a class="mode-card advanced" href="#advanced">
+        <div class="kicker">ADVANCED · Khoa học dữ liệu</div>
+        <div class="adv-preview">
+          <div style="background:var(--root)"></div>
+          <div style="background:var(--mekong)"></div>
+          <div style="background:var(--land)"></div>
+          <div style="background:var(--people)"></div>
+          <div style="background:var(--air)"></div>
+          <div style="background:var(--cloud)"></div>
+        </div>
+        <h3>Bản đồ đa lớp —<br>Mekong theo dữ liệu.</h3>
+        <p>Bật/tắt 6 lớp khoa học: Biodiversity, Mekong River, Land, People, MapMe Solution, Climate. Chồng ghép, so sánh, xuất báo cáo. Ba chỉ số tổng hợp: Kinh tế, Dân sinh, Bền vững.</p>
+        <div class="meta">
+          <span class="meta-chip">6 GIS layers</span>
+          <span class="meta-chip">PostGIS + Mapbox</span>
+          <span class="meta-chip">B2B access</span>
+          <span class="meta-chip">Admin curated</span>
+        </div>
+        <div class="for">Dành cho: <b>NGO, Viện nghiên cứu, Nhà đầu tư, Nhà hoạch định</b></div>
+        <span class="cta">Vào Advanced Mode →</span>
+      </a>
+
+      <a class="mode-card community" href="#community">
+        <div class="kicker">CỘNG ĐỒNG · Giải pháp được biên tập</div>
+        <div class="adv-preview">
+          <div style="background:var(--mekong);opacity:.8"></div>
+          <div style="background:var(--land);opacity:.7"></div>
+          <div style="background:#d46a9d;opacity:.7"></div>
+          <div style="background:var(--root);opacity:.7"></div>
+          <div style="background:#e39a4b;opacity:.7"></div>
+          <div style="background:var(--people);opacity:.6"></div>
+        </div>
+        <h3>Giải pháp theo chủ đề —<br>câu chuyện có thể kích hoạt.</h3>
+        <p>Các bộ sưu tập được biên tập xoay quanh một đề tài: Làng nghề, Kinh tế tuần hoàn, Du lịch văn hóa. Mỗi giải pháp là một mạng lưới người, nơi chốn và cơ hội — sẵn sàng để tham gia.</p>
+        <div class="meta">
+          <span class="meta-chip">2 live · 3 sắp ra mắt</span>
+          <span class="meta-chip">Data Keeper anchored</span>
+          <span class="meta-chip">Open contribution</span>
+          <span class="meta-chip">Editorial curated</span>
+        </div>
+        <div class="for">Dành cho: <b>Du khách, Nhà thiết kế, Nghệ nhân, Nghệ sĩ, Sinh viên</b></div>
+        <span class="cta">Vào Community Mode →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ADVANCED MODE ==================== -->
+<section class="page" id="page-advanced">
+  <div class="advanced-layout">
+    <aside class="adv-left">
+      <button class="back-link" onclick="go('explore')">← Chọn chế độ khác</button>
+      <div class="adv-section">
+        <div class="lbl">Advanced Mode · 6 lớp khoa học</div>
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;line-height:1.5">Bật/tắt để chồng ghép các lớp dữ liệu. Dữ liệu được xác thực bởi MapMe Data Team.</p>
+      </div>
+      <div class="adv-section">
+        <div class="lbl">Root → Cloud</div>
+        <div class="layer-toggle on" data-layer="root"><span class="lt-dot" style="background:var(--root)"></span><div class="lt-body"><div class="lt-name">Root — Biodiversity</div><div class="lt-sub">Forest cover · Land cover · Temperature</div></div><div class="lt-switch"></div></div>
+        <div class="layer-toggle on" data-layer="mekong"><span class="lt-dot" style="background:var(--mekong)"></span><div class="lt-body"><div class="lt-name">Mekong River — Human-Nature</div><div class="lt-sub">Flood mapping · Water surface · Networks</div></div><div class="lt-switch"></div></div>
+        <div class="layer-toggle" data-layer="land"><span class="lt-dot" style="background:var(--land)"></span><div class="lt-body"><div class="lt-name">Land — Socio-economics</div><div class="lt-sub">LCLU · Building footprint · POI</div></div><div class="lt-switch"></div></div>
+        <div class="layer-toggle" data-layer="people"><span class="lt-dot" style="background:var(--people)"></span><div class="lt-body"><div class="lt-name">People — Habitat</div><div class="lt-sub">Census · Nightlight · Accessibility</div></div><div class="lt-switch"></div></div>
+        <div class="layer-toggle" data-layer="air"><span class="lt-dot" style="background:var(--air)"></span><div class="lt-body"><div class="lt-name">Air — MapMe solution</div><div class="lt-sub">Insights · Recommendations · Policy</div></div><div class="lt-switch"></div></div>
+        <div class="layer-toggle" data-layer="cloud"><span class="lt-dot" style="background:var(--cloud)"></span><div class="lt-body"><div class="lt-name">Cloud — Climate prediction</div><div class="lt-sub">Temperature · Precipitation · Scenarios</div></div><div class="lt-switch"></div></div>
+      </div>
+      <div class="adv-section">
+        <div class="lbl">Khu vực</div>
+        <select style="width:100%;background:var(--bg-2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-family:inherit;font-size:13px">
+          <option>Toàn Đồng bằng sông Cửu Long</option>
+          <option>An Giang</option>
+          <option>Cần Thơ</option>
+          <option>Bến Tre</option>
+          <option>Cà Mau</option>
+          <option>Kiên Giang</option>
+        </select>
+      </div>
+      <div class="adv-section">
+        <div class="lbl">Năm</div>
+        <select style="width:100%;background:var(--bg-2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-family:inherit;font-size:13px">
+          <option>2026 (mới nhất)</option>
+          <option>2025</option>
+          <option>2020</option>
+          <option>2015</option>
+        </select>
+      </div>
+    </aside>
+
+    <div class="adv-center">
+      <div id="advMap"></div>
+      <div class="adv-overlay">
+        <div class="title">Bản đồ Mekong Delta — <span id="advLayerCount">2</span> lớp bật</div>
+        <div class="note">Chọn lớp để chồng ghép. Vùng tô màu hiển thị <b>mật độ dữ liệu</b> theo lớp được bật.</div>
+      </div>
+      <div class="adv-legend">
+        <b>Chú giải</b>
+        <div class="row"><span class="sw" style="background:var(--root)"></span>Root · Biodiversity</div>
+        <div class="row"><span class="sw" style="background:var(--mekong)"></span>Mekong · River</div>
+        <div class="row"><span class="sw" style="background:var(--land)"></span>Land · Socio-econ</div>
+        <div class="row"><span class="sw" style="background:var(--people)"></span>People · Habitat</div>
+      </div>
+    </div>
+
+    <aside class="adv-right">
+      <div class="adv-section">
+        <div class="lbl">Chỉ số tổng hợp MapMe</div>
+        <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;line-height:1.5">3 chỉ số được tổng hợp từ 6 lớp GIS. Dùng cho báo cáo chính sách và quyết định đầu tư.</p>
+      </div>
+      <div class="index-card good">
+        <div class="ic-head"><h4>📈 Economic Development</h4><div class="score">72</div></div>
+        <div class="bar"><div class="fill" style="width:72%"></div></div>
+        <p class="ic-note">Kết hợp thu nhập · nightlight · đô thị hóa · mật độ xây dựng. Mức trung bình khá, xu hướng tăng.</p>
+      </div>
+      <div class="index-card ok">
+        <div class="ic-head"><h4>🌟 Human Well-being</h4><div class="score">64</div></div>
+        <div class="bar"><div class="fill" style="width:64%"></div></div>
+        <p class="ic-note">Kết hợp dân số · khả năng tiếp cận (y tế, giáo dục) · hoạt động con người · POI. Còn chênh lệch giữa đô thị và nông thôn.</p>
+      </div>
+      <div class="index-card warn">
+        <div class="ic-head"><h4>🌍 Planet Sustainability</h4><div class="score">48</div></div>
+        <div class="bar"><div class="fill" style="width:48%"></div></div>
+        <p class="ic-note">Rừng · mặt nước · nhiệt độ · độ phủ đất. Đang giảm do biến đổi khí hậu và mở rộng nông nghiệp.</p>
+      </div>
+      <div class="adv-section" style="margin-top:24px">
+        <div class="lbl">Xuất dữ liệu</div>
+        <button class="btn sec" style="width:100%;margin-bottom:6px">Tải GeoJSON</button>
+        <button class="btn sec" style="width:100%;margin-bottom:6px">Tải CSV</button>
+        <button class="btn sec" style="width:100%">PDF báo cáo</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ==================== COMMUNITY MODE ==================== -->
+<section class="page" id="page-community">
+  <div class="community">
+    <button class="back-link" onclick="go('explore')">← Chọn chế độ khác</button>
+    <span class="section-label">Community Mode</span>
+    <h1>Giải pháp được biên tập</h1>
+    <p class="dek">Mỗi giải pháp là một bộ sưu tập các bản đồ, câu chuyện và cơ hội xoay quanh một chủ đề. Data Keeper chịu trách nhiệm duy trì chất lượng và kết nối cộng đồng đóng góp.</p>
+
+    <div class="solution-grid">
+      <!-- Craft villages (live) -->
+      <a class="solution-card craft" href="mapme-prototype.html">
+        <div class="thumb"><span class="label live">LIVE · Jun 2026</span></div>
+        <div class="body">
+          <h3>Làng nghề Việt Nam</h3>
+          <p>90 làng nghề truyền thống khắp 12 tỉnh. Nghệ nhân, câu chuyện, và bản đồ layer People. Khởi đầu với Bác Hùng ở Rèn Phú Mỹ.</p>
+          <div class="meta-row">
+            <span class="meta-chip">90 làng</span>
+            <span class="meta-chip">12 tỉnh</span>
+            <span class="meta-chip">8 dòng nghề</span>
+          </div>
+          <span class="cta">Mở bản đồ làng nghề →</span>
+        </div>
+      </a>
+
+      <!-- Circular economies (new) -->
+      <a class="solution-card circular" href="#circular">
+        <div class="thumb"><span class="label new">MỚI · Oct 2026 preview</span></div>
+        <div class="body">
+          <h3>Kinh tế tuần hoàn Mekong</h3>
+          <p>Tám trường hợp kinh tế tuần hoàn tại ĐBSCL — từ dừa Bến Tre đến lục bình An Giang. Dành cho du khách, nhà nghiên cứu và nhà thiết kế muốn học hoặc kích hoạt tài nguyên địa phương.</p>
+          <div class="meta-row">
+            <span class="meta-chip">8 case studies</span>
+            <span class="meta-chip">Mekong Delta</span>
+            <span class="meta-chip">Planet + Potential</span>
+          </div>
+          <span class="cta">Khám phá Kinh tế tuần hoàn →</span>
+        </div>
+      </a>
+
+      <!-- Mines at Quảng Trị (curator lens) -->
+      <a class="solution-card mines" href="mines-map.html">
+        <div class="thumb"><span class="label new">MỚI · Curator lens</span></div>
+        <div class="body">
+          <h3>Mines at Quảng Trị</h3>
+          <p>Di sản bom mìn Quảng Trị — 6 typology theo thời gian, từ chiến trường cũ đến đất đã trả lại cho đời sống. Curator: <strong>Giang Nguyen</strong>, Creative Director &amp; PhD Student. Cách đọc đất như đọc một quyển sách chậm.</p>
+          <div class="meta-row">
+            <span class="meta-chip">24 điểm</span>
+            <span class="meta-chip">6 typology</span>
+            <span class="meta-chip">War-legacy</span>
+          </div>
+          <span class="cta">Mở bản đồ Mines →</span>
+        </div>
+      </a>
+
+      <!-- Cemetery as Landscape (curator lens) -->
+      <a class="solution-card cemetery" href="cemetery-map.html">
+        <div class="thumb"><span class="label new">MỚI · Curator lens</span></div>
+        <div class="body">
+          <h3>Cemetery as Landscape</h3>
+          <p>Kiến trúc nghĩa trang Việt Nam — sáu typology từ lăng tẩm Huế đến mộ ruộng Mekong. 24 di tích trên bản đồ, do <strong>Architect Thy Dang</strong> biên soạn. Một cách đọc cảnh quan nơi người sống và người mất ở cùng một đất.</p>
+          <div class="meta-row">
+            <span class="meta-chip">24 di tích</span>
+            <span class="meta-chip">6 typology</span>
+            <span class="meta-chip">Architecture lens</span>
+          </div>
+          <span class="cta">Mở bản đồ Cemetery →</span>
+        </div>
+      </a>
+
+      <!-- Văn chương (Literature × Fonos proposal) -->
+      <a class="solution-card literature" href="literature-map.html">
+        <div class="thumb"><span class="label new">ĐỀ XUẤT · mapme × Fonos</span></div>
+        <div class="body">
+          <h3>Văn chương trên đất Việt</h3>
+          <p>Bản đồ văn học Việt Nam — Sơn Nam, Bảo Ninh, Thạch Lam, Tô Hoài, Nguyễn Tuân... 9 tác phẩm, 24 địa điểm, 4 vùng miền. Đề xuất hợp tác với Fonos để gắn đoạn trích audio vào mỗi pin. Mở trước cuộc gặp Fonos founder.</p>
+          <div class="meta-row">
+            <span class="meta-chip">9 tác phẩm</span>
+            <span class="meta-chip">24 pins</span>
+            <span class="meta-chip">Fonos proposal</span>
+          </div>
+          <span class="cta">Mở bản đồ Văn chương →</span>
+        </div>
+      </a>
+
+      <!-- Coming -->
+      <div class="solution-card coming">
+        <div class="thumb"><span class="label soon">SẮP RA MẮT · Q1 2027</span></div>
+        <div class="body">
+          <h3>Du lịch cộng đồng</h3>
+          <p>Homestay, mô hình du lịch có trách nhiệm, và tuyến đường văn hóa theo mùa. Kết nối du khách với chủ nhà và nghệ nhân.</p>
+          <div class="meta-row">
+            <span class="meta-chip">Data Keeper tuyển dụng</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="solution-card coming">
+        <div class="thumb"><span class="label soon">SẮP RA MẮT</span></div>
+        <div class="body">
+          <h3>Di sản văn hóa phi vật thể</h3>
+          <p>Bản đồ lễ hội, nhạc cụ, nghi lễ, và những người giữ di sản. Lưu trữ đa phương tiện — văn bản, ảnh, âm thanh, video.</p>
+          <div class="meta-row"><span class="meta-chip">Hợp tác UNESCO Việt Nam</span></div>
+        </div>
+      </div>
+
+      <div class="solution-card coming">
+        <div class="thumb"><span class="label soon">SẮP RA MẮT</span></div>
+        <div class="body">
+          <h3>An ninh nguồn nước</h3>
+          <p>Theo dõi chất lượng nước, xâm nhập mặn, và các dự án phục hồi rừng ngập mặn ở ĐBSCL.</p>
+          <div class="meta-row"><span class="meta-chip">Hợp tác với Viện Địa Mỹ Tho</span></div>
+        </div>
+      </div>
+
+      <div class="solution-card coming">
+        <div class="thumb"><span class="label soon">SẮP RA MẮT</span></div>
+        <div class="body">
+          <h3>Bản đồ cá nhân (Personal maps)</h3>
+          <p>Người dùng tự tạo bản đồ riêng — ghi chép hành trình, di sản gia đình, ký ức làng mình. Template có sẵn.</p>
+          <div class="meta-row"><span class="meta-chip">Explore Mode tổng quát</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CIRCULAR ECONOMIES ==================== -->
+<section class="page" id="page-circular">
+  <div class="circ-hero">
+    <button class="back-link" onclick="go('community')">← Cộng đồng · Community Mode</button>
+    <span class="section-label">Community Mode · Kinh tế tuần hoàn</span>
+    <h1>Kinh tế tuần hoàn<br><em>ở Đồng bằng sông Cửu Long</em></h1>
+    <p class="dek">Không gì bỏ đi. Ở Mekong, phần bị coi là phế phẩm của một ngành lại là nguyên liệu đầu vào của ngành khác. Tám trường hợp đang hoạt động — để học, để thăm, để hợp tác.</p>
+    <div class="circ-facts">
+      <div><label>Số trường hợp</label><strong>8 mô hình</strong></div>
+      <div><label>Tỉnh thành</label><strong>7 tỉnh ĐBSCL</strong></div>
+      <div><label>Vật liệu xoay vòng</label><strong>12 loại</strong></div>
+      <div><label>Doanh nghiệp</label><strong>30+ đơn vị</strong></div>
+    </div>
+  </div>
+
+  <div class="circ-map-section">
+    <div id="circMap"></div>
+    <div class="circ-side">
+      <h3>Bản đồ chuỗi tuần hoàn</h3>
+      <p>Mỗi điểm trên bản đồ là một mô hình kinh tế tuần hoàn đang hoạt động. Nhấp vào pin để xem chi tiết — từ nguyên liệu đầu vào, sản phẩm đầu ra, đến các doanh nghiệp tham gia.</p>
+      <div class="circ-flow">
+        <div class="step"><div class="ico">🌾</div><div><div class="ttl">Nguyên liệu địa phương</div><div class="txt">Phế phẩm nông nghiệp, thủy sản, thủ công</div></div></div>
+        <div class="step"><div class="ico">♻️</div><div><div class="ttl">Chế biến tại chỗ</div><div class="txt">Bởi hợp tác xã, nghệ nhân, doanh nghiệp xã hội</div></div></div>
+        <div class="step"><div class="ico">🎁</div><div><div class="ttl">Sản phẩm có đầu ra</div><div class="txt">Đồ gia dụng, biochar, thực phẩm, vật liệu</div></div></div>
+        <div class="step"><div class="ico">🌿</div><div><div class="ttl">Phản hồi về đất</div><div class="txt">Phân bón hữu cơ, phục hồi môi trường</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="circ-cases">
+    <h2>Tám trường hợp đang hoạt động</h2>
+    <p class="sub">Mỗi thẻ là một chuỗi "từ phế phẩm đến giá trị mới." Nhấp vào thẻ để xem bản đồ mạng lưới, doanh nghiệp, và các cách bạn có thể tham gia.</p>
+    <div class="case-grid" id="caseGrid"></div>
+  </div>
+
+  <div class="jtbd">
+    <span class="section-label">Bạn có thể làm gì với dữ liệu này</span>
+    <h2>Ba nhóm người dùng,<br>ba cách sử dụng.</h2>
+    <p class="sub">Cùng một bộ sưu tập. Ba công việc khác nhau — tùy bạn là ai và đến với mục đích gì.</p>
+
+    <div class="jtbd-grid">
+      <div class="jtbd-card tour">
+        <div class="role">Du khách &amp; Công chúng</div>
+        <h3>Explore &amp; Learn</h3>
+        <p class="job">"Tôi muốn thăm các mô hình kinh tế tuần hoàn, học được điều gì đó, và mua sản phẩm trực tiếp từ người làm."</p>
+        <ul>
+          <li>Xem các mô hình trên bản đồ, lên kế hoạch chuyến đi</li>
+          <li>Đặt tour trải nghiệm 1–2 ngày tại một làng</li>
+          <li>Mua sản phẩm trực tiếp — kèm câu chuyện nguồn gốc</li>
+          <li>Chia sẻ hành trình lên bản đồ cá nhân</li>
+          <li>Đóng góp ảnh / đánh giá sau chuyến đi</li>
+        </ul>
+      </div>
+      <div class="jtbd-card research">
+        <div class="role">Nhà nghiên cứu &amp; Nhà báo</div>
+        <h3>Explore &amp; Document</h3>
+        <p class="job">"Tôi muốn hiểu mô hình hoạt động, xác minh dữ liệu, và trích dẫn trong công trình của mình."</p>
+        <ul>
+          <li>Tải dữ liệu CSV/GeoJSON của toàn bộ 8 mô hình</li>
+          <li>Xem chỉ số kinh tế / môi trường kết hợp từ Advanced Mode</li>
+          <li>Gửi yêu cầu phỏng vấn qua Data Keeper</li>
+          <li>Xuất trích dẫn theo BibTeX / APA / Chicago</li>
+          <li>Ghi chú hiện trường kèm tọa độ (field notes)</li>
+        </ul>
+      </div>
+      <div class="jtbd-card create">
+        <div class="role">Nhà thiết kế &amp; Doanh nhân</div>
+        <h3>Explore &amp; Activate</h3>
+        <p class="job">"Tôi muốn lấy nguyên liệu, hợp tác với hợp tác xã, và tạo ra sản phẩm mới có câu chuyện nguồn gốc."</p>
+        <ul>
+          <li>Liên hệ trực tiếp với hợp tác xã / nghệ nhân</li>
+          <li>Yêu cầu mẫu nguyên liệu · đặt sản xuất nhỏ</li>
+          <li>Tạo provenance card cho sản phẩm hoàn thiện</li>
+          <li>Gộp nhiều mô hình thành brief dự án</li>
+          <li>Kết nối với Quỹ ĐBSCL để được tài trợ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+/* ====================== ROUTING ====================== */
+const PAGES = ['home','explore','advanced','community','circular'];
+let currentPage = null;
+function go(name){
+  if(!PAGES.includes(name)) name='home';
+  location.hash = name==='home' ? '' : name;
+}
+function render(){
+  const h = (location.hash||'').replace('#','').split('?')[0] || 'home';
+  const target = PAGES.includes(h) ? h : 'home';
+  document.querySelectorAll('main > section.page').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-'+target).classList.add('active');
+  document.querySelectorAll('header.app .nav a').forEach(a=>{
+    a.classList.toggle('active', a.dataset.page===target);
+  });
+  window.scrollTo({top:0,behavior:'instant'});
+  currentPage = target;
+  if(target==='advanced') initAdvancedMap();
+  if(target==='circular') { renderCases(); initCircMap(); }
+}
+window.addEventListener('hashchange', render);
+// Handle in-app nav clicks to still scroll-top
+document.querySelectorAll('header.app .nav a, .path-card, .mode-card, .back-link, .sugg').forEach(a=>{});
+
+/* ====================== ADVANCED MAP ====================== */
+let advMap = null;
+let advLayerMarkers = { root:[], mekong:[], land:[], people:[], air:[], cloud:[] };
+const LAYER_COLORS = { root:'#a96a38', mekong:'#3eac86', land:'#9fb85a', people:'#6aa7c2', air:'#b894ff', cloud:'#d1ccc1' };
+// Representative sample points across Mekong Delta (not real data — demo scaffold)
+const ADV_SAMPLE = {
+  root: [[10.05,105.50],[10.15,105.20],[9.80,105.10],[9.65,105.25],[10.40,104.95]],
+  mekong: [[10.03,105.78],[10.28,105.85],[9.60,105.05],[9.95,106.30],[10.45,106.35],[9.52,104.90]],
+  land: [[10.35,105.65],[10.20,105.45],[9.78,105.62],[10.08,106.15],[9.90,105.95],[10.50,106.20]],
+  people: [[10.03,105.78],[10.38,106.36],[9.17,105.15],[10.05,105.45],[10.22,106.08]],
+  air: [[10.15,105.45]],
+  cloud: [[10.00,105.50],[10.30,106.00],[9.60,105.50]]
+};
+function initAdvancedMap(){
+  if(advMap){ advMap.invalidateSize(); return; }
+  advMap = L.map('advMap',{zoomControl:true}).setView([10.03,105.78],7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{
+    subdomains:'abcd',maxZoom:19,attribution:'© OpenStreetMap · © CARTO'
+  }).addTo(advMap);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{
+    subdomains:'abcd',maxZoom:19
+  }).addTo(advMap);
+  // Build layer markers
+  Object.keys(ADV_SAMPLE).forEach(layer=>{
+    ADV_SAMPLE[layer].forEach(([lat,lng])=>{
+      const el = document.createElement('div');
+      el.className = 'adv-marker';
+      el.style.background = LAYER_COLORS[layer];
+      const m = L.marker([lat,lng],{icon:L.divIcon({className:'',html:el.outerHTML,iconSize:[12,12],iconAnchor:[6,6]})});
+      advLayerMarkers[layer].push(m);
+    });
+  });
+  // Initial: root + mekong
+  advLayerMarkers.root.forEach(m=>m.addTo(advMap));
+  advLayerMarkers.mekong.forEach(m=>m.addTo(advMap));
+  // Wire toggles
+  document.querySelectorAll('#page-advanced .layer-toggle').forEach(t=>{
+    t.addEventListener('click',()=>{
+      const layer = t.dataset.layer;
+      const isOn = t.classList.toggle('on');
+      advLayerMarkers[layer].forEach(m=> isOn ? m.addTo(advMap) : m.remove());
+      document.getElementById('advLayerCount').textContent = document.querySelectorAll('#page-advanced .layer-toggle.on').length;
+    });
+  });
+}
+
+/* ====================== CIRCULAR ECONOMIES ====================== */
+const CASES = [
+  { id:'coconut', ico:'🥥', title:'Dừa Bến Tre', place:'Bến Tre', lat:10.235, lng:106.383,
+    flow:['Dừa','Xơ dừa / vỏ / nước','Thảm · chổi · mỹ phẩm · biochar','Đất'],
+    body:'Mỗi cây dừa ra khoảng 60 trái/năm. 100% trái dừa được tận dụng: xơ dừa làm thảm và giá thể trồng cây, vỏ thành đồ thủ công, nước thành thực phẩm lên men, bã thành biochar cho đất.',
+    biz:['HTX Nông Sản Bến Tre','Cocoxim','Bến Tre Eco Crafts'],
+    tags:[{t:'Du lịch trang trại',c:'tour'},{t:'Nghiên cứu vật liệu',c:'research'},{t:'Thiết kế đồ nội thất',c:'create'}]},
+  { id:'hyacinth', ico:'🪴', title:'Lục bình (water hyacinth)', place:'An Giang · Đồng Tháp', lat:10.75, lng:105.4,
+    flow:['Lục bình (loài xâm lấn)','Phơi · se','Giỏ · thảm · túi · nội thất','Sạch kênh rạch'],
+    body:'Từ loài thực vật xâm lấn gây tắc kênh rạch, lục bình được thu hoạch, phơi khô và đan thành sản phẩm xuất khẩu. Tạo việc làm cho hàng nghìn phụ nữ nông thôn.',
+    biz:['Hiệp hội Thủ công Mỹ nghệ ĐBSCL','Gỗ Đức Thành','Ecolife'],
+    tags:[{t:'Du lịch làng',c:'tour'},{t:'Nghiên cứu sinh thái',c:'research'},{t:'Thiết kế sản phẩm',c:'create'}]},
+  { id:'ricestraw', ico:'🌾', title:'Rơm rạ thành biochar', place:'An Giang · Kiên Giang', lat:10.38, lng:105.43,
+    flow:['Rơm rạ sau thu hoạch','Khí hóa yếm khí','Biochar + sinh khối','Đất lúa'],
+    body:'Thay vì đốt ngoài trời (gây ô nhiễm), rơm rạ được khí hóa thành biochar — than sinh học cải tạo đất lúa, giữ nước và giảm phát thải methane. Giảm ~70% khí nhà kính so với đốt đồng.',
+    biz:['HTX Nông nghiệp Vĩnh Bình','Biochar Vietnam Co.','IRRI Vietnam'],
+    tags:[{t:'Nghiên cứu khí hậu',c:'research'},{t:'Nông nghiệp carbon',c:'create'},{t:'Thăm trang trại',c:'tour'}]},
+  { id:'fishskin', ico:'🐟', title:'Da cá basa & collagen', place:'An Giang · Đồng Tháp', lat:10.48, lng:105.62,
+    flow:['Phụ phẩm thủy sản','Xử lý sinh học','Da cá · collagen · mỹ phẩm','Thức ăn chăn nuôi'],
+    body:'Phụ phẩm ngành cá basa (10–30% khối lượng cá) được biến thành da cá thuộc và collagen chiết xuất. Ứng dụng trong thời trang, mỹ phẩm, thực phẩm chức năng.',
+    biz:['Vĩnh Hoàn Collagen','Biostadt Vietnam','Mekong Fish Leather'],
+    tags:[{t:'Thiết kế thời trang',c:'create'},{t:'Nghiên cứu sinh hóa',c:'research'},{t:'Tham quan nhà máy',c:'tour'}]},
+  { id:'palm', ico:'🌴', title:'Cây thốt nốt toàn phần', place:'An Giang · Tịnh Biên', lat:10.57, lng:104.86,
+    flow:['Mật thốt nốt · lá · thân','Cô đặc · dệt · cưa','Đường · nón · nội thất','Phân compost'],
+    body:'Cây thốt nốt Khmer ở vùng Bảy Núi được khai thác toàn phần: mật làm đường (có nhãn hiệu tập thể), lá dệt nón và lợp nhà, thân già làm đồ nội thất. Không phần nào bỏ đi.',
+    biz:['HTX Thốt Nốt Tịnh Biên','Đường thốt nốt Châu Lăng','Khmer Craft Cooperative'],
+    tags:[{t:'Du lịch Khmer',c:'tour'},{t:'Nghiên cứu dân tộc',c:'research'},{t:'Nguồn nguyên liệu bền vững',c:'create'}]},
+  { id:'bamboo', ico:'🎋', title:'Tre Mekong — từ rễ tới ngọn', place:'Đồng Tháp · Long An', lat:10.55, lng:105.80,
+    flow:['Rễ · thân · lá · mụn tre','Xử lý · cắt · nghiền','Vật liệu · đồ dùng · than hoạt tính','Đất phì nhiêu'],
+    body:'Tre là "thép xanh" của Mekong. Thân làm vật liệu xây dựng và nội thất, mụn tre làm than hoạt tính, lá làm bao bì sinh học, rễ ổn định đê điều. Tốc độ tăng trưởng 1m/ngày.',
+    biz:['Viet Bamboo','BamBuild','Công ty Tre Bình Thuận'],
+    tags:[{t:'Thiết kế kiến trúc',c:'create'},{t:'Trải nghiệm rừng tre',c:'tour'},{t:'Nghiên cứu carbon',c:'research'}]},
+  { id:'salt', ico:'🧂', title:'Muối Bạc Liêu — di sản & spa', place:'Bạc Liêu', lat:9.29, lng:105.73,
+    flow:['Nước biển','Cánh đồng muối thủ công','Muối ăn · mỹ phẩm · trị liệu','Hệ sinh thái ven biển'],
+    body:'Muối Bạc Liêu đã là di sản văn hóa phi vật thể. Ngoài muối ăn cao cấp, cánh đồng muối phát triển thành điểm du lịch sinh thái, sản phẩm spa (muối biển nguyên khoáng, bùn muối).',
+    biz:['HTX Diêm dân Bạc Liêu','Muối Sa Huỳnh','Mekong Salt Spa'],
+    tags:[{t:'Du lịch di sản',c:'tour'},{t:'Nghiên cứu dân tộc học',c:'research'},{t:'Mỹ phẩm thủ công',c:'create'}]},
+  { id:'fruit', ico:'🥭', title:'Vỏ trái cây lên hương', place:'Cần Thơ · Tiền Giang', lat:10.03, lng:105.78,
+    flow:['Vỏ xoài · cam · bưởi','Chưng cất · ép','Tinh dầu · pectin · bánh kẹo','Phân vi sinh'],
+    body:'Chợ nổi Cái Răng mỗi ngày thải ~20 tấn vỏ trái cây. Start-up địa phương thu gom, chưng cất thành tinh dầu, chiết xuất pectin làm phụ gia thực phẩm, còn bã thành phân vi sinh.',
+    biz:['Cái Răng Bio','Mekong Essence','HTX Nông sản Cái Bè'],
+    tags:[{t:'Du lịch chợ nổi',c:'tour'},{t:'Nghiên cứu sinh hóa',c:'research'},{t:'Nguyên liệu mỹ phẩm',c:'create'}]},
+];
+function renderCases(){
+  const grid = document.getElementById('caseGrid');
+  if(!grid || grid.dataset.rendered==='1') return;
+  grid.dataset.rendered='1';
+  grid.innerHTML = CASES.map(c => `
+    <a class="case-card" href="#circular-${c.id}" onclick="event.preventDefault()">
+      <div class="ic">${c.ico}</div>
+      <div class="place">${c.place}</div>
+      <h4>${c.title}</h4>
+      <div class="flow">${c.flow.map((s,i)=>`<span>${s}</span>${i<c.flow.length-1?'<span class="arr">→</span>':''}`).join('')}</div>
+      <p>${c.body}</p>
+      <div class="tags">${c.tags.map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('')}</div>
+    </a>
+  `).join('');
+}
+
+/* Circ map — warm editorial tiles with pins per case */
+let circMap = null;
+function initCircMap(){
+  if(circMap){ circMap.invalidateSize(); return; }
+  circMap = L.map('circMap',{zoomControl:true,scrollWheelZoom:false}).setView([10.2,105.8],7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+    subdomains:'abcd',maxZoom:19,attribution:'© OpenStreetMap · © CARTO Voyager'
+  }).addTo(circMap);
+  CASES.forEach((c,i)=>{
+    const el = document.createElement('div');
+    el.className = 'case-marker'+(i===0?' big':'');
+    L.marker([c.lat,c.lng],{icon:L.divIcon({className:'',html:el.outerHTML,iconSize:[14,14],iconAnchor:[7,7]})})
+      .addTo(circMap)
+      .bindPopup(`<div style="font-weight:500;font-size:13px">${c.ico} ${c.title}</div><div style="font-size:11.5px;color:#666;margin-top:3px">${c.place}</div>`);
+  });
+}
+
+/* Init */
+render();
+</script>
+
+</body>
+</html>

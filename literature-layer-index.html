@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Văn chương trên đất Việt — mapme × Fonos (proposal)</title>
+<meta name="description" content="Bản đồ văn học Việt Nam · đề xuất hợp tác mapme × Fonos · Community Mode." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#141008;
+    --bg-2:#1b160d;
+    --bg-3:#241d10;
+    --bg-4:#2d2515;
+    --paper:#ede6d0;
+    --paper-dim:#c9c0a4;
+    --paper-mute:#8e8570;
+    --ink:#141008;
+    --border:rgba(237,230,208,.1);
+    --border-2:rgba(237,230,208,.22);
+    --accent:#b88b4d;
+    --accent-2:#d4a86d;
+    --accent-soft:rgba(184,139,77,.14);
+
+    --north:#d4a86d;
+    --tbac:#7a8a4f;
+    --central:#c47b5d;
+    --mekong:#4e8a8a;
+    --maxw:920px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--paper);
+    font-family:"Manrope",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-size:15.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent-2);text-decoration:none;border-bottom:1px solid rgba(212,168,109,.3)}
+  a:hover{border-bottom-color:var(--accent-2)}
+
+  nav.top{position:sticky;top:0;z-index:50;background:rgba(20,16,8,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;font-size:13.5px}
+  nav.top .logo{display:inline-flex;align-items:center;gap:8px;color:var(--paper);border:0}
+  nav.top .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px rgba(184,139,77,.6)}
+  nav.top .logo em{color:var(--accent);font-style:normal;font-weight:600}
+  nav.top .crumbs{color:var(--paper-mute);display:flex;gap:8px;align-items:center}
+  nav.top .crumbs a{color:var(--paper-mute);border:0}
+  nav.top .crumbs a:hover{color:var(--paper)}
+  nav.top .crumbs span.sep{color:var(--paper-mute);opacity:.5}
+  .pship-badge{font-size:10.5px;padding:3px 10px;background:var(--accent-soft);color:var(--accent-2);border:1px solid rgba(184,139,77,.3);border-radius:999px;letter-spacing:.06em;font-weight:500}
+  nav.top .actions{margin-left:auto;display:flex;gap:8px}
+  nav.top .btn{background:transparent;border:1px solid var(--border-2);color:var(--paper);padding:6px 12px;border-radius:999px;font-size:12.5px;font-family:inherit;cursor:pointer}
+  nav.top .btn:hover{background:var(--bg-3)}
+  nav.top .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:500}
+
+  .hero{position:relative;min-height:70vh;display:flex;align-items:flex-end;overflow:hidden;background:#0a0805}
+  .hero-bg{position:absolute;inset:0;background:
+    radial-gradient(ellipse at 25% 40%,rgba(184,139,77,.3) 0,transparent 55%),
+    radial-gradient(ellipse at 75% 80%,rgba(196,123,93,.25) 0,transparent 55%),
+    linear-gradient(155deg,#1a110a 0%,#322014 30%,#5a3a24 60%,#8a5a34 100%)}
+  .hero-bg::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 18% 30%,rgba(255,220,170,.22) 0,transparent 32%),
+    radial-gradient(circle at 82% 30%,rgba(0,0,0,.4) 0,transparent 50%),
+    linear-gradient(to bottom,transparent 45%,rgba(20,16,8,.9) 100%)}
+  .hero-content{position:relative;padding:56px 24px 64px;max-width:var(--maxw);margin:0 auto;width:100%;z-index:2}
+  .kicker{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .kicker .pill{background:var(--accent-soft);border:1px solid rgba(184,139,77,.35);padding:3px 10px;border-radius:999px;color:var(--accent-2)}
+  h1.title{font-family:"Fraunces",Georgia,serif;font-weight:300;font-size:clamp(42px,6.2vw,76px);line-height:1.03;letter-spacing:-.025em;margin:0 0 18px;color:var(--paper)}
+  h1.title em{font-style:italic;color:var(--accent-2);font-weight:400}
+  .dek{font-family:"Fraunces",Georgia,serif;font-size:clamp(17px,2vw,21px);font-weight:300;line-height:1.5;max-width:680px;color:var(--paper-dim);margin:0}
+  .hero-meta{margin-top:34px;display:flex;flex-wrap:wrap;gap:28px;font-size:13px;color:var(--paper-mute);padding-top:22px;border-top:1px solid rgba(237,230,208,.1)}
+  .hero-meta div{display:flex;flex-direction:column;gap:3px}
+  .hero-meta label{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);opacity:.7}
+  .hero-meta strong{color:var(--paper);font-weight:500;font-size:14px}
+
+  .facts{max-width:var(--maxw);margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--border);border-top:1px solid var(--border)}
+  .fact{padding:10px 18px;border-left:1px solid var(--border)}
+  .fact:first-child{border-left:0;padding-left:0}
+  .fact .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:6px}
+  .fact .v{font-family:"Fraunces",Georgia,serif;font-size:22px;font-weight:300;letter-spacing:-.01em;color:var(--paper);line-height:1.15}
+
+  .section{max-width:var(--maxw);margin:0 auto;padding:72px 24px 40px}
+  .section-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:12px}
+  .section h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(30px,4vw,44px);line-height:1.15;letter-spacing:-.02em;margin:0 0 18px}
+  .section > p.lede{font-family:"Fraunces",Georgia,serif;font-size:18.5px;font-weight:300;line-height:1.55;color:var(--paper-dim);max-width:720px;margin:0 0 40px}
+
+  /* PROPOSAL BANNER */
+  .prop-banner{background:linear-gradient(100deg,rgba(184,139,77,.12),rgba(196,123,93,.06));border:1px solid rgba(184,139,77,.3);border-radius:14px;padding:22px 26px;margin-bottom:48px}
+  .prop-banner h3{margin:0 0 10px;font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:20px;letter-spacing:-.005em}
+  .prop-banner p{margin:0 0 8px;font-size:14.5px;color:var(--paper-dim);line-height:1.6}
+  .prop-banner p:last-child{margin-bottom:0}
+  .prop-banner b{color:var(--accent-2)}
+
+  /* BOOKS GRID */
+  .books-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .book-card{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px;text-decoration:none;color:inherit;cursor:pointer;transition:all .2s}
+  .book-card:hover{border-color:var(--border-2);transform:translateY(-2px)}
+  .book-card .row{display:flex;gap:14px;align-items:flex-start}
+  .book-spine{width:40px;height:60px;flex-shrink:0;border-radius:3px 7px 7px 3px;box-shadow:-1px 1px 3px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:9px;color:rgba(255,255,255,.85);writing-mode:vertical-rl;text-orientation:mixed;padding:6px 0;position:relative;overflow:hidden}
+  .book-spine::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(0,0,0,.2)}
+  .book-card .bm{min-width:0;flex:1}
+  .book-card h4{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:17px;margin:0 0 3px;letter-spacing:-.005em;line-height:1.2}
+  .book-card .author{font-size:12.5px;color:var(--paper-dim)}
+  .book-card .year-reg{font-size:10.5px;color:var(--paper-mute);margin-top:4px;display:flex;gap:8px;align-items:center}
+  .book-card .year-reg .reg-sw{width:8px;height:8px;border-radius:50%}
+  .book-card .hook{font-size:13px;color:var(--paper-dim);line-height:1.55;margin:0}
+  .book-card .pins-n{font-size:11px;color:var(--accent-2);font-weight:500;padding-top:10px;border-top:1px solid var(--border);margin-top:auto}
+  @media (max-width:780px){.books-grid{grid-template-columns:1fr}}
+
+  /* ESSAY */
+  .essay-section{background:var(--bg-2);padding:72px 24px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .essay-inner{max-width:var(--maxw);margin:0 auto}
+  .essay-inner h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;letter-spacing:-.02em;margin:0 0 8px}
+  .essay-inner p{font-family:"Fraunces",Georgia,serif;font-size:18px;line-height:1.7;color:var(--paper-dim);font-weight:300;margin:0 0 20px}
+  .essay-inner p.lead{font-size:21px;color:var(--paper);line-height:1.55}
+  .essay-inner p.lead::first-letter{font-size:70px;float:left;font-weight:400;line-height:.85;margin:8px 12px 0 -2px;color:var(--accent-2);font-family:"Fraunces",Georgia,serif}
+  .essay-inner blockquote{margin:36px 0;padding:0;border:0;text-align:center}
+  .essay-inner blockquote p{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:26px;line-height:1.35;color:var(--paper);max-width:640px;margin:0 auto 12px;font-weight:300}
+  .essay-inner blockquote cite{font-style:normal;font-family:"Manrope",sans-serif;font-size:12px;letter-spacing:.08em;color:var(--paper-mute);text-transform:uppercase}
+
+  /* Launch trio */
+  .launch-kit{max-width:var(--maxw);margin:0 auto;padding:56px 24px 40px}
+  .launch-kit h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;letter-spacing:-.02em;margin:0 0 10px}
+  .launch-kit > p.sub{color:var(--paper-dim);font-size:16.5px;font-family:"Fraunces",Georgia,serif;font-weight:300;line-height:1.55;margin:0 0 32px;max-width:640px}
+  .kit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .kit-item{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px}
+  .kit-item .lens-tag{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-2);font-weight:600;margin-bottom:10px}
+  .kit-item h3{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:19px;margin:0 0 4px;letter-spacing:-.005em}
+  .kit-item .author{font-size:13px;color:var(--paper-mute);margin:0 0 12px}
+  .kit-item p{font-size:13.5px;color:var(--paper-dim);line-height:1.55;margin:0 0 14px}
+  .kit-item .pairing{font-size:11.5px;color:var(--paper-mute);padding-top:10px;border-top:1px solid var(--border)}
+  .kit-item .pairing b{color:var(--paper)}
+  @media (max-width:780px){.kit-grid{grid-template-columns:1fr}}
+
+  /* PARTNERSHIP SHAPE */
+  .pship{max-width:var(--maxw);margin:40px auto;padding:0 24px}
+  .pship h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;letter-spacing:-.02em;margin:0 0 10px}
+  .pship > p.sub{color:var(--paper-dim);font-size:14.5px;margin:0 0 28px;max-width:640px;line-height:1.55}
+  .pship-split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .pship-col{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px}
+  .pship-col .who{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-2);font-weight:600;margin-bottom:6px}
+  .pship-col h3{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:19px;margin:0 0 14px;letter-spacing:-.005em}
+  .pship-col ul{list-style:none;padding:0;margin:0}
+  .pship-col li{font-size:13.5px;color:var(--paper-dim);padding:7px 0;border-top:1px solid var(--border);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+  .pship-col li:first-child{border-top:0;padding-top:0}
+  .pship-col li::before{content:"→";color:var(--accent-2);opacity:.7;flex-shrink:0;margin-top:1px}
+  @media (max-width:780px){.pship-split{grid-template-columns:1fr}}
+
+  /* MVP shape */
+  .mvp{max-width:var(--maxw);margin:40px auto;padding:0 24px}
+  .mvp-card{background:linear-gradient(155deg,rgba(184,139,77,.08),rgba(78,138,138,.05));border:1px solid rgba(184,139,77,.25);border-radius:16px;padding:28px 30px}
+  .mvp-card h3{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:22px;margin:0 0 10px;letter-spacing:-.01em}
+  .mvp-card .grid{display:grid;grid-template-columns:120px 1fr;gap:10px 18px;font-size:13.5px;margin-top:14px}
+  .mvp-card .grid dt{color:var(--paper-mute);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;padding-top:2px}
+  .mvp-card .grid dd{margin:0;color:var(--paper-dim);line-height:1.55}
+  .mvp-card .grid dd b{color:var(--paper)}
+
+  .related{max-width:var(--maxw);margin:40px auto;padding:0 24px 48px}
+  .related h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:24px;letter-spacing:-.015em;margin:0 0 18px}
+  .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .rel-card{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;color:inherit;transition:transform .2s, border-color .2s;text-decoration:none}
+  .rel-card:hover{transform:translateY(-2px);border-color:var(--border-2)}
+  .rel-card .t{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-2);margin-bottom:6px}
+  .rel-card h4{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:16px;margin:0 0 4px;letter-spacing:-.005em}
+  .rel-card p{font-size:12.5px;color:var(--paper-mute);margin:0;line-height:1.45}
+  @media (max-width:780px){.related-grid{grid-template-columns:1fr}}
+
+  footer{padding:40px 24px 56px;text-align:center;color:var(--paper-mute);font-size:13px;border-top:1px solid var(--border);margin-top:24px}
+  footer p{margin:4px 0}
+  footer a{color:var(--paper-dim);border:0}
+  footer a:hover{color:var(--paper)}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <a class="logo" href="mapme-app.html"><svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="mapme" style="width:26px;height:26px;flex-shrink:0"><path d="M50 52 L88 31 L88 71 L50 92 Z" fill="#7B3FEB"/><path d="M12 31 L50 52 L50 92 L12 71 Z" fill="#A370F7"/><path d="M50 8 L88 31 L50 52 L12 31 Z" fill="#6E9834"/><path d="M50 8 Q70 16 88 31 Q66 24 50 32 Q34 24 12 31 Q30 16 50 8 Z" fill="#B6D86E"/><path d="M12 66 Q25 58 38 66 T62 66 T88 62" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg>map<em>me</em></a>
+  <div class="crumbs">
+    <a href="mapme-app.html#community">Cộng đồng</a><span class="sep">/</span>
+    <a href="literature-map.html">Văn chương map</a><span class="sep">/</span>
+    <span style="color:var(--paper)">Index đầy đủ</span>
+  </div>
+  <span class="pship-badge">ĐỀ XUẤT · mapme × Fonos</span>
+  <div class="actions">
+    <a class="btn" href="literature-map.html">← Về bản đồ</a>
+    <button class="btn primary">Gửi bản đề xuất tới Fonos</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="kicker">
+      <span class="pill">Community Mode · Proposal</span>
+      <span>mapme × Fonos</span>
+    </div>
+    <h1 class="title">Văn chương <em>trên đất Việt</em></h1>
+    <p class="dek">Văn học Việt Nam là một bản đồ được viết bằng tiếng Việt. Sơn Nam là Cà Mau. Bảo Ninh là Quảng Trị. Thạch Lam là Hà Nội. Đề xuất hợp tác này — giữa bản đồ của mapme và giọng đọc của Fonos — làm cho cuốn sách <strong style="color:var(--paper)">ở lại trong nơi nó thuộc về</strong>.</p>
+    <div class="hero-meta">
+      <div><label>Tác phẩm</label><strong>9 đầu sách</strong></div>
+      <div><label>Địa điểm</label><strong>24 pins</strong></div>
+      <div><label>Vùng miền</label><strong>4 regions</strong></div>
+      <div><label>Status</label><strong>Proposal · draft V0.1</strong></div>
+      <div><label>Thời điểm pitch</label><strong>Gặp Fonos founder tuần này</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- FACTS -->
+<section class="facts">
+  <div class="fact"><div class="k">Tác phẩm khởi điểm</div><div class="v">9 cuốn</div></div>
+  <div class="fact"><div class="k">Place pins</div><div class="v">24 điểm</div></div>
+  <div class="fact"><div class="k">Năm sớm nhất</div><div class="v">1936 · Số đỏ</div></div>
+  <div class="fact"><div class="k">Năm gần nhất</div><div class="v">2005 · Cánh đồng bất tận</div></div>
+</section>
+
+<!-- BOOKS GRID -->
+<section class="section">
+  <div class="section-label">9 tác phẩm · Tuyển chọn V0.1</div>
+  <h2>Chín cuốn sách —<br>bốn vùng đất.</h2>
+  <p class="lede">Tuyển chọn khởi điểm — chín tác phẩm kinh điển hoặc đương đại mà <em>địa điểm không phải là bối cảnh</em> mà là <em>nhân vật</em>. Lựa chọn theo tiêu chí: địa lý sâu, giọng đặc trưng, đã có hoặc có thể có audiobook trên Fonos.</p>
+
+  <div class="books-grid">
+    <a class="book-card" href="literature-map.html">
+      <div class="row"><div class="book-spine" style="background:#4a3826">Hương rừng…</div>
+        <div class="bm"><h4>Hương rừng Cà Mau</h4><div class="author">Sơn Nam</div><div class="year-reg"><span class="reg-sw" style="background:var(--mekong)"></span>1962 · ĐBSCL</div></div></div>
+      <p class="hook">Tập truyện ngắn về rừng U Minh, rạch Cà Mau, người sống dưới bóng đước. Sơn Nam gọi rừng là "hương" — không phải là cảnh.</p>
+      <div class="pins-n">3 place pins</div>
+    </a>
+
+    <a class="book-card" href="literature-map.html">
+      <div class="row"><div class="book-spine" style="background:#2a4a55">Cánh đồng…</div>
+        <div class="bm"><h4>Cánh đồng bất tận</h4><div class="author">Nguyễn Ngọc Tư</div><div class="year-reg"><span class="reg-sw" style="background:var(--mekong)"></span>2005 · ĐBSCL</div></div></div>
+      <p class="hook">Gia đình chăn vịt đi trên đồng Cà Mau. Đất không phải của ai — và đất không giữ ai lại. Giọng nữ Mekong thế kỷ 21.</p>
+      <div class="pins-n">3 place pins</div>
+    </a>
+
+    <a class="book-card" href="literature-map.html">
+      <div class="row"><div class="book-spine" style="background:#5a3e2a">Hòn Đất</div>
+        <div class="bm"><h4>Hòn Đất</h4><div class="author">Anh Đức</div><div class="year-reg"><span class="reg-sw" style="background:var(--mekong)"></span>1966 · ĐBSCL</div></div></div>
+      <p class="hook">Ngọn núi đá nổi giữa đồng bằng Kiên Giang. Căn cứ cách mạng, rồi di tích quốc gia. Một cuốn tiểu thuyết chiến tranh bám vào địa chất.</p>
+      <div class="pins-n">2 place pins</div>
+    </a>
+
+    <a class="book-card" href="literature-map.html">
+      <div class="row"><div class="book-spine" style="background:#3a2620">Nỗi buồn…</div>
+        <div class="bm"><h4>Nỗi buồn chiến tranh</h4><div class="author">Bảo Ninh</div><div class="year-reg"><span class="reg-sw" style="background:var(--central)"></span>1990 · Miền Trung</div></div></div>
+      <p class="hook">Kiên đi qua Trường Sơn, rừng Tây Nguyên, về Hà Nội. Chiến tranh như một địa tầng vẫn còn trong tâm — và trên đất.</p>
+      <div class="pins-n">3 place pins</div>
+    </a>
+
+    <a class="book-card" href="literature-map.html">
+      <div class="row"><div class="book-spine" style="background:#6a2a3a">Mắt biếc</div>
+        <div class="bm"><h4>Mắt biếc</h4><div class="author">Nguyễn Nhật Ánh</div><div class="year-reg"><span class="reg-sw" style="background:var(--central)"></span>1990 · Miền Trung</div></div></div>
+      <p class="hook">Làng Đo Đo, Huế, Quy Nhơn — bản đồ một cuộc đời thanh xuân đi qua bốn vùng. Ngạn nhớ — Hà Lan đi tiếp.</p>
+      <div class="pins-n">3 place pins</div>
+    </a>
+
+    <a class="book-card" href="literature-map.html">
+      <div class="row"><div class="book-spine" style="background:#5a1a1a">Số đỏ</div>
+        <div class="bm"><h4>Số đỏ</h4><div class="author">Vũ Trọng Phụng</div><div class="year-reg"><span class="reg-sw" style="background:var(--north)"></span>1936 · Bắc Bộ</div></div></div>
+      <p class="hook">Hà Nội 1930 — phố cổ và phố Tây va chạm. Xuân Tóc Đỏ đi giữa hai thế giới. Một bản đồ của giai cấp và thuộc địa.</p>
+      <div class="pins-n">3 place pins</div>
+    </a>
+
+    <a class="book-card" href="literature-map.html">
+      <div class="row"><div class="book-spine" style="background:#4a3a1a">Hà Nội…</div>
+        <div class="bm"><h4>Hà Nội băm sáu phố phường</h4><div class="author">Thạch Lam</div><div class="year-reg"><span class="reg-sw" style="background:var(--north)"></span>1943 · Bắc Bộ</div></div></div>
+      <p class="hook">Tập tản văn về 36 phố Hà Nội. Bún riêu, cốm Vòng, quán bún chả — không phải ẩm thực, mà là một thành phố.</p>
+      <div class="pins-n">2 place pins</div>
+    </a>
+
+    <a class="book-card" href="literature-map.html">
+      <div class="row"><div class="book-spine" style="background:#2a3a24">Vợ chồng…</div>
+        <div class="bm"><h4>Vợ chồng A Phủ</h4><div class="author">Tô Hoài</div><div class="year-reg"><span class="reg-sw" style="background:var(--tbac)"></span>1952 · Tây Bắc</div></div></div>
+      <p class="hook">Hồng Ngài, bản H'Mông, mùa đông Sơn La. Mỵ quay guồng sợi lanh nhưng lòng đã ở trên núi tự do. Văn xuôi miền ngược.</p>
+      <div class="pins-n">2 place pins</div>
+    </a>
+
+    <a class="book-card" href="literature-map.html">
+      <div class="row"><div class="book-spine" style="background:#1a2a3a">Người lái…</div>
+        <div class="bm"><h4>Người lái đò Sông Đà</h4><div class="author">Nguyễn Tuân</div><div class="year-reg"><span class="reg-sw" style="background:var(--tbac)"></span>1960 · Tây Bắc</div></div></div>
+      <p class="hook">Tùy bút sông Đà — con cọp trắng giữa núi đá Tây Bắc. Nguyễn Tuân viết địa lý như viết chân dung.</p>
+      <div class="pins-n">3 place pins</div>
+    </a>
+  </div>
+</section>
+
+<!-- ESSAY -->
+<section class="essay-section">
+  <div class="essay-inner">
+    <div class="section-label">Thesis · Tại sao pairing này quan trọng</div>
+    <h2>Sách Việt<br>không rời khỏi đất.</h2>
+
+    <p class="lead">Sơn Nam viết rừng Cà Mau. Bảo Ninh viết Trường Sơn. Thạch Lam viết Hàng Bạc. Nguyễn Tuân viết thác Đà. Nếu bạn mang những cuốn sách này ra khỏi nơi chúng được viết — chúng sẽ mất một nửa. Địa lý Việt Nam là một thành phần của giọng Việt Nam.</p>
+
+    <p>Nhưng bản đồ số hóa của Việt Nam hôm nay không có văn chương. Google Maps có pin cho cà phê, cho khách sạn, cho ATM — nhưng không có pin cho rừng Cà Mau như Sơn Nam đã nghe nó. Fonos có giọng đọc của Nguyễn Ngọc Tư — nhưng Fonos không nói đâu là "cánh đồng bất tận." mapme có 90 làng nghề với tọa độ GPS — nhưng không có một câu văn xuôi để đọc khi bạn đứng đó.</p>
+
+    <blockquote>
+      <p>"Mapme có nơi chốn. Fonos có giọng. Cùng nhau — một bản đồ có tiếng."</p>
+      <cite>— Thesis · Văn chương trên đất Việt</cite>
+    </blockquote>
+
+    <p>Đề xuất này không phải là marketing chéo. Đó là một công trình biên tập: chọn những tác phẩm mà địa lý là nhân vật, chọn những địa điểm mà văn học đã khắc tên. Mỗi pin = một cuốn sách + một đoạn trích + một giọng đọc. 24 điểm V0.1. 50 điểm trong năm đầu. 200+ trong ba năm — một atlas văn chương Việt Nam đầu tiên dạng số.</p>
+
+    <p>Với du khách quốc tế — họ nghe sách trên chuyến bay đến Việt Nam. Xuống Mekong, họ đã có Sơn Nam trong đầu. Đứng trên đồng Cà Mau, họ có thể bấm nghe Nguyễn Ngọc Tư. Với du khách Việt — họ đi chợ Hàng Bạc và nghe Thạch Lam viết về nó 80 năm trước. Với học sinh — văn học trong sách giáo khoa có tọa độ, có giọng, có nơi.</p>
+  </div>
+</section>
+
+<!-- LAUNCH TRIO -->
+<section class="launch-kit">
+  <div class="section-label">Launch trio · First shippable product</div>
+  <h2>Ba cuốn mở đầu<br>cho atlas văn chương.</h2>
+  <p class="sub">Cách nhanh nhất để test partnership: ship ba audiobook đầu tiên có đủ clearance, đủ place-bound, đủ voice. Ba cuốn này đại diện ba vùng, ba thế hệ, ba giọng — đủ để chứng minh mô hình, đủ nhỏ để launch trong một quý.</p>
+
+  <div class="kit-grid">
+    <div class="kit-item">
+      <div class="lens-tag">Mekong · Thế hệ 1960s</div>
+      <h3>Hương rừng Cà Mau</h3>
+      <div class="author">Sơn Nam · 1962</div>
+      <p>Mekong của Sơn Nam — rừng U Minh, rạch Cà Mau, nước và người không phân biệt. Giọng Nam Bộ cổ điển, địa-sinh thái dày.</p>
+      <div class="pairing"><b>4 pins:</b> U Minh Hạ · Rạch Giá · Năm Căn · Cà Mau</div>
+    </div>
+
+    <div class="kit-item">
+      <div class="lens-tag">Miền Trung · Thế hệ 1990s</div>
+      <h3>Nỗi buồn chiến tranh</h3>
+      <div class="author">Bảo Ninh · 1990</div>
+      <p>Quảng Trị và Tây Nguyên qua trí nhớ Kiên — một lớp địa chất bằng ký ức. Tiểu thuyết hậu-chiến đầu tiên được dịch ra 20 ngôn ngữ.</p>
+      <div class="pairing"><b>4 pins:</b> Trường Sơn · Tây Nguyên · Hà Nội · Quảng Trị</div>
+    </div>
+
+    <div class="kit-item">
+      <div class="lens-tag">Mekong · Đương đại</div>
+      <h3>Cánh đồng bất tận</h3>
+      <div class="author">Nguyễn Ngọc Tư · 2005</div>
+      <p>Cánh đồng Cà Mau du mục của thế kỷ 21. Giọng nữ đồng bằng Mekong — tỉnh táo, lạnh, đẹp đau đớn.</p>
+      <div class="pairing"><b>4 pins:</b> Đầm Dơi · U Minh Thượng · Cà Mau coast · + 1</div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERSHIP SHAPE -->
+<section class="pship">
+  <div class="section-label">Partnership · Ai mang gì</div>
+  <h2>Hợp tác như thế nào.</h2>
+  <p class="sub">Một bản phân vai rõ — để cuộc gặp không biến thành "ai làm hết mọi thứ." Mỗi bên mang thế mạnh thật, nhận lại giá trị thật.</p>
+
+  <div class="pship-split">
+    <div class="pship-col">
+      <div class="who">mapme mang đến</div>
+      <h3>Geographic + editorial layer</h3>
+      <ul>
+        <li>Bản đồ Việt Nam dưới dạng platform sống, đã launched</li>
+        <li>Editorial curation: chọn sách, chọn địa điểm, viết dẫn giải</li>
+        <li>UX + pin + layer design (đã có template Community Mode)</li>
+        <li>Community Mode audience: nhà thiết kế, du khách nghiên cứu, độc giả Việt Nam</li>
+        <li>Three-tier schema: mỗi observation có spine + context + status</li>
+        <li>Data Keeper cho Literary layer (mapme editorial)</li>
+      </ul>
+    </div>
+
+    <div class="pship-col">
+      <div class="who">Fonos mang đến</div>
+      <h3>Audio + catalog + rights</h3>
+      <ul>
+        <li>Catalogue audiobook tiếng Việt đã sản xuất</li>
+        <li>Rights clearance cho excerpt 30–60 giây (hoặc blanket agreement)</li>
+        <li>Audio quality production — giọng đọc đã qua casting + mastering</li>
+        <li>Subscription funnel nếu người nghe muốn đọc tiếp cả cuốn</li>
+        <li>Fonos brand + authenticity (họ là authority tiếng Việt audiobook)</li>
+        <li>Long-tail audience: người đã thích văn học VN — người dùng hiện tại của Fonos</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- MVP -->
+<section class="mvp">
+  <div class="mvp-card">
+    <div class="section-label" style="margin-bottom:8px">Starter MVP · 8 tuần</div>
+    <h3>Một kit, ba tác phẩm, 12 place pins.</h3>
+    <p style="color:var(--paper-dim);margin:12px 0 0;font-size:14.5px;line-height:1.6">Test partnership trên một phiên bản nhỏ trước khi scale lên toàn atlas 9-book. Điều kiện thành công: launched trong Q3 2026, measure-able engagement, rights cleared cho cả ba.</p>
+    <dl class="grid">
+      <dt>Scope</dt>              <dd><b>3 audiobooks</b> (Sơn Nam · Bảo Ninh · Nguyễn Ngọc Tư) × <b>4 pins mỗi cuốn</b> = 12 place pins</dd>
+      <dt>Timeline</dt>            <dd><b>8 tuần</b> từ kickoff đến launch · soft launch 2 tuần trước public release</dd>
+      <dt>mapme delivers</dt>      <dd>Layer page, pin UX, editorial text, integration với launch trio</dd>
+      <dt>Fonos delivers</dt>      <dd>Excerpt clips (30–60s × 12), author/publisher clearance, co-branding guidelines</dd>
+      <dt>Shared</dt>              <dd>Launch marketing, 2 social posts mỗi tuần trong tháng đầu, analytics dashboard</dd>
+      <dt>Success metrics</dt>     <dd>Time-to-play per pin · Click-through to Fonos subscription · Press / social engagement · Return visits</dd>
+      <dt>Revenue split</dt>       <dd>V1 không revenue — exchange of value. Nếu sub driven measurable, explore affiliate model in V2.</dd>
+      <dt>If it works</dt>         <dd>Scale lên 9 books (24 pins) by Q1 2027 — full atlas V1.0</dd>
+      <dt>If it doesn't</dt>       <dd>mapme giữ editorial + text pins. Fonos giữ audiobook business. No damage done.</dd>
+    </dl>
+  </div>
+</section>
+
+<!-- RELATED -->
+<section class="related">
+  <h2>Layer liên quan trong Community Mode</h2>
+  <div class="related-grid">
+    <a class="rel-card" href="mines-map.html">
+      <div class="t">Community · Lens 2/3</div>
+      <h4>Mines at Quảng Trị</h4>
+      <p>Curator: Giang Nguyen. "Nỗi buồn chiến tranh" của Bảo Ninh cross-reference trực tiếp layer này.</p>
+    </a>
+    <a class="rel-card" href="cemetery-map.html">
+      <div class="t">Community · Lens 3/3</div>
+      <h4>Cemetery as Landscape</h4>
+      <p>Curator: Thy Dang. "Cánh đồng bất tận" có cross-reference với typology 01 (Mekong family tombs).</p>
+    </a>
+    <a class="rel-card" href="mapme-prototype.html">
+      <div class="t">Community · Foundational</div>
+      <h4>Làng nghề Việt Nam</h4>
+      <p>90 làng nghề — nhiều làng trùng với địa điểm Thạch Lam viết trong "Hà Nội băm sáu phố phường."</p>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p><b style="color:var(--paper-dim)">Văn chương trên đất Việt</b> · Community Mode lens · Đề xuất mapme × Fonos</p>
+  <p>Curated by mapme editorial · Audio by Fonos (partnership proposed) · License: CC BY-NC 4.0 for editorial; audio licensed to Fonos</p>
+  <p><a href="mapme-app.html#community">← Quay lại Cộng đồng</a> · <a href="literature-map.html">Xem bản đồ</a></p>
+</footer>
+
+</body>
+</html>
