@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Câu chuyện thực địa — mapme</title>
+<meta name="description" content="Tiếng làng từ 10 hộ nghệ nhân — phim ngắn, chuyện dài, từ đất Việt." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-1:#101012; --bg-2:#16161a; --bg-3:#1d1d22; --bg-4:#262631;
+    --border:rgba(245,236,222,.08); --border-2:rgba(245,236,222,.2);
+    --text:#f3f2ef; --text-dim:#b4b1a8; --text-mute:#706d66;
+    --purple:#7B3FEB; --purple-light:#A370F7; --purple-deep:#5929c4;
+    --green-lime:#B6D86E; --green-olive:#6E9834;
+    --accent:var(--purple-light); --accent-soft:rgba(163,112,247,.14);
+    --craft:#c58a55;
+    --fs:"Manrope",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --fd:"Fraunces",Georgia,serif;
+    --maxw:1100px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--fs);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+
+  /* HEADER */
+  header.app{position:sticky;top:0;z-index:50;background:rgba(10,10,11,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:14px}
+  .logo{display:inline-flex;align-items:center;gap:9px;color:var(--text);text-decoration:none;font-weight:700;font-size:16px;letter-spacing:-.01em}
+  .logo em{color:var(--accent);font-style:normal}
+  .beta{font-size:10px;padding:2px 8px;border:1px solid var(--border-2);border-radius:999px;color:var(--text-dim);letter-spacing:.08em}
+  nav.main{display:flex;gap:4px;margin-left:18px;flex-wrap:wrap}
+  nav.main a{font-size:13px;color:var(--text-dim);padding:6px 12px;border-radius:999px;transition:all .2s}
+  nav.main a:hover{color:var(--text);background:var(--bg-2)}
+  nav.main a.active{color:var(--text);background:var(--bg-3)}
+  .hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .lang-toggle{display:flex;background:var(--bg-2);border:1px solid var(--border);border-radius:999px;padding:3px}
+  .lang-toggle button{background:transparent;border:0;padding:4px 11px;border-radius:999px;color:var(--text-mute);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer}
+  .lang-toggle button.active{background:var(--bg-3);color:var(--text)}
+  .btn{background:transparent;border:1px solid var(--border-2);color:var(--text);padding:7px 14px;border-radius:999px;font-size:12.5px;font-family:inherit;cursor:pointer;text-decoration:none}
+  .btn:hover{background:var(--bg-2)}
+  .btn.primary{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:600}
+  .btn.primary:hover{background:var(--purple-deep)}
+
+  /* HERO */
+  .hero{position:relative;padding:68px 24px 40px;max-width:var(--maxw);margin:0 auto;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:-200px -50% 0 -50%;background:
+    radial-gradient(ellipse at 30% 40%,rgba(197,138,85,.18) 0,transparent 55%),
+    radial-gradient(ellipse at 70% 60%,rgba(163,112,247,.13) 0,transparent 55%);
+    z-index:-1;pointer-events:none}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--craft);border:1px solid rgba(197,138,85,.25);background:rgba(197,138,85,.08);padding:5px 14px;border-radius:999px;font-weight:600;margin-bottom:18px}
+  h1.hero-title{font-family:var(--fd);font-weight:300;font-size:clamp(38px,5.5vw,62px);line-height:1.05;letter-spacing:-.025em;margin:0 0 14px}
+  h1.hero-title em{font-style:italic;color:var(--craft);font-weight:400}
+  .hero-dek{font-family:var(--fd);font-size:clamp(16px,2vw,20px);font-weight:300;line-height:1.55;max-width:700px;margin:0 0 28px;color:var(--text-dim)}
+  .hero-meta{display:flex;gap:36px;flex-wrap:wrap;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0;font-size:13px}
+  .hero-meta div{display:flex;flex-direction:column;gap:3px}
+  .hero-meta label{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-mute)}
+  .hero-meta strong{font-family:var(--fd);font-weight:300;font-size:24px;color:var(--text);letter-spacing:-.015em;line-height:1.1}
+
+  /* FEATURED STORY */
+  .featured-section{max-width:var(--maxw);margin:32px auto 0;padding:0 24px}
+  .featured-section .label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--craft);font-weight:600;margin-bottom:12px}
+  .featured-card{background:var(--bg-2);border:1px solid var(--border);border-radius:20px;overflow:hidden;display:grid;grid-template-columns:1.4fr 1fr;gap:0;margin-bottom:48px}
+  .featured-video{position:relative;aspect-ratio:16/9;background:
+    radial-gradient(circle at 30% 40%,rgba(255,200,140,.3) 0,transparent 55%),
+    radial-gradient(circle at 70% 70%,rgba(197,138,85,.4) 0,transparent 50%),
+    linear-gradient(155deg,#1a1410 0%,#3a2820 30%,#6a4a32 60%,#a0703f 100%);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .featured-video::before{content:"";position:absolute;inset:0;background:
+    repeating-radial-gradient(circle at 30% 40%,rgba(255,255,255,.08) 0,transparent 10%);
+    mix-blend-mode:overlay}
+  .play-btn{width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 36px rgba(0,0,0,.4);transition:transform .25s;position:relative;z-index:1}
+  .play-btn::after{content:"";width:0;height:0;border-style:solid;border-width:14px 0 14px 22px;border-color:transparent transparent transparent #1a1410;margin-left:5px}
+  .featured-video:hover .play-btn{transform:scale(1.08)}
+  .featured-video .v-label{position:absolute;bottom:14px;left:14px;background:rgba(10,10,11,.82);backdrop-filter:blur(8px);padding:6px 12px;border-radius:999px;font-size:11px;color:#fff;font-weight:500;letter-spacing:.04em}
+  .featured-body{padding:32px 36px;display:flex;flex-direction:column}
+  .featured-body .ftag{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;font-weight:600;color:var(--craft);margin-bottom:8px}
+  .featured-body h2{font-family:var(--fd);font-weight:400;font-size:30px;letter-spacing:-.015em;margin:0 0 8px;line-height:1.15}
+  .featured-body .fmeta{font-size:13px;color:var(--text-mute);margin:0 0 18px;font-style:italic}
+  .featured-body p{font-size:14.5px;color:var(--text-dim);line-height:1.65;margin:0 0 18px}
+  .featured-body .credits{font-size:11.5px;color:var(--text-mute);padding-top:14px;border-top:1px solid var(--border);margin-top:auto;line-height:1.55}
+  .featured-body .credits strong{color:var(--text-dim);font-weight:600}
+  @media (max-width:880px){.featured-card{grid-template-columns:1fr}}
+
+  /* FILTER */
+  .filter-bar{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 28px;align-items:center}
+  .fchip{background:var(--bg-2);border:1px solid var(--border);color:var(--text-dim);padding:8px 14px;border-radius:999px;font-size:12.5px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit}
+  .fchip .dot{width:8px;height:8px;border-radius:50%}
+  .fchip[aria-pressed="true"]{background:var(--bg-3);color:var(--text);border-color:var(--border-2)}
+  .fchip.all[aria-pressed="true"]{background:var(--craft);color:#0a0a0b;border-color:var(--craft)}
+  .filter-bar .stat{margin-left:auto;font-size:12.5px;color:var(--text-mute)}
+  .filter-bar .stat strong{color:var(--text);font-weight:600}
+
+  /* GRID */
+  .stories-section{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .stories-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
+  @media (max-width:880px){.stories-grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:580px){.stories-grid{grid-template-columns:1fr}}
+
+  .story-card{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+  .story-card:hover{transform:translateY(-2px);border-color:var(--border-2)}
+  .story-thumb{aspect-ratio:16/9;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .story-thumb::before{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,.45) 100%)}
+  .story-thumb .play-mini{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;position:relative;z-index:1;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+  .story-thumb .play-mini::after{content:"";width:0;height:0;border-style:solid;border-width:8px 0 8px 13px;border-color:transparent transparent transparent #1a1410;margin-left:3px}
+  .story-thumb .duration{position:absolute;bottom:10px;right:10px;background:rgba(10,10,11,.82);backdrop-filter:blur(6px);padding:3px 9px;border-radius:6px;font-size:10.5px;color:#fff;font-weight:500;z-index:1}
+  .story-body{padding:18px 20px;flex:1;display:flex;flex-direction:column}
+  .story-body .scraft{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:6px}
+  .story-body h3{font-family:var(--fd);font-weight:500;font-size:18px;letter-spacing:-.005em;margin:0 0 4px;line-height:1.2}
+  .story-body .who{font-size:11.5px;color:var(--text-mute);margin:0 0 10px;font-style:italic}
+  .story-body p{font-size:13px;color:var(--text-dim);line-height:1.55;margin:0 0 12px;flex:1}
+  .story-body .meta-row{display:flex;flex-wrap:wrap;gap:6px;padding-top:10px;border-top:1px solid var(--border);font-size:10.5px;color:var(--text-mute)}
+  .story-body .meta-row span{padding:2px 7px;border:1px solid var(--border);border-radius:999px}
+
+  /* SCHEMA SECTION */
+  .schema-section{background:linear-gradient(180deg,var(--bg) 0%,var(--bg-1) 100%);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:64px 24px;margin-top:24px}
+  .schema-inner{max-width:var(--maxw);margin:0 auto}
+  .schema-inner .label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:12px}
+  .schema-inner h2{font-family:var(--fd);font-weight:400;font-size:32px;letter-spacing:-.02em;margin:0 0 12px}
+  .schema-inner > p.lede{font-family:var(--fd);font-size:17px;font-weight:300;color:var(--text-dim);max-width:680px;margin:0 0 32px;line-height:1.55}
+  .schema-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+  @media (max-width:780px){.schema-grid{grid-template-columns:1fr}}
+  .schema-tier{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px;border-top:3px solid var(--tier-color)}
+  .schema-tier.spine{--tier-color:var(--success,#7fb069)}
+  .schema-tier.context{--tier-color:var(--accent)}
+  .schema-tier.status{--tier-color:#d4a86d}
+  .schema-tier h4{font-family:var(--fd);font-weight:500;font-size:18px;letter-spacing:-.005em;margin:0 0 4px}
+  .schema-tier .ttype{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-mute);font-weight:600;margin-bottom:14px}
+  .schema-tier ul{list-style:none;padding:0;margin:0}
+  .schema-tier li{font-size:12.5px;color:var(--text-dim);padding:6px 0;border-top:1px solid var(--border);display:flex;gap:10px}
+  .schema-tier li:first-child{border-top:0;padding-top:0}
+  .schema-tier li strong{flex-shrink:0;width:90px;color:var(--text);font-weight:500;font-size:11.5px;font-family:"SF Mono",Menlo,monospace}
+
+  /* SUBMIT FORM */
+  .submit-section{max-width:900px;margin:0 auto;padding:48px 24px 80px}
+  .submit-card{background:linear-gradient(155deg,rgba(197,138,85,.14),rgba(163,112,247,.06));border:1px solid rgba(197,138,85,.3);border-radius:18px;padding:36px 36px 32px;text-align:center}
+  .submit-card .eyebrow{margin-bottom:16px;color:var(--craft);background:rgba(197,138,85,.12);border-color:rgba(197,138,85,.3)}
+  .submit-card h2{font-family:var(--fd);font-weight:400;font-size:30px;letter-spacing:-.02em;margin:0 0 10px}
+  .submit-card > p{font-size:14.5px;color:var(--text-dim);max-width:580px;margin:0 auto 22px;line-height:1.6}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:600px;margin:0 auto 14px;text-align:left}
+  .form-grid input,.form-grid textarea{padding:12px 14px;border:1px solid var(--border-2);border-radius:10px;background:var(--bg-1);color:var(--text);font-family:inherit;font-size:14px;outline:0}
+  .form-grid input:focus,.form-grid textarea:focus{border-color:var(--craft)}
+  .form-grid .full{grid-column:1/-1}
+  .form-grid textarea{min-height:80px;resize:vertical}
+  .form-grid label{display:block;font-size:11px;color:var(--text-mute);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:5px}
+  .form-grid .field{display:block}
+  .form-grid .field.full{grid-column:1/-1}
+  .consent-row{font-size:12px;color:var(--text-dim);max-width:560px;margin:14px auto;line-height:1.55;text-align:left;background:var(--bg-1);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+  .consent-row strong{color:var(--text)}
+  .submit-actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
+  .submit-info{font-size:11.5px;color:var(--text-mute);margin-top:14px;line-height:1.55}
+
+  footer{padding:40px 24px 56px;text-align:center;color:var(--text-mute);border-top:1px solid var(--border);font-size:13px;margin-top:24px}
+  footer p{margin:4px 0}
+
+</style>
+</head>
+<body>
+
+<header class="app">
+  <a class="logo" href="mapme-app.html">
+    <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="mapme" style="width:26px;height:26px;flex-shrink:0">
+      <path d="M50 52 L88 31 L88 71 L50 92 Z" fill="#7B3FEB"/>
+      <path d="M12 31 L50 52 L50 92 L12 71 Z" fill="#A370F7"/>
+      <path d="M50 8 L88 31 L50 52 L12 31 Z" fill="#6E9834"/>
+      <path d="M50 8 Q70 16 88 31 Q66 24 50 32 Q34 24 12 31 Q30 16 50 8 Z" fill="#B6D86E"/>
+      <path d="M12 66 Q25 58 38 66 T62 66 T88 62" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+    </svg>
+    map<em>me</em>
+  </a>
+  <span class="beta">BETA</span>
+  <nav class="main">
+    <a href="mapme-app.html">Trang chủ</a>
+    <a href="mapme-app.html#community">Cộng đồng</a>
+    <a href="projects.html">Dự án</a>
+    <a href="field-stories.html" class="active">Câu chuyện</a>
+    <a href="about-us.html">Về chúng tôi</a>
+  </nav>
+  <div class="hdr-right">
+    <div class="lang-toggle">
+      <button class="active" data-lang="vi">VN</button>
+      <button data-lang="en">EN</button>
+    </div>
+    <a class="btn primary" href="signup-flow.html">Đăng ký</a>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <span class="eyebrow" data-vi="Câu chuyện thực địa · Field Stories" data-en="Field Stories · Câu chuyện thực địa">Câu chuyện thực địa · Field Stories</span>
+  <h1 class="hero-title" data-vi="Tiếng làng — <em>mười hộ, mười nghề</em>" data-en="Voices of the village — <em>ten households, ten crafts</em>">Tiếng làng — <em>mười hộ, mười nghề</em></h1>
+  <p class="hero-dek" data-vi="Loạt phim ngắn từ mười hộ nghệ nhân vẫn đang giữ nghề truyền thống ở các làng. Mỗi tập một câu chuyện — về đôi tay, về thế hệ, về một nghề mà ngày mai có thể không còn." data-en="A short film series from ten artisan households still keeping traditional craft alive. Each episode a single story — of hands, generations, and a craft that tomorrow may not survive.">Loạt phim ngắn từ mười hộ nghệ nhân vẫn đang giữ nghề truyền thống ở các làng. Mỗi tập một câu chuyện — về đôi tay, về thế hệ, về một nghề mà ngày mai có thể không còn.</p>
+
+  <div class="hero-meta">
+    <div><label data-vi="Tập" data-en="Episodes">Tập</label><strong>10</strong></div>
+    <div><label data-vi="Hộ nghệ nhân" data-en="Households">Hộ nghệ nhân</label><strong>10</strong></div>
+    <div><label data-vi="Tỉnh thành" data-en="Provinces">Tỉnh thành</label><strong>8</strong></div>
+    <div><label data-vi="Tổng thời lượng" data-en="Total runtime">Tổng thời lượng</label><strong>~2h 30m</strong></div>
+    <div><label data-vi="Ngôn ngữ" data-en="Languages">Ngôn ngữ</label><strong>VN · EN sub</strong></div>
+  </div>
+</section>
+
+<!-- FEATURED -->
+<section class="featured-section">
+  <div class="label" data-vi="Tập đầu tiên · phát hành 25/4/2026" data-en="First episode · released Apr 25, 2026">Tập đầu tiên · phát hành 25/4/2026</div>
+  <div class="featured-card">
+    <div class="featured-video" onclick="alert('Trong production, video YouTube/Vimeo embed sẽ phát ở đây.')">
+      <div class="play-btn"></div>
+      <div class="v-label">10:24 · YouTube · 4K</div>
+    </div>
+    <div class="featured-body">
+      <div class="ftag" data-vi="Rèn · An Giang" data-en="Blacksmithing · An Giang">Rèn · An Giang</div>
+      <h2 data-vi="Bác Hùng — <em>52 năm bên lò</em>" data-en="Bác Hùng — <em>52 years at the forge</em>">Bác Hùng — <em>52 năm bên lò</em></h2>
+      <div class="fmeta" data-vi="Hộ Nguyễn Văn Hùng · TT Phú Mỹ · Phú Tân" data-en="Nguyễn Văn Hùng household · Phú Mỹ town · Phú Tân district">Hộ Nguyễn Văn Hùng · TT Phú Mỹ · Phú Tân</div>
+      <p data-vi="Bác Hùng học nghề rèn từ cha, cha học từ ông. Thước đo của một con dao Phú Mỹ là tiếng thép khi tôi — và đôi tay biết nghe lửa. Tập đầu của loạt phim, chúng tôi ngồi với bác bên lò một sáng mùa khô, từ 5 giờ đến trưa." data-en="Bác Hùng learned blacksmithing from his father, who learned from his grandfather. The measure of a Phú Mỹ knife is the sound of steel when tempered — and a hand that listens to fire. In the first episode, we sat with him at the forge from 5 AM through midday in dry season.">Bác Hùng học nghề rèn từ cha, cha học từ ông. Thước đo của một con dao Phú Mỹ là tiếng thép khi tôi — và đôi tay biết nghe lửa. Tập đầu của loạt phim, chúng tôi ngồi với bác bên lò một sáng mùa khô, từ 5 giờ đến trưa.</p>
+      <div class="credits">
+        <strong>Đạo diễn:</strong> mapme editorial · <strong>Quay phim:</strong> NTH · <strong>Dựng phim:</strong> mapme<br>
+        <strong>Phỏng vấn:</strong> 12/3/2026 · <strong>Consent:</strong> ký ngày 14/3/2026 · CC BY-NC 4.0
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GRID -->
+<section class="stories-section">
+  <div class="filter-bar">
+    <button class="fchip all" aria-pressed="true" data-vi="Tất cả · 10" data-en="All · 10">Tất cả · 10</button>
+    <button class="fchip"><span class="dot" style="background:#c58a55"></span><span data-vi="Kim khí" data-en="Metal">Kim khí</span></button>
+    <button class="fchip"><span class="dot" style="background:#d46a9d"></span><span data-vi="Dệt may" data-en="Textile">Dệt may</span></button>
+    <button class="fchip"><span class="dot" style="background:#e39a4b"></span><span data-vi="Ẩm thực" data-en="Food &amp; drink">Ẩm thực</span></button>
+    <button class="fchip"><span class="dot" style="background:#7fb069"></span><span data-vi="Tre nứa mây" data-en="Bamboo &amp; rattan">Tre nứa mây</span></button>
+    <button class="fchip"><span class="dot" style="background:#c7704e"></span><span data-vi="Gốm sứ" data-en="Ceramics">Gốm sứ</span></button>
+    <button class="fchip"><span class="dot" style="background:#a37358"></span><span data-vi="Mộc" data-en="Wood">Mộc</span></button>
+    <span class="stat">Đang hiển thị <strong>10</strong>/10 tập</span>
+  </div>
+
+  <div class="stories-grid" id="grid"></div>
+</section>
+
+<!-- SCHEMA / OPEN STANDARD -->
+<section class="schema-section">
+  <div class="schema-inner">
+    <div class="label" data-vi="Mở cho cộng đồng" data-en="Open standard">Mở cho cộng đồng</div>
+    <h2 data-vi="Cùng một chuẩn — <span style='color:var(--accent);font-style:italic'>cho ai cũng kể</span>" data-en="One standard — <span style='color:var(--accent);font-style:italic'>for anyone to tell</span>">Cùng một chuẩn — <span style="color:var(--accent);font-style:italic">cho ai cũng kể</span></h2>
+    <p class="lede" data-vi="Mười hộ là tập mở đầu — không phải tập kết. mapme công bố cấu trúc dữ liệu để bất kỳ ai (nhà báo, sinh viên, NGO, nhiếp ảnh gia) đều có thể quay phim, biên soạn, và đóng góp một tập theo cùng chuẩn — Spine, Context, Status." data-en="Ten households is the opening, not the closing. mapme publishes the data schema so anyone (journalists, students, NGOs, photographers) can film, edit, and contribute an episode under the same standard — Spine, Context, Status.">Mười hộ là tập mở đầu — không phải tập kết. mapme công bố cấu trúc dữ liệu để bất kỳ ai (nhà báo, sinh viên, NGO, nhiếp ảnh gia) đều có thể quay phim, biên soạn, và đóng góp một tập theo cùng chuẩn — Spine, Context, Status.</p>
+
+    <div class="schema-grid">
+      <div class="schema-tier spine">
+        <div class="ttype" data-vi="Bắt buộc" data-en="Required">Bắt buộc</div>
+        <h4 data-vi="Tier 1 · Spine" data-en="Tier 1 · Spine">Tier 1 · Spine</h4>
+        <ul>
+          <li><strong>village</strong><span data-vi="Làng nghề liên kết" data-en="Linked craft village">Làng nghề liên kết</span></li>
+          <li><strong>household</strong><span data-vi="Tên hộ + người được phỏng vấn" data-en="Household + interviewee name">Tên hộ + người được phỏng vấn</span></li>
+          <li><strong>video_url</strong><span data-vi="YouTube / Vimeo / direct" data-en="YouTube / Vimeo / direct">YouTube / Vimeo / direct</span></li>
+          <li><strong>length</strong><span data-vi="Thời lượng (giây)" data-en="Length (sec)">Thời lượng (giây)</span></li>
+          <li><strong>filmed_at</strong><span data-vi="Ngày quay" data-en="Date filmed">Ngày quay</span></li>
+          <li><strong>director</strong><span data-vi="Đạo diễn / quay phim" data-en="Director / cinematographer">Đạo diễn / quay phim</span></li>
+        </ul>
+      </div>
+
+      <div class="schema-tier context">
+        <div class="ttype" data-vi="Khuyến khích" data-en="Encouraged">Khuyến khích</div>
+        <h4 data-vi="Tier 2 · Context" data-en="Tier 2 · Context">Tier 2 · Context</h4>
+        <ul>
+          <li><strong>narrative</strong><span data-vi="3 đoạn giới thiệu" data-en="3 paragraph framing">3 đoạn giới thiệu</span></li>
+          <li><strong>transcript_vi</strong><span data-vi="Bản ghi tiếng Việt" data-en="Vietnamese transcript">Bản ghi tiếng Việt</span></li>
+          <li><strong>subtitles_en</strong><span data-vi="Phụ đề tiếng Anh" data-en="English subtitles">Phụ đề tiếng Anh</span></li>
+          <li><strong>still_photos</strong><span data-vi="3–10 ảnh tĩnh" data-en="3–10 still photos">3–10 ảnh tĩnh</span></li>
+          <li><strong>quotes</strong><span data-vi="Trích dẫn nổi bật" data-en="Pull quotes">Trích dẫn nổi bật</span></li>
+          <li><strong>related_pins</strong><span data-vi="Cross-ref villages" data-en="Cross-ref villages">Cross-ref villages</span></li>
+        </ul>
+      </div>
+
+      <div class="schema-tier status">
+        <div class="ttype" data-vi="Bắt buộc · review" data-en="Required · review">Bắt buộc · review</div>
+        <h4 data-vi="Tier 3 · Status" data-en="Tier 3 · Status">Tier 3 · Status</h4>
+        <ul>
+          <li><strong>consent</strong><span data-vi="Giấy xác nhận từ hộ" data-en="Signed release from household">Giấy xác nhận từ hộ</span></li>
+          <li><strong>license</strong><span data-vi="CC BY-NC 4.0 mặc định" data-en="CC BY-NC 4.0 default">CC BY-NC 4.0 mặc định</span></li>
+          <li><strong>review_state</strong><span>draft → review → published</span></li>
+          <li><strong>data_keeper</strong><span data-vi="Reviewer chịu trách nhiệm" data-en="Responsible reviewer">Reviewer chịu trách nhiệm</span></li>
+          <li><strong>last_verified</strong><span data-vi="Ngày xác minh gần nhất" data-en="Last verified date">Ngày xác minh gần nhất</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--text-mute);max-width:680px;line-height:1.6;font-style:italic" data-vi="Schema này giống schema của các layer khác (Mines, Cemetery, Literature) — Spine giữ tính có thể tra cứu, Context giữ ý nghĩa, Status giữ đáng tin cậy. Đó là cùng một hợp đồng dữ liệu mà mọi đóng góp trên mapme đều ký vào." data-en="This schema mirrors the other layers (Mines, Cemetery, Literature) — Spine for findable, Context for meaningful, Status for trustworthy. The same data contract every mapme contribution signs.">Schema này giống schema của các layer khác (Mines, Cemetery, Literature) — Spine giữ tính có thể tra cứu, Context giữ ý nghĩa, Status giữ đáng tin cậy. Đó là cùng một hợp đồng dữ liệu mà mọi đóng góp trên mapme đều ký vào.</p>
+  </div>
+</section>
+
+<!-- SUBMIT -->
+<section class="submit-section" id="submit">
+  <div class="submit-card">
+    <span class="eyebrow" data-vi="Đóng góp một tập" data-en="Contribute an episode">Đóng góp một tập</span>
+    <h2 data-vi="Bạn đang quay một làng nghề?" data-en="Are you filming a craft village?">Bạn đang quay một làng nghề?</h2>
+    <p data-vi="Sinh viên, nhà báo, nhiếp ảnh gia, hoặc thành viên cộng đồng — nếu bạn đã quay một hộ nghệ nhân và muốn chia sẻ trên mapme, gửi cho chúng tôi. Data Keeper sẽ review trong 7–14 ngày." data-en="Students, journalists, photographers, or community members — if you've filmed an artisan household and want to share on mapme, send it. Data Keeper reviews in 7–14 days.">Sinh viên, nhà báo, nhiếp ảnh gia, hoặc thành viên cộng đồng — nếu bạn đã quay một hộ nghệ nhân và muốn chia sẻ trên mapme, gửi cho chúng tôi. Data Keeper sẽ review trong 7–14 ngày.</p>
+
+    <div class="form-grid">
+      <div class="field"><label>Tên hộ nghệ nhân</label><input placeholder="Ví dụ: Hộ Nguyễn Văn Hùng" /></div>
+      <div class="field"><label>Làng / xã / tỉnh</label><input placeholder="TT Phú Mỹ, Phú Tân, An Giang" /></div>
+      <div class="field full"><label>Link video (YouTube / Vimeo)</label><input placeholder="https://youtu.be/..." /></div>
+      <div class="field"><label>Đạo diễn / quay phim</label><input placeholder="Tên hoặc nhóm làm phim" /></div>
+      <div class="field"><label>Thời lượng + ngày quay</label><input placeholder="10:24 · 12/3/2026" /></div>
+      <div class="field full"><label>Mô tả ngắn (3 câu)</label><textarea placeholder="Bối cảnh, nghề, vì sao đáng kể chuyện này..."></textarea></div>
+      <div class="field full"><label>Email liên hệ</label><input placeholder="email@example.com" /></div>
+    </div>
+
+    <div class="consent-row">
+      <strong>⚠ Quan trọng — Consent của hộ nghệ nhân.</strong> mapme chỉ xuất bản khi có giấy xác nhận từ hộ được quay. Khi gửi, bạn xác nhận: (1) đã được hộ đồng ý quay và xuất bản công khai, (2) sẵn sàng cung cấp giấy consent có ký nếu được yêu cầu, (3) chấp nhận giấy phép CC BY-NC 4.0 cho nội dung mapme xuất bản (bạn vẫn giữ quyền tác giả).
+    </div>
+
+    <div class="submit-actions">
+      <button class="btn primary" onclick="alert('Trong production: form đi vào contribution_queue · Data Keeper notification · review trong 7–14 ngày.')" data-vi="Gửi đề xuất tập" data-en="Submit episode">Gửi đề xuất tập</button>
+      <a class="btn" href="#" onclick="event.preventDefault()" data-vi="Tải sample release form (PDF)" data-en="Download sample release form (PDF)">Tải sample release form (PDF)</a>
+    </div>
+
+    <p class="submit-info" data-vi="Data Keeper review · 7–14 ngày · không tính phí · giữ quyền tác giả · xuất bản dưới giấy phép CC BY-NC 4.0 mặc định" data-en="Data Keeper review · 7–14 days · no fee · you keep authorship · published under CC BY-NC 4.0 default">Data Keeper review · 7–14 ngày · không tính phí · giữ quyền tác giả · xuất bản dưới giấy phép CC BY-NC 4.0 mặc định</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><strong style="color:var(--text-dim)">mapme</strong> · Câu chuyện thực địa · Field Stories</p>
+  <p><a href="mapme-app.html">App</a> · <a href="projects.html">Dự án</a> · <a href="about-us.html">Về chúng tôi</a> · <a href="design-system.html">Design system</a></p>
+</footer>
+
+<script>
+const STORIES = [
+  {craft:'Kim khí',color:'#c58a55',household:'Hộ Bác Hùng',title:'52 năm bên lò',title_en:'52 years at the forge',village:'Rèn Phú Mỹ · An Giang',duration:'10:24',teaser:'Đôi tay biết nghe lửa. Mười phút phim trong sáng mùa khô, từ 5 giờ.',teaser_en:'Hands that listen to fire. Ten minutes of dry-season morning, from 5 AM.',meta:['Ép.1','VN · EN','Mar 2026']},
+  {craft:'Dệt may',color:'#d46a9d',household:'Hộ Bà Liên',title:'Lụa Tân Châu — Lãnh Mỹ A',title_en:'Tân Châu silk — Lãnh Mỹ A',village:'Tân Châu · An Giang',duration:'8:12',teaser:'Ba thế hệ, một loại tơ tằm gần như không còn ai dệt.',teaser_en:'Three generations, a silk almost no one weaves anymore.',meta:['Ép.2','VN · EN','Mar 2026']},
+  {craft:'Tre nứa mây',color:'#7fb069',household:'Hộ Cô Hạnh',title:'Lục bình thành thảm',title_en:'Water hyacinth becomes a mat',village:'An Giang · Mekong',duration:'6:48',teaser:'Loài thực vật xâm lấn — và nguồn sinh kế cho hàng nghìn người phụ nữ.',teaser_en:'An invasive plant — and a livelihood for thousands of women.',meta:['Ép.3','VN · EN','Apr 2026']},
+  {craft:'Ẩm thực',color:'#e39a4b',household:'Hộ Ông Sáu',title:'Đường thốt nốt — vùng Bảy Núi',title_en:'Palm sugar — Bảy Núi region',village:'Tịnh Biên · An Giang',duration:'9:30',teaser:'Khmer trồng thốt nốt từ mấy thế kỷ. Một cây cho 60 năm đường.',teaser_en:'The Khmer have grown the palm for centuries. One tree, 60 years of sugar.',meta:['Ép.4','VN · EN · KM','Apr 2026']},
+  {craft:'Gốm sứ',color:'#c7704e',household:'Hộ Bà Phượng',title:'Gốm Phù Lãng — bảy thế kỷ',title_en:'Phù Lãng pottery — seven centuries',village:'Phù Lãng · Bắc Ninh',duration:'11:05',teaser:'Lò gốm sành 700 năm, không tráng men, mộc và lửa.',teaser_en:'Seven hundred years of stoneware. No glaze. Just clay and flame.',meta:['Ép.5','VN · EN','Apr 2026']},
+  {craft:'Mộc',color:'#a37358',household:'Hộ Bác Năm',title:'Đóng xuồng ghe Mỹ Hiệp',title_en:'Mỹ Hiệp boat builders',village:'Chợ Mới · An Giang',duration:'7:55',teaser:'Một chiếc ghe, ba người trai, hai mươi ngày, không đinh.',teaser_en:'One boat, three brothers, twenty days, no nails.',meta:['Ép.6','VN · EN','May 2026']},
+  {craft:'Dệt may',color:'#d46a9d',household:'Hộ Bà Sang',title:'Chiếu cói Cà Hom — đến hồi cuối',title_en:'Cà Hom sedge mats — toward the end',village:'Trà Vinh · Khmer',duration:'8:40',teaser:'Bà sang là thợ dệt cuối cùng còn ngồi dệt cả ngày. Sau bà, không còn ai.',teaser_en:'Bà Sang is the last weaver who still weaves all day. After her, no one.',meta:['Ép.7','VN · EN · KM','May 2026']},
+  {craft:'Kim khí',color:'#c58a55',household:'Hộ Đại Bái',title:'Đúc đồng Đại Bái',title_en:'Đại Bái bronze casting',village:'Gia Bình · Bắc Ninh',duration:'9:18',teaser:'Tượng phật, lư hương, tiếng cồng. Khuôn đất, lửa, kim loại nóng chảy.',teaser_en:'Buddha statues, incense burners, gong notes. Clay molds, fire, molten metal.',meta:['Ép.8','VN · EN','May 2026']},
+  {craft:'Tre nứa mây',color:'#7fb069',household:'Hộ Anh Tuấn',title:'Mây tre đan Tăng Tiến',title_en:'Tăng Tiến bamboo weaving',village:'Việt Yên · Bắc Giang',duration:'7:22',teaser:'Hơn 300 năm. Anh Tuấn đời thứ chín. Đứa con trai đi học đại học Hà Nội.',teaser_en:'Three hundred years. Anh Tuấn is the ninth generation. His son is at university in Hà Nội.',meta:['Ép.9','VN · EN','Jun 2026']},
+  {craft:'Ẩm thực',color:'#e39a4b',household:'Hộ Anh Phong',title:'Bánh tráng Mỹ Lồng',title_en:'Mỹ Lồng rice paper',village:'Giồng Trôm · Bến Tre',duration:'6:10',teaser:'Bánh tráng phơi trên giàn tre, dưới nắng dừa. Kết thúc một loạt phim.',teaser_en:'Rice paper drying on bamboo racks, under coconut sun. The series closes here.',meta:['Ép.10','VN · EN','Jun 2026']},
+];
+
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = STORIES.map((s,i) => `
+    <a class="story-card" href="#" onclick="event.preventDefault();alert('Trong production: trang chi tiết tập ${i+1} với video embed, transcript, ảnh tĩnh, và link tới village profile.')">
+      <div class="story-thumb" style="background:linear-gradient(155deg,${s.color}44,${s.color}aa,${s.color}88,#1a1410);">
+        <div class="play-mini"></div>
+        <div class="duration">${s.duration}</div>
+      </div>
+      <div class="story-body">
+        <div class="scraft" style="color:${s.color}">${s.craft}</div>
+        <h3>${s.title}</h3>
+        <div class="who">${s.household} · ${s.village}</div>
+        <p>${s.teaser}</p>
+        <div class="meta-row">${s.meta.map(m=>`<span>${m}</span>`).join('')}</div>
+      </div>
+    </a>
+  `).join('');
+}
+
+document.querySelectorAll('.lang-toggle button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.lang-toggle button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const lang = b.dataset.lang;
+    document.querySelectorAll('[data-vi]').forEach(el => {
+      const t = el.getAttribute(lang === 'vi' ? 'data-vi' : 'data-en');
+      if (t) el.innerHTML = t;
+    });
+    document.documentElement.lang = lang;
+  });
+});
+
+renderGrid();
+</script>
+
+</body>
+</html>
