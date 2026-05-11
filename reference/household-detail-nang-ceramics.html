@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Huỳnh Xuân Huỳnh — Nắng Ceramics · Lái Thiêu · mapme</title>
+<meta name="description" content="Huỳnh Xuân Huỳnh, người sáng lập Nắng Ceramics — khôi phục gốm Lái Thiêu tại Bình Dương. Truyền nghề như một dự án cộng đồng." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+  :root{
+    --bg:#17130e;
+    --bg-2:#1e1913;
+    --bg-3:#26201a;
+    --paper:#f5ecde;
+    --paper-dim:#d8cfbe;
+    --paper-mute:#9a9081;
+    --ink:#1a1410;
+    --border:rgba(245,236,222,.1);
+    --border-strong:rgba(245,236,222,.22);
+
+    /* === Per-household accent: terracotta for Nắng Ceramics === */
+    --accent:#c4623a;
+    --accent-2:#a14d2c;
+    --accent-soft:rgba(196,98,58,.15);
+
+    --hot:#e8623b;
+    --cool:#7aa5a1;
+    --warn:#c49a30;
+    --risk:#c46030;
+    --growth:#6b9a3a;
+    --danger:#9a3a3a;
+    --maxw:880px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--paper);
+    font-family:"Manrope",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
+    font-feature-settings:"ss01","cv11"}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(196,98,58,.3)}
+  a:hover{border-bottom-color:var(--accent)}
+  img{max-width:100%;display:block}
+
+  /* ========== TOP NAV ========== */
+  nav.top{position:sticky;top:0;z-index:60;background:rgba(23,19,14,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;font-size:13.5px}
+  nav.top .logo{display:inline-flex;align-items:center;gap:8px;color:var(--paper);border:0}
+  nav.top .crumbs{color:var(--paper-mute);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  nav.top .crumbs a{color:var(--paper-mute);border:0}
+  nav.top .crumbs a:hover{color:var(--paper)}
+  nav.top .crumbs span.sep{color:var(--paper-mute);opacity:.5}
+  nav.top .actions{margin-left:auto;display:flex;gap:8px}
+  nav.top .btn{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:6px 12px;border-radius:999px;font-size:12.5px;cursor:pointer;font-family:inherit}
+  nav.top .btn:hover{background:var(--bg-3)}
+  nav.top .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:500}
+
+  /* ========== STICKY SECTION NAV ========== */
+  .section-nav{position:sticky;top:53px;z-index:40;background:rgba(23,19,14,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+    transform:translateY(-100%);opacity:0;transition:transform .28s ease,opacity .28s ease;pointer-events:none}
+  .section-nav.show{transform:translateY(0);opacity:1;pointer-events:auto}
+  .section-nav-inner{max-width:var(--maxw);margin:0 auto;padding:0 24px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .section-nav-inner::-webkit-scrollbar{display:none}
+  .section-nav a{flex-shrink:0;font-family:"Manrope",sans-serif;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--paper-mute);padding:14px 10px;border:0;border-bottom:2px solid transparent;font-weight:500}
+  .section-nav a:hover{color:var(--paper)}
+  .section-nav a.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* ========== HERO ========== */
+  .hero{position:relative;min-height:80vh;display:flex;align-items:flex-end;overflow:hidden;background:#0c0a07}
+  .hero-bg{position:absolute;inset:0;background:
+    radial-gradient(ellipse at 25% 40%,rgba(196,98,58,.32) 0,transparent 55%),
+    radial-gradient(ellipse at 80% 80%,rgba(232,98,59,.22) 0,transparent 55%),
+    linear-gradient(135deg,#2a1208 0%,#4a2010 30%,#7a3518 60%,#c05028 90%);
+    filter:saturate(1.05)}
+  .hero-bg::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 20% 30%,rgba(255,180,120,.32) 0,transparent 32%),
+    radial-gradient(circle at 88% 22%,rgba(0,0,0,.4) 0,transparent 50%),
+    linear-gradient(to bottom,transparent 35%,rgba(23,19,14,.88) 100%)}
+  .hero-noise{position:absolute;inset:0;opacity:.1;mix-blend-mode:overlay;background-image:
+    repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 1px,transparent 1px 6px),
+    repeating-linear-gradient(25deg,rgba(0,0,0,.05) 0 1px,transparent 1px 9px)}
+  .hero-content{position:relative;padding:56px 24px 60px;max-width:var(--maxw);margin:0 auto;width:100%;z-index:2}
+  .kicker{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .kicker .pill{background:var(--accent-soft);border:1px solid rgba(196,98,58,.35);padding:3px 10px;border-radius:999px;color:var(--accent)}
+  h1.title{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(40px,6vw,76px);line-height:1.04;letter-spacing:-.025em;margin:0 0 18px;color:var(--paper)}
+  h1.title em{font-style:italic;color:var(--accent);font-weight:400;font-size:.78em;display:block;margin-top:8px}
+  .dek{font-family:"Fraunces",Georgia,serif;font-size:clamp(18px,2vw,22px);font-weight:300;line-height:1.5;max-width:640px;color:var(--paper-dim);margin:0}
+  .hero-meta{margin-top:36px;display:flex;flex-wrap:wrap;gap:32px;font-size:13px;color:var(--paper-mute);padding-top:22px;border-top:1px solid var(--border)}
+  .hero-meta div{display:flex;flex-direction:column;gap:4px}
+  .hero-meta label{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);opacity:.75}
+  .hero-meta strong{color:var(--paper);font-weight:500;font-size:14px}
+
+  /* Succession badge — Code 1: green "Đang truyền nghề" */
+  .succession-badge{position:absolute;top:24px;right:24px;z-index:3;display:inline-flex;align-items:center;gap:9px;
+    background:rgba(107,154,58,.16);border:1px solid rgba(107,154,58,.5);
+    color:#bcdf86;font-family:"Manrope",sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;
+    padding:8px 14px;border-radius:999px;text-transform:uppercase;backdrop-filter:blur(6px)}
+  .succession-badge .dot{width:7px;height:7px;border-radius:50%;background:#8fc24a;box-shadow:0 0 10px rgba(143,194,74,.7)}
+
+  @media (max-width:780px){.succession-badge{top:16px;right:16px;font-size:10.5px;padding:6px 11px}}
+
+  /* ========== FACTS STRIP ========== */
+  .facts{max-width:var(--maxw);margin:0 auto;padding:36px 24px;display:grid;grid-template-columns:repeat(6,1fr);gap:0;border-bottom:1px solid var(--border)}
+  .fact{padding:14px 16px 14px 16px;border-left:1px solid var(--border)}
+  .fact:first-child{border-left:0;padding-left:0}
+  .fact .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:6px}
+  .fact .v{font-family:"Fraunces",Georgia,serif;font-size:19px;font-weight:400;letter-spacing:-.01em;color:var(--paper);line-height:1.18}
+  .fact .v.muted{color:var(--paper-mute);font-style:italic;font-size:15px}
+  @media (max-width:780px){
+    .facts{grid-template-columns:repeat(2,1fr);padding:24px 20px}
+    .fact{border-left:0;border-top:1px solid var(--border);padding:14px 0}
+    .fact:nth-child(odd){padding-right:14px}
+    .fact:nth-child(even){padding-left:14px;border-left:1px solid var(--border)}
+    .fact:first-child,.fact:nth-child(2){border-top:0}
+  }
+
+  /* ========== ARTISAN CARD ========== */
+  .artisan{max-width:var(--maxw);margin:0 auto;padding:72px 24px 24px}
+  .artisan-card{display:grid;grid-template-columns:240px 1fr;gap:36px;align-items:start;background:var(--bg-2);border:1px solid var(--border);border-radius:18px;padding:30px;overflow:hidden;position:relative}
+  .artisan-portrait{aspect-ratio:3/4;border-radius:12px;background:
+    linear-gradient(160deg,#2a1208 0%,#5a2412 30%,#9a4020 60%,#c4623a 100%);
+    position:relative;overflow:hidden}
+  .artisan-portrait::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 38% 32%,rgba(255,180,120,.4) 0,transparent 32%),
+    radial-gradient(circle at 60% 88%,rgba(0,0,0,.5) 0,transparent 50%),
+    repeating-linear-gradient(118deg,rgba(255,255,255,.03) 0 1px,transparent 1px 5px)}
+  .artisan-portrait .corner-label{position:absolute;left:10px;bottom:10px;z-index:2;font-family:"Manrope";font-size:9.5px;color:rgba(245,236,222,.85);letter-spacing:.05em;text-transform:uppercase;background:rgba(0,0,0,.45);padding:4px 8px;border-radius:6px;backdrop-filter:blur(4px)}
+  .artisan-meta .kicker{margin-bottom:10px}
+  .artisan h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 5px;letter-spacing:-.015em}
+  .artisan .role{color:var(--paper-mute);font-size:13px;margin:0 0 18px;font-family:"Manrope"}
+  .artisan .quote{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:20px;line-height:1.5;color:var(--paper);margin:0 0 16px;font-weight:300}
+  .artisan .credit{font-size:12.5px;color:var(--paper-mute)}
+  .artisan-actions{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}
+  .artisan-actions button{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:8px 14px;border-radius:999px;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .artisan-actions button.primary{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:500}
+  .artisan-actions button.ghost{color:var(--paper-mute)}
+  .artisan-actions button:hover{background:var(--bg-3);color:var(--paper)}
+  .artisan-actions button.primary:hover{background:var(--accent-2);color:var(--paper)}
+  .ai-badge{position:absolute;top:18px;right:20px;font-family:"Manrope";font-size:10px;letter-spacing:.06em;color:var(--paper-mute)}
+  .ai-badge::before{content:"✦ ";color:var(--accent)}
+  @media (max-width:780px){.artisan-card{grid-template-columns:1fr;gap:22px}.artisan-portrait{max-width:200px}}
+
+  /* ========== ARTICLE / STORY ========== */
+  article.story{max-width:var(--maxw);margin:0 auto;padding:48px 24px 24px;position:relative}
+  article.story h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;line-height:1.15;margin:0 0 28px;color:var(--paper)}
+  article.story h3{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:22px;margin:44px 0 14px;letter-spacing:-.01em;color:var(--paper)}
+  article.story p{font-family:"Fraunces",Georgia,serif;font-size:18.5px;line-height:1.7;margin:0 0 22px;color:var(--paper-dim);font-weight:300;text-wrap:pretty}
+  article.story p.lead{font-size:22px;line-height:1.55;color:var(--paper)}
+  article.story p.lead::first-letter{font-size:72px;float:left;font-weight:400;line-height:.85;margin:8px 12px 0 -2px;color:var(--accent);font-family:"Fraunces",Georgia,serif}
+  article.story blockquote{border:0;margin:48px 0;padding:0;text-align:center}
+  article.story blockquote p{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:28px;line-height:1.35;color:var(--paper);font-weight:300;letter-spacing:-.01em;max-width:680px;margin:0 auto 14px;text-wrap:balance}
+  article.story blockquote cite{font-style:normal;font-size:13px;color:var(--paper-mute);font-family:"Manrope",sans-serif;letter-spacing:.04em;text-transform:uppercase}
+  article.story blockquote .translation{font-family:"Manrope",sans-serif;font-style:normal;font-size:13px;color:var(--paper-mute);max-width:560px;margin:14px auto 0;line-height:1.55;font-weight:400}
+
+  /* ========== 3D HOUSEHOLD LAYOUT (fallback diagram) ========== */
+  .layout-section{background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:64px 24px;margin-top:32px}
+  .layout-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:36px;align-items:start}
+  .layout-inner h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .layout-inner .sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 22px;font-family:"Manrope"}
+  .layout-stat{font-family:"Fraunces",Georgia,serif;font-size:18px;color:var(--paper);margin:0 0 4px;letter-spacing:-.01em}
+  .layout-stat .accent{color:var(--accent)}
+
+  .layout-diagram{position:relative;background:
+    radial-gradient(ellipse at 50% 50%,rgba(196,98,58,.05) 0,transparent 60%),
+    var(--bg-3);
+    border:1px solid var(--border);border-radius:16px;padding:28px;aspect-ratio:5/4;
+    background-image:
+      linear-gradient(rgba(196,98,58,.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(196,98,58,.04) 1px,transparent 1px);
+    background-size:32px 32px}
+  .layout-svg{width:100%;height:100%;display:block;overflow:visible}
+  .zone-rect{fill:var(--bg-2);stroke:var(--accent);stroke-width:1.5;stroke-dasharray:0;transition:fill .25s,stroke-width .25s,filter .25s;cursor:pointer}
+  .zone-rect.dashed{stroke-dasharray:6 5}
+  .zone-rect:hover{fill:rgba(196,98,58,.1);stroke-width:2.5;filter:drop-shadow(0 0 16px rgba(196,98,58,.25))}
+  .zone-badge{font-family:"Fraunces",serif;font-size:18px;font-weight:500;fill:var(--accent);letter-spacing:.02em;pointer-events:none}
+  .zone-label{font-family:"Manrope",sans-serif;font-size:10.5px;font-weight:600;fill:var(--paper);letter-spacing:.04em;pointer-events:none;text-transform:uppercase}
+  .zone-sub{font-family:"Manrope",sans-serif;font-size:9.5px;fill:var(--paper-mute);pointer-events:none}
+
+  .compass{position:absolute;right:16px;bottom:16px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;color:var(--paper-mute)}
+  .compass svg{width:100%;height:100%}
+
+  .zone-tooltip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--accent);border-radius:12px;padding:14px 16px;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.4);
+    opacity:0;transform:translate(-50%,-12px) scale(.96);transition:opacity .18s,transform .18s;z-index:5}
+  .zone-tooltip.show{opacity:1;transform:translate(-50%,-100%) scale(1)}
+  .zone-tooltip .zt-name{font-family:"Manrope";font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+  .zone-tooltip .zt-desc{font-family:"Manrope";font-size:12.5px;color:var(--paper-dim);line-height:1.5;margin-bottom:10px}
+  .zone-tooltip .zt-quote{font-family:"Fraunces",serif;font-style:italic;font-size:14px;color:var(--paper);line-height:1.4;border-top:1px solid var(--border);padding-top:10px}
+
+  .zone-legend{display:flex;flex-direction:column;gap:0}
+  .zone-legend .zl{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--border);align-items:start;cursor:pointer;transition:background .15s}
+  .zone-legend .zl:first-child{border-top:0;padding-top:0}
+  .zone-legend .zl:hover{background:rgba(196,98,58,.04)}
+  .zone-legend .zl.active{background:rgba(196,98,58,.08)}
+  .zone-legend .badge{width:26px;height:26px;border-radius:6px;border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:14px;color:var(--accent);background:rgba(196,98,58,.08)}
+  .zone-legend .zl-name{font-family:"Manrope";font-size:13px;font-weight:600;color:var(--paper);margin:0 0 4px}
+  .zone-legend .zl-desc{font-family:"Manrope";font-size:12px;color:var(--paper-mute);line-height:1.5;margin:0}
+
+  @media (max-width:900px){.layout-inner{grid-template-columns:1fr}}
+
+  /* ========== MEDIA STRIP ========== */
+  .media-strip{padding:36px 0 8px;background:var(--bg)}
+  .media-strip-inner{max-width:1240px;margin:0 auto;padding:0 24px}
+  .media-strip-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+  .media-strip-head h3{font-family:"Fraunces",serif;font-weight:400;font-size:20px;margin:0;color:var(--paper);letter-spacing:-.01em}
+  .media-strip-head .ms-note{font-family:"Manrope";font-size:11.5px;color:var(--paper-mute);letter-spacing:.04em}
+  .media-rail{display:flex;gap:14px;overflow-x:auto;padding:6px 24px 24px;margin:0 -24px;scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent}
+  .media-rail::-webkit-scrollbar{height:8px}
+  .media-rail::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px}
+  .media-card{position:relative;flex-shrink:0;border-radius:12px;border:1px solid var(--border);overflow:hidden;background:var(--bg-2);display:flex;align-items:flex-end;padding:14px;transition:border-color .2s,transform .2s}
+  .media-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .media-card .ms-label{position:relative;z-index:2;font-family:"Manrope";font-size:12.5px;font-weight:600;color:var(--paper);letter-spacing:.04em;text-transform:uppercase}
+  .media-card .ms-chip{position:absolute;top:10px;left:10px;z-index:2;font-family:"Manrope";font-size:9.5px;color:rgba(245,236,222,.85);background:rgba(0,0,0,.55);backdrop-filter:blur(4px);padding:4px 9px;border-radius:6px;letter-spacing:.05em}
+  .media-card .ms-bg{position:absolute;inset:0;z-index:0}
+  .media-card .ms-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 35% 30%,rgba(255,180,120,.25) 0,transparent 35%),linear-gradient(180deg,transparent 50%,rgba(0,0,0,.45) 100%);pointer-events:none}
+  .media-card.portrait{width:200px;aspect-ratio:3/4}
+  .media-card.portrait .ms-bg{background:linear-gradient(160deg,#2a1208 0%,#5a2412 30%,#9a4020 60%,#c4623a 100%)}
+  .media-card.workshop{width:340px;aspect-ratio:16/9}
+  .media-card.workshop .ms-bg{background:linear-gradient(135deg,#1f0e08 0%,#3d1810 50%,#7a3518 100%)}
+  .media-card.product{width:240px;aspect-ratio:1/1}
+  .media-card.product .ms-bg{background:linear-gradient(150deg,#5a2412 0%,#9a4020 60%,#d27345 100%)}
+  .media-card.process{width:340px;aspect-ratio:16/9}
+  .media-card.process .ms-bg{background:linear-gradient(135deg,#26201a 0%,#5a2412 50%,#8a3a1a 100%)}
+  .media-card.audio{width:340px;aspect-ratio:16/9}
+  .media-card.audio .ms-bg{background:linear-gradient(135deg,#0d0805 0%,#26100a 60%,#3d1810 100%)}
+  .media-card.audio .play-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;width:54px;height:54px;border-radius:50%;background:rgba(196,98,58,.85);display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:20px;padding-left:4px}
+  @media (max-width:780px){.media-card.portrait{width:160px}.media-card.workshop,.media-card.process,.media-card.audio{width:280px}.media-card.product{width:200px}}
+
+  /* ========== PROCESS ========== */
+  .process{background:var(--bg);padding:64px 24px;border-bottom:1px solid var(--border)}
+  .step-thumb{width:40px;height:40px;border-radius:6px;margin-bottom:14px;background:linear-gradient(140deg,#2a1208 0%,#5a2412 50%,#9a4020 100%);border:1px solid var(--border);position:relative;overflow:hidden}
+  .step-thumb::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(255,180,120,.3) 0,transparent 40%)}
+  .step .num{display:inline-block}
+  .step-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .step-head .num{margin-bottom:0}
+  .process-inner{max-width:var(--maxw);margin:0 auto}
+  .process-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+  .process h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;margin:0 0 6px;letter-spacing:-.02em}
+  .process .sub{color:var(--paper-mute);margin:0;font-size:13.5px}
+  .time-badge{font-family:"Manrope";font-size:11.5px;color:var(--accent);background:var(--accent-soft);border:1px solid rgba(196,98,58,.3);padding:8px 14px;border-radius:999px;letter-spacing:.04em;text-align:right;line-height:1.3}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .step{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:22px;position:relative;transition:border-color .2s,transform .2s}
+  .step:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .step .num{font-family:"Fraunces",Georgia,serif;font-size:42px;font-weight:300;color:var(--accent);line-height:1;margin-bottom:10px;letter-spacing:-.04em}
+  .step h4{margin:0 0 6px;font-size:15px;font-weight:500;letter-spacing:-.005em;color:var(--paper)}
+  .step p{margin:0;color:var(--paper-mute);font-size:13.5px;line-height:1.55}
+  @media (max-width:780px){.steps{grid-template-columns:1fr}}
+
+  /* ========== MATERIALS & SUPPLY ========== */
+  .materials{padding:64px 24px;background:var(--bg-2);border-bottom:1px solid var(--border)}
+  .materials-inner{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+  .materials h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em;grid-column:1/-1}
+  .materials .section-sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 22px;grid-column:1/-1;font-family:"Manrope"}
+  .flow{display:flex;flex-direction:column;gap:0;align-items:stretch}
+  .flow-node{background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;position:relative}
+  .flow-node.origin{border-color:var(--risk);background:linear-gradient(180deg,rgba(196,96,48,.08) 0,var(--bg-3) 100%)}
+  .flow-node.workshop{border-color:var(--accent);background:linear-gradient(180deg,rgba(196,98,58,.08) 0,var(--bg-3) 100%)}
+  .flow-node .fn-tag{font-family:"Manrope";font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:6px}
+  .flow-node.origin .fn-tag{color:var(--risk)}
+  .flow-node.workshop .fn-tag{color:var(--accent)}
+  .flow-node .fn-name{font-family:"Fraunces",serif;font-size:18px;color:var(--paper);margin:0 0 4px;letter-spacing:-.01em}
+  .flow-node .fn-sub{font-family:"Manrope";font-size:12.5px;color:var(--paper-mute);margin:0;line-height:1.45}
+  .flow-arrow{padding:14px 0 14px 28px;border-left:1px dashed var(--border-strong);margin-left:24px;color:var(--paper-mute);font-family:"Manrope";font-size:12px;letter-spacing:.04em}
+  .flow-arrow::before{content:"↓ ";color:var(--accent)}
+
+  .risk-panel{background:var(--bg-3);border:1px solid var(--border);border-radius:14px;padding:24px}
+  .risk-panel h3{font-family:"Fraunces",serif;font-weight:500;font-size:18px;margin:0 0 12px}
+  .risk-level{display:inline-flex;align-items:center;gap:8px;font-family:"Manrope";font-size:13px;color:var(--paper);background:rgba(196,154,48,.12);border:1px solid rgba(196,154,48,.4);padding:6px 12px;border-radius:999px;margin-bottom:18px}
+  .risk-level .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 8px var(--warn)}
+  .risk-panel ul{list-style:none;padding:0;margin:0 0 20px}
+  .risk-panel li{font-family:"Manrope";font-size:13px;color:var(--paper-dim);padding:8px 0 8px 18px;line-height:1.5;position:relative;border-top:1px solid var(--border)}
+  .risk-panel li:first-child{border-top:0}
+  .risk-panel li::before{content:"";position:absolute;left:0;top:14px;width:6px;height:6px;border-radius:50%;background:var(--warn)}
+  .risk-panel li em{color:var(--paper-mute);font-style:italic;font-family:"Fraunces",serif}
+  .env-deps{font-family:"Manrope";font-size:12.5px;color:var(--paper-dim);line-height:1.6;border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px}
+  .env-deps strong{color:var(--paper-mute);font-weight:500;text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;display:block;margin-bottom:4px}
+  .waste{font-family:"Manrope";font-size:11.5px;color:var(--paper-mute);line-height:1.55;border-top:1px solid var(--border);padding-top:12px}
+
+  @media (max-width:780px){.materials-inner{grid-template-columns:1fr}}
+
+  /* ========== ECONOMIC PORTRAIT ========== */
+  .econ{padding:80px 24px;background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 100%);border-bottom:1px solid var(--border)}
+  .econ-inner{max-width:var(--maxw);margin:0 auto}
+  .econ h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .econ .section-sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 36px;font-family:"Manrope"}
+  .sentiment{text-align:center;margin:24px 0 48px;padding:36px 24px;background:var(--bg-2);border:1px solid var(--border);border-radius:16px}
+  .sentiment .label{font-family:"Manrope";font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-mute);margin-bottom:14px}
+  .sentiment .word{font-family:"Fraunces",serif;font-style:italic;font-weight:400;font-size:clamp(48px,7vw,80px);color:var(--growth);line-height:1;letter-spacing:-.025em;margin-bottom:18px}
+  .sentiment .quote{font-family:"Fraunces",serif;font-style:italic;font-size:18px;color:var(--paper-dim);line-height:1.5;max-width:560px;margin:0 auto;font-weight:300}
+
+  .business-model{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:48px;background:var(--bg-3)}
+  .bm-cell{padding:22px 24px;border-left:1px solid var(--border)}
+  .bm-cell:first-child{border-left:0}
+  .bm-cell .k{font-family:"Manrope";font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:8px}
+  .bm-cell .v{font-family:"Fraunces",serif;font-size:17px;line-height:1.35;color:var(--paper);letter-spacing:-.005em}
+  @media (max-width:780px){.business-model{grid-template-columns:1fr}.bm-cell{border-left:0;border-top:1px solid var(--border)}.bm-cell:first-child{border-top:0}}
+
+  .tension{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--bg-3);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+  .tension-col{padding:24px 26px}
+  .tension-col.strength{border-right:1px solid var(--border)}
+  .tension-col h4{font-family:"Manrope";font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px;font-weight:600}
+  .tension-col.strength h4{color:var(--accent)}
+  .tension-col.pressure h4{color:var(--warn)}
+  .tension-col ul{list-style:none;padding:0;margin:0}
+  .tension-col li{font-family:"Manrope";font-size:13.5px;color:var(--paper-dim);padding:9px 0 9px 18px;line-height:1.5;position:relative;border-top:1px solid var(--border)}
+  .tension-col li:first-child{border-top:0}
+  .tension-col.strength li::before{content:"+";position:absolute;left:0;top:9px;color:var(--accent);font-family:"Fraunces",serif;font-size:16px;line-height:1}
+  .tension-col.pressure li::before{content:"−";position:absolute;left:0;top:9px;color:var(--warn);font-family:"Fraunces",serif;font-size:16px;line-height:1}
+  @media (max-width:780px){.tension{grid-template-columns:1fr}.tension-col.strength{border-right:0;border-bottom:1px solid var(--border)}}
+
+  /* ========== SUCCESSION (Code 1: green wash) ========== */
+  .succession{padding:96px 24px;text-align:center;border-bottom:1px solid var(--border);background:
+    radial-gradient(ellipse at 50% 50%,rgba(107,154,58,.08) 0,transparent 60%),
+    radial-gradient(ellipse at 50% 90%,rgba(107,154,58,.05) 0,transparent 70%),
+    var(--bg);position:relative}
+  .succession::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(107,154,58,.3) 50%,transparent 100%)}
+  .succession-inner{max-width:640px;margin:0 auto}
+  .succession .label{font-family:"Manrope";font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-mute);margin-bottom:18px}
+  .succession h2{font-family:"Fraunces",serif;font-weight:300;font-style:italic;font-size:clamp(48px,7vw,84px);line-height:1.05;color:var(--growth);margin:0 0 30px;letter-spacing:-.02em}
+  .succession .quote{font-family:"Fraunces",serif;font-style:italic;font-size:22px;line-height:1.5;color:var(--paper);margin:0 0 14px;font-weight:300}
+  .succession .quote-cite{font-family:"Manrope";font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--paper-mute);margin-bottom:36px;display:block}
+  .succession .subtext{font-family:"Fraunces",serif;font-size:18px;line-height:1.6;color:var(--paper-dim);margin:0 0 42px;font-weight:300;max-width:560px;margin-left:auto;margin-right:auto}
+  .succession .cta{display:inline-flex;align-items:center;gap:10px;font-family:"Manrope";font-size:13px;color:var(--paper);background:transparent;border:1px solid var(--border-strong);padding:12px 22px;border-radius:999px;cursor:pointer;transition:border-color .2s,background .2s}
+  .succession .cta:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .succession .cta-arrow{color:var(--accent)}
+
+  /* ========== MAP (province-level) ========== */
+  .map-section{padding:64px 24px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .map-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:320px 1fr;gap:36px;align-items:start}
+  .map-inner h2{font-family:"Fraunces",serif;font-weight:400;font-size:28px;margin:0 0 10px;letter-spacing:-.02em}
+  .map-inner p{color:var(--paper-dim);font-size:14px;line-height:1.6;margin:0 0 18px}
+  .map-note{font-family:"Manrope";font-size:12px;color:var(--warn);background:rgba(196,154,48,.1);border:1px dashed rgba(196,154,48,.4);border-radius:8px;padding:10px 14px;line-height:1.45}
+  #miniMap{width:100%;height:440px;border-radius:16px;background:#e8dfcf;border:1px solid var(--border)}
+  @media (max-width:900px){.map-inner{grid-template-columns:1fr}}
+
+  .leaflet-container{font:inherit;background:#e8dfcf}
+  .leaflet-control-attribution{background:rgba(245,236,222,.8)!important;color:#5a544a!important;font-size:10px}
+  .leaflet-control-attribution a{color:#5a544a!important}
+  .leaflet-control-zoom{border:1px solid rgba(26,20,16,.2)!important;overflow:hidden;border-radius:8px!important;box-shadow:0 2px 8px rgba(0,0,0,.08)!important}
+  .leaflet-control-zoom a{background:#f5ecde!important;color:#1a1410!important;border-color:rgba(26,20,16,.15)!important}
+  .home-marker{width:18px;height:18px;border-radius:50%;background:var(--accent);border:3px solid var(--paper);box-shadow:0 0 0 4px rgba(196,98,58,.35),0 2px 6px rgba(0,0,0,.2)}
+
+  /* ========== RELATED ========== */
+  .related{padding:64px 24px;background:var(--bg-2)}
+  .related-inner{max-width:var(--maxw);margin:0 auto}
+  .related h2{font-family:"Fraunces",serif;font-weight:400;font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
+  .related .sub{color:var(--paper-mute);margin:0 0 24px;font-size:13.5px}
+  .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .related-card{background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:20px 22px;text-decoration:none;color:var(--paper);border-bottom:1px solid var(--border);cursor:pointer;transition:transform .2s,border-color .2s;display:block}
+  .related-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .related-card .fam{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:8px;font-weight:600}
+  .related-card h4{font-family:"Fraunces",serif;font-weight:500;font-size:18px;margin:0 0 6px;letter-spacing:-.005em}
+  .related-card .meta{font-size:12.5px;color:var(--paper-mute);margin:0 0 12px;line-height:1.45}
+  .related-card .badge{display:inline-flex;align-items:center;gap:6px;font-family:"Manrope";font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-mute)}
+  .related-card .badge .dot{width:6px;height:6px;border-radius:50%}
+  .related-card .badge.last .dot{background:var(--danger)}
+  .related-card .badge.none .dot{background:var(--warn)}
+  .related-card .badge.active .dot{background:var(--growth)}
+  @media (max-width:780px){.related-grid{grid-template-columns:1fr}}
+
+  /* ========== FOOTER ========== */
+  footer{padding:40px 24px 60px;text-align:center;color:var(--paper-mute);font-size:13px;border-top:1px solid var(--border)}
+  footer p{margin:6px 0}
+  footer a{color:var(--paper-dim);border-bottom-color:transparent}
+  footer a:hover{color:var(--paper);border-bottom-color:var(--border-strong)}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <a class="logo" href="#"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="mapme" style="width:24px;height:24px;flex-shrink:0"><path d="M50 52 L88 31 L88 71 L50 92 Z" fill="#7B3FEB"/><path d="M12 31 L50 52 L50 92 L12 71 Z" fill="#A370F7"/><path d="M50 8 L88 31 L50 52 L12 31 Z" fill="#6E9834"/><path d="M50 8 Q70 16 88 31 Q66 24 50 32 Q34 24 12 31 Q30 16 50 8 Z" fill="#B6D86E"/><path d="M12 66 Q25 58 38 66 T62 66 T88 62" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg><span style="font-weight:600">map<em style="font-style:normal;color:var(--accent)">me</em></span></a>
+  <div class="crumbs">
+    <a href="#">Bản đồ</a><span class="sep">/</span>
+    <a href="#">Bình Dương</a><span class="sep">/</span>
+    <a href="#">Gốm Lái Thiêu</a><span class="sep">/</span>
+    <span style="color:var(--paper)">Huỳnh Xuân Huỳnh</span>
+  </div>
+  <div class="actions">
+    <button class="btn">Lưu</button>
+    <button class="btn">Chia sẻ</button>
+    <button class="btn primary">Liên hệ</button>
+  </div>
+</nav>
+
+<!-- ========== STICKY SECTION NAV ========== -->
+<div class="section-nav" id="sectionNav">
+  <div class="section-nav-inner">
+    <a href="#artisan" data-target="artisan">Nghệ nhân</a>
+    <a href="#story" data-target="story">Câu chuyện</a>
+    <a href="#layout" data-target="layout">Xưởng</a>
+    <a href="#process" data-target="process">Quy trình</a>
+    <a href="#materials" data-target="materials">Vật liệu</a>
+    <a href="#economy" data-target="economy">Kinh tế</a>
+    <a href="#succession" data-target="succession">Kế nghiệp</a>
+  </div>
+</div>
+
+<!-- ========== HERO ========== -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-noise"></div>
+
+  <div class="succession-badge" title="Trạng thái kế nghiệp">
+    <span class="dot"></span>
+    Đang truyền nghề
+  </div>
+
+  <div class="hero-content">
+    <div class="kicker">
+      <span class="pill">Gốm Lái Thiêu</span>
+      <span>Lái Thiêu · Bình Dương · Đồng bằng sông Cửu Long</span>
+    </div>
+    <h1 class="title">Huỳnh Xuân Huỳnh<br><em>"Một nét vẽ tạo nên hình dáng"</em></h1>
+    <p class="dek">Năm 29 tuổi, Huỳnh dùng toàn bộ tiết kiệm của mình để đặt 500 chiếc chén đầu tiên. Hôm nay, Nắng Ceramics là một trong số ít thương hiệu đang khôi phục gốm Lái Thiêu — loại gốm từng định hình cái đẹp của Nam Bộ suốt một thế kỷ.</p>
+    <div class="hero-meta">
+      <div><label>Sinh năm</label><strong>1997</strong></div>
+      <div><label>Kinh nghiệm</label><strong>8 năm</strong></div>
+      <div><label>Vật liệu chính</label><strong>Đất cao lanh, men tro, men đá</strong></div>
+      <div><label>Trạng thái</label><strong>Đang hoạt động</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== QUICK FACTS STRIP ========== -->
+<section class="facts">
+  <div class="fact"><div class="k">Tỉnh/TP</div><div class="v">Bình Dương</div></div>
+  <div class="fact"><div class="k">Nghề</div><div class="v">Gốm Lái Thiêu</div></div>
+  <div class="fact"><div class="k">Sinh năm</div><div class="v">1997</div></div>
+  <div class="fact"><div class="k">Kinh nghiệm</div><div class="v">8 năm</div></div>
+  <div class="fact"><div class="k">Xưởng</div><div class="v">4.000 m²</div></div>
+  <div class="fact"><div class="k">Kế nghiệp</div><div class="v">Đang truyền</div></div>
+</section>
+
+<!-- ========== THE ARTISAN ========== -->
+<section class="artisan" id="artisan">
+  <div class="artisan-card">
+    <span class="ai-badge">Tạo bởi heritage-analyst · 01/04/2026</span>
+    <div class="artisan-portrait">
+      <span class="corner-label">Ảnh: chưa có · Chuyến thực địa tiếp theo</span>
+    </div>
+    <div class="artisan-meta">
+      <div class="kicker"><span class="pill">Nghệ nhân</span></div>
+      <h2>Huỳnh Xuân Huỳnh</h2>
+      <p class="role">Gốm Lái Thiêu · 8 năm kinh nghiệm · sinh 1997 · Người sáng lập Nắng Ceramics</p>
+      <p class="quote">"Nó là một nét vẽ tạo nên một cái hình dáng… hỏi cái sự dứt khoát của người thợ."</p>
+      <p class="credit">Ghi âm ngày 01/04/2026 · Phiên A005 · Phiên dịch: mapme</p>
+      <div class="artisan-actions">
+        <button class="primary">Nhắn tin</button>
+        <button>Xem sản phẩm</button>
+        <button class="ghost">Tải dữ liệu</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MEDIA STRIP ========== -->
+<section class="media-strip" aria-label="Hình ảnh & video">
+  <div class="media-strip-inner">
+    <div class="media-strip-head">
+      <h3>Hình ảnh &amp; ghi âm</h3>
+      <span class="ms-note">Chưa có · dự kiến chuyến thực địa tiếp theo</span>
+    </div>
+  </div>
+  <div class="media-rail">
+    <div class="media-card portrait"><div class="ms-bg"></div><span class="ms-chip">📷 Chuyến thực địa tiếp theo</span><span class="ms-label">Chân dung</span></div>
+    <div class="media-card workshop"><div class="ms-bg"></div><span class="ms-chip">📷 Chuyến thực địa tiếp theo</span><span class="ms-label">Xưởng &amp; lò</span></div>
+    <div class="media-card product"><div class="ms-bg"></div><span class="ms-chip">📷 Chuyến thực địa tiếp theo</span><span class="ms-label">Sản phẩm</span></div>
+    <div class="media-card process"><div class="ms-bg"></div><span class="ms-chip">📷 Chuyến thực địa tiếp theo</span><span class="ms-label">Vẽ thảo</span></div>
+    <div class="media-card audio"><div class="ms-bg"></div><span class="ms-chip">🎧 Ghi âm A005 · 90 phút</span><span class="play-icon">▶</span><span class="ms-label">Ghi âm / Video</span></div>
+  </div>
+</section>
+
+<!-- ========== THE STORY ========== -->
+<article class="story" id="story">
+  <h2>Khôi phục gốm Lái Thiêu — một nét vẽ dứt khoát</h2>
+
+  <p class="lead">Nắng Ceramics bắt đầu từ 500.000 đồng — toàn bộ tiết kiệm của Huỳnh khi còn là sinh viên. Đủ để đặt 500 chiếc chén tại một lò gốm già ở Lái Thiêu. Anh không biết chúng sẽ bán được không. Nhưng anh biết gốm Lái Thiêu truyền thống đang biến mất khỏi các tiệm bán đồ, khỏi bàn ăn của người Sài Gòn — và điều đó không ổn.</p>
+
+  <p>Lái Thiêu từng là trung tâm gốm Nam Bộ, mang theo kỹ thuật của người Triều Châu, Phúc Kiến, Quảng Đông di cư qua nhiều thế kỷ. Mỗi dòng người mang một kỹ năng: vẽ xanh trắng, đắp nổi, men tro. Cái con gà trống vẽ trên chén — con gà không có ở đâu giống gà Lái Thiêu — là kết quả của những cuộc gặp gỡ văn hóa đó, được chắt lọc qua nhiều đời thợ.</p>
+
+  <p>Anh tiếp nhận lại lò từ một người chủ lò lớn tuổi không còn người kế. Hiện Nắng đào tạo sinh viên thực tập, hợp tác với các lò khác trong làng, và bán sản phẩm đến nhà hàng và nhà sưu tầm trong nước. Không giàu — anh nói thẳng điều đó. Nhưng nghề sống.</p>
+
+  <blockquote>
+    <p>"Nhà mình có truyền thống nấu ăn cầu kỳ. Hồi nhỏ hay dùng gốm Lái Thiêu. Rồi ra tiệm không thấy bán nữa. Đó là lúc mình nghĩ phải làm điều gì đó."</p>
+    <cite>— Huỳnh Xuân Huỳnh, Lái Thiêu, 01/04/2026</cite>
+    <div class="translation">My family had a tradition of careful cooking. We used Lái Thiêu ceramics growing up. Then one day I went to the shop and they were no longer for sale. That was the moment I knew I had to do something.</div>
+  </blockquote>
+
+  <h3>Vẽ thảo — triết học của sự không hoàn hảo</h3>
+
+  <p>Kỹ thuật vẽ thảo là vẽ một nét liên tục, không sửa. Nét cọ tiếp xúc đất ướt — nếu do dự, nét sẽ loang. Nếu vội, nét sẽ gãy. Huỳnh gọi đây là triết học: <em>"không hoàn hảo"</em> không phải lỗi — đó là dấu vết của con người thật sự làm ra vật. Máy không thể tạo ra điều đó. Đó là lý do gốm thủ công có giá trị.</p>
+</article>
+
+<!-- ========== 3D HOUSEHOLD LAYOUT (FALLBACK DIAGRAM) ========== -->
+<section class="layout-section" id="layout">
+  <div class="layout-inner">
+    <div>
+      <div class="kicker" style="margin-bottom:12px"><span class="pill">Sơ đồ xưởng</span></div>
+      <h2>Bảy khu vực, một dòng chảy của lửa</h2>
+      <p class="sub">Xưởng Nắng vận hành quanh một trục: từ đất ướt đến lò nung củi. Mỗi zone là một trạm, lò là trái tim — thắp sáng cả tháng không tắt.</p>
+      <p class="layout-stat"><span class="accent">~4.000 m²</span> (xưởng chính) <span style="color:var(--paper-mute)">+ 100 m² (xưởng phụ)</span> · Lái Thiêu, Bình Dương</p>
+
+      <div class="layout-diagram" id="layoutDiagram" style="margin-top:22px">
+        <svg class="layout-svg" viewBox="0 0 600 480" preserveAspectRatio="xMidYMid meet">
+          <!-- Zone A: Xử lý đất — top left -->
+          <g class="zone" data-zone="A">
+            <rect class="zone-rect" x="30" y="30" width="170" height="120" rx="10"/>
+            <text class="zone-badge" x="48" y="58">A</text>
+            <text class="zone-label" x="74" y="56">XỬ LÝ ĐẤT</text>
+            <text class="zone-sub" x="48" y="78">Máy nghiền · cao lanh Tây Nguyên</text>
+            <g opacity=".22" stroke="#c4623a" stroke-width="1" fill="none">
+              <circle cx="80" cy="115" r="14"/>
+              <circle cx="120" cy="115" r="14"/>
+              <circle cx="160" cy="115" r="14"/>
+            </g>
+          </g>
+
+          <!-- Zone B: Tạo hình — top center -->
+          <g class="zone" data-zone="B">
+            <rect class="zone-rect" x="220" y="30" width="170" height="120" rx="10"/>
+            <text class="zone-badge" x="238" y="58">B</text>
+            <text class="zone-label" x="264" y="56">TẠO HÌNH</text>
+            <text class="zone-sub" x="238" y="78">Bàn xoay · khuôn · be chạch</text>
+            <g opacity=".25" stroke="#c4623a" stroke-width="1" fill="none">
+              <circle cx="270" cy="115" r="16"/>
+              <circle cx="270" cy="115" r="6"/>
+              <circle cx="340" cy="115" r="16"/>
+              <circle cx="340" cy="115" r="6"/>
+            </g>
+          </g>
+
+          <!-- Zone C: Phơi — top right (sun-dependent, dashed) -->
+          <g class="zone" data-zone="C">
+            <rect class="zone-rect dashed" x="410" y="30" width="160" height="120" rx="10"/>
+            <text class="zone-badge" x="428" y="58">C</text>
+            <text class="zone-label" x="454" y="56">KHU PHƠI</text>
+            <text class="zone-sub" x="428" y="78">Giàn phơi ngoài trời · phụ nắng</text>
+            <g opacity=".3" stroke="#c4623a" stroke-width="1">
+              <line x1="425" y1="100" x2="565" y2="100"/>
+              <line x1="425" y1="118" x2="565" y2="118"/>
+              <line x1="425" y1="136" x2="565" y2="136"/>
+            </g>
+          </g>
+
+          <!-- Zone D: Tráng men & vẽ — middle left -->
+          <g class="zone" data-zone="D">
+            <rect class="zone-rect" x="30" y="180" width="170" height="120" rx="10"/>
+            <text class="zone-badge" x="48" y="208">D</text>
+            <text class="zone-label" x="74" y="206">MEN &amp; VẼ THẢO</text>
+            <text class="zone-sub" x="48" y="228">Ánh sáng tự nhiên · yên tĩnh</text>
+            <!-- Brushstroke hint -->
+            <g opacity=".4" stroke="#c4623a" stroke-width="1.4" fill="none" stroke-linecap="round">
+              <path d="M 55 268 Q 90 252 130 268 T 180 264"/>
+            </g>
+          </g>
+
+          <!-- Zone E: Lò nung củi — CENTER, spiritual heart, accent -->
+          <g class="zone" data-zone="E" id="zoneE">
+            <rect class="zone-rect" x="220" y="180" width="170" height="160" rx="10"
+                  style="stroke:var(--accent);stroke-width:2.4;fill:rgba(196,98,58,.09)"/>
+            <text class="zone-badge" x="238" y="208">E</text>
+            <text class="zone-label" x="264" y="206">LÒ NUNG CỦI</text>
+            <text class="zone-sub" x="238" y="226">Vỏ cao su · trung tâm tinh thần</text>
+            <!-- Kiln dome -->
+            <g opacity=".55" fill="none" stroke="#c4623a" stroke-width="1.4">
+              <path d="M 250 312 Q 305 252 360 312 Z"/>
+              <path d="M 270 312 Q 305 282 340 312"/>
+              <line x1="305" y1="252" x2="305" y2="240"/>
+              <circle cx="305" cy="234" r="3" fill="#c4623a"/>
+            </g>
+            <text class="zone-sub" x="238" y="328" style="fill:var(--accent);font-style:italic;font-family:Fraunces,serif;font-size:11px">★ bàn thờ Ông thần lò</text>
+          </g>
+
+          <!-- Zone F: Lò điện thử men — right of E -->
+          <g class="zone" data-zone="F">
+            <rect class="zone-rect" x="410" y="180" width="160" height="120" rx="10"/>
+            <text class="zone-badge" x="428" y="208">F</text>
+            <text class="zone-label" x="454" y="206">LÒ ĐIỆN THỬ MEN</text>
+            <text class="zone-sub" x="428" y="226">Thử công thức · Pháp · Nhật · TQ</text>
+            <g opacity=".3" stroke="#c4623a" stroke-width="1" fill="none">
+              <rect x="455" y="248" width="80" height="42" rx="3"/>
+              <line x1="475" y1="258" x2="525" y2="258"/>
+              <line x1="475" y1="270" x2="525" y2="270"/>
+              <circle cx="540" cy="269" r="3" fill="#c4623a"/>
+            </g>
+          </g>
+
+          <!-- Zone G: Showroom & kho — bottom -->
+          <g class="zone" data-zone="G">
+            <rect class="zone-rect" x="30" y="330" width="370" height="100" rx="10"/>
+            <text class="zone-badge" x="48" y="358">G</text>
+            <text class="zone-label" x="74" y="356">SHOWROOM &amp; KHO</text>
+            <text class="zone-sub" x="48" y="376">Bán sỉ · khách trực tiếp · sản phẩm bể → vật liệu xây dựng</text>
+            <g opacity=".25" stroke="#c4623a" stroke-width="1" fill="none">
+              <rect x="60" y="392" width="22" height="28" rx="2"/>
+              <rect x="92" y="392" width="22" height="28" rx="2"/>
+              <rect x="124" y="392" width="22" height="28" rx="2"/>
+              <rect x="156" y="392" width="22" height="28" rx="2"/>
+              <rect x="188" y="392" width="22" height="28" rx="2"/>
+              <rect x="220" y="392" width="22" height="28" rx="2"/>
+              <rect x="252" y="392" width="22" height="28" rx="2"/>
+            </g>
+          </g>
+
+          <!-- Subtle process flow lines -->
+          <g opacity=".18" stroke="#c4623a" stroke-width="1" stroke-dasharray="3 4" fill="none">
+            <path d="M 200 90 L 220 90"/>
+            <path d="M 390 90 L 410 90"/>
+            <path d="M 305 150 L 305 180"/>
+            <path d="M 200 240 L 220 240"/>
+            <path d="M 390 240 L 410 240"/>
+            <path d="M 305 340 L 305 330"/>
+          </g>
+        </svg>
+
+        <!-- Compass -->
+        <div class="compass" aria-label="Compass — North">
+          <svg viewBox="0 0 56 56">
+            <circle cx="28" cy="28" r="22" fill="none" stroke="currentColor" stroke-width="1" opacity=".4"/>
+            <path d="M28 10 L32 28 L28 24 L24 28 Z" fill="#c4623a"/>
+            <path d="M28 46 L32 28 L28 32 L24 28 Z" fill="currentColor" opacity=".5"/>
+            <text x="28" y="9" text-anchor="middle" font-family="Manrope" font-size="9" font-weight="600" fill="#c4623a">N</text>
+            <text x="28" y="55" text-anchor="middle" font-family="Manrope" font-size="9" fill="currentColor" opacity=".55">S</text>
+          </svg>
+        </div>
+
+        <!-- Tooltip (zone E quote) -->
+        <div class="zone-tooltip" id="zoneTooltip">
+          <div class="zt-name">Lò nung củi (vỏ cao su)</div>
+          <div class="zt-desc">Trung tâm tinh thần của xưởng. Bàn thờ Ông thần lò đặt tại cửa lò. Đốt bằng vỏ cây cao su — nhiệt độ và thời gian kiểm soát bằng kinh nghiệm, không bằng máy.</div>
+          <div class="zt-quote">"Lò chén kị nung có đâm tiêu — chữ tiêu nghe như tiêu tán. Người chủ lò không được đi đám tang khi lò đang đốt."</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="zone-legend" id="zoneLegend">
+      <div class="zl" data-zone="A">
+        <div class="badge">A</div>
+        <div><p class="zl-name">Xưởng xử lý đất</p><p class="zl-desc">Máy nghiền đất, trộn cao lanh từ Tây Nguyên. Bắt đầu của mọi sản phẩm.</p></div>
+      </div>
+      <div class="zl" data-zone="B">
+        <div class="badge">B</div>
+        <div><p class="zl-name">Phòng tạo hình</p><p class="zl-desc">Bàn xoay điện, khuôn, be chạch tay. Ba kỹ thuật tạo hình khác nhau trong cùng một phòng.</p></div>
+      </div>
+      <div class="zl" data-zone="C">
+        <div class="badge">C</div>
+        <div><p class="zl-name">Khu phơi sản phẩm</p><p class="zl-desc">Giàn phơi ngoài trời. Mùa nắng: ưu tiên chén dĩa. Mùa mưa: chuyển sang đồ đắp nổi.</p></div>
+      </div>
+      <div class="zl" data-zone="D">
+        <div class="badge">D</div>
+        <div><p class="zl-name">Phòng tráng men &amp; vẽ</p><p class="zl-desc">Vẽ thảo được thực hiện ở đây. Ánh sáng tự nhiên. Yên tĩnh — công đoạn đòi hỏi tập trung cao.</p></div>
+      </div>
+      <div class="zl" data-zone="E">
+        <div class="badge">E</div>
+        <div><p class="zl-name">Lò nung củi (vỏ cao su)</p><p class="zl-desc">Trung tâm tinh thần của xưởng. Bàn thờ Ông thần lò đặt tại cửa lò. Đốt bằng vỏ cây cao su.</p></div>
+      </div>
+      <div class="zl" data-zone="F">
+        <div class="badge">F</div>
+        <div><p class="zl-name">Lò điện thử men</p><p class="zl-desc">Lò nhỏ, thử nghiệm công thức men mới từ Pháp, Nhật, Trung Quốc, Đài Loan.</p></div>
+      </div>
+      <div class="zl" data-zone="G">
+        <div class="badge">G</div>
+        <div><p class="zl-name">Showroom &amp; kho</p><p class="zl-desc">Bán sỉ cho thương lái và khách trực tiếp. Sản phẩm bị bể → bán làm vật liệu xây dựng.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CRAFT PROCESS ========== -->
+<section class="process" id="process">
+  <div class="process-inner">
+    <div class="process-head">
+      <div>
+        <h2>Quy trình làm một chiếc chén gốm Lái Thiêu</h2>
+        <p class="sub">Bảy công đoạn — từ đất cao lanh Tây Nguyên đến chén tráng men trên bàn ăn.</p>
+      </div>
+      <div class="time-badge">Chén, dĩa: 1 ngày<br>Sản phẩm cầu kỳ: nhiều ngày hơn</div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-head"><div class="num">01</div><div class="step-thumb"></div></div><h4>Xử lý đất</h4><p>Cao lanh từ Tây Nguyên nghiền mịn, trộn tỷ lệ. Đất Lái Thiêu gốc đã cạn kiệt — nay lấy từ xa.</p></div>
+      <div class="step"><div class="step-head"><div class="num">02</div><div class="step-thumb"></div></div><h4>Tạo hình</h4><p>Ba cách: xoay tay (thủ công nhất), khuôn (nhanh, đồng đều), be chạch (cho hình dạng phức tạp).</p></div>
+      <div class="step"><div class="step-head"><div class="num">03</div><div class="step-thumb"></div></div><h4>Phơi và sửa</h4><p>Để khô sơ. Kiểm tra, sửa lỗi nhỏ. Mùa mưa giai đoạn này kéo dài hơn.</p></div>
+      <div class="step"><div class="step-head"><div class="num">04</div><div class="step-thumb"></div></div><h4>Nhúng men ướt</h4><p>Nhúng cả sản phẩm vào men. Men tro, men đá, men da lươn — mỗi loại cho màu sắc khác nhau.</p></div>
+      <div class="step"><div class="step-head"><div class="num">05</div><div class="step-thumb"></div></div><h4>Vẽ trang trí</h4><p>Vẽ thảo bằng cọ — một nét, không sửa. Chim, gà, hoa lan, điên điển. Dấu ấn của người thợ.</p></div>
+      <div class="step"><div class="step-head"><div class="num">06</div><div class="step-thumb"></div></div><h4>Nung củi</h4><p>Lò nung vỏ cây cao su. Nhiệt độ và thời gian kiểm soát bằng kinh nghiệm, không bằng máy.</p></div>
+      <div class="step"><div class="step-head"><div class="num">07</div><div class="step-thumb"></div></div><h4>Kiểm tra &amp; phân loại</h4><p>Sản phẩm đạt → bán. Bể, nứt → làm vật liệu xây dựng. Gần như không có rác thải.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MATERIALS & SUPPLY ========== -->
+<section class="materials" id="materials">
+  <div class="materials-inner">
+    <h2>Nguyên liệu &amp; chuỗi cung ứng</h2>
+    <p class="section-sub">Đất Lái Thiêu gốc đã chôn vùi dưới khu dân cư. Men oxit nhập từ bốn quốc gia. Chuỗi cung dài, nhưng gần như khép kín ở đầu phế liệu.</p>
+
+    <div class="flow">
+      <div class="flow-node origin">
+        <div class="fn-tag">● Nguồn (xa · nhập khẩu)</div>
+        <div class="fn-name">Tây Nguyên / Đà Lạt — đất cao lanh</div>
+        <div class="fn-sub">Cách Lái Thiêu ~250 km · Pháp, Nhật, Đài Loan — men oxit</div>
+      </div>
+      <div class="flow-arrow">Thương lái + nhập khẩu trực tiếp</div>
+      <div class="flow-node">
+        <div class="fn-tag">Trung gian</div>
+        <div class="fn-name">Đại lý nguyên liệu</div>
+        <div class="fn-sub">Giá tăng 10 lần trong 8 năm — đất Lái Thiêu gốc bị chôn vùi dưới khu dân cư</div>
+      </div>
+      <div class="flow-arrow">Vận chuyển + tỷ giá ngoại tệ</div>
+      <div class="flow-node workshop">
+        <div class="fn-tag">● Xưởng</div>
+        <div class="fn-name">Xưởng Nắng Ceramics</div>
+        <div class="fn-sub">Lái Thiêu · Bình Dương · 4.000 m² + 100 m²</div>
+      </div>
+    </div>
+
+    <div class="risk-panel">
+      <h3>Rủi ro nguồn cung</h3>
+      <div class="risk-level"><span class="dot"></span>Trung bình–Cao</div>
+      <ul>
+        <li>Đất Lái Thiêu truyền thống khai thác hết, bị chôn vùi dưới khu dân cư</li>
+        <li>Giá nguyên liệu tăng 10 lần trong 8 năm</li>
+        <li>Men oxit nhập từ 4 quốc gia — dễ bị ảnh hưởng tỷ giá</li>
+      </ul>
+      <div class="env-deps">
+        <strong>Phụ thuộc môi trường</strong>
+        Nắng (phơi ngoài trời) · củi vỏ cao su (lò nung) · nhiệt độ ổn định<br>
+        <em style="color:var(--warn);font-style:normal">Rủi ro:</em> mùa mưa → kéo dài giai đoạn phơi
+      </div>
+      <div class="waste">
+        <strong style="color:var(--paper-mute);text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;display:block;margin-bottom:4px">Phế liệu (gần như khép kín)</strong>
+        Đất thừa/bể: tái dùng để vẽ hoặc trộn lại · Nước rửa màu: lắng lọc dùng lại · Chén bể: bán làm vật liệu xây dựng
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ECONOMIC PORTRAIT ========== -->
+<section class="econ" id="economy">
+  <div class="econ-inner">
+    <h2>Chân dung kinh tế</h2>
+    <p class="section-sub">Một thương hiệu mới có câu chuyện. Doanh nghiệp hóa, kế toán đầy đủ. Đào tạo sinh viên thực tập như một dự án cộng đồng.</p>
+
+    <div class="sentiment">
+      <div class="label">Cảm nhận kinh tế</div>
+      <div class="word">Bền vững</div>
+      <p class="quote">"Làm nghề gốm bấp bênh, nghề không đói mà cũng không giàu. Thu nhập đủ ăn — khó khăn nhưng không phải vấn đề bận tâm lớn."</p>
+    </div>
+
+    <div class="business-model">
+      <div class="bm-cell"><div class="k">Kênh bán hàng</div><div class="v">Thương lái tại lò<br><span style="color:var(--paper-mute);font-size:14px">cửa hàng lưu niệm · xuất khẩu gián tiếp</span></div></div>
+      <div class="bm-cell"><div class="k">Lao động</div><div class="v">Nhân viên cố định<br><span style="color:var(--paper-mute);font-size:14px">+ thực tập sinh đào tạo</span></div></div>
+      <div class="bm-cell"><div class="k">Thị trường</div><div class="v">Trong nước (chính)<br><span style="color:var(--paper-mute);font-size:14px">nhà hàng, nhà sưu tầm · một phần xuất khẩu</span></div></div>
+    </div>
+
+    <div class="tension">
+      <div class="tension-col strength">
+        <h4>Sức mạnh</h4>
+        <ul>
+          <li>Thương hiệu rõ ràng, có câu chuyện</li>
+          <li>Doanh nghiệp hóa (có kế toán)</li>
+          <li>Đào tạo sinh viên, kết nối mạng lưới</li>
+          <li>Workshop + nghiên cứu bổ sung thu nhập</li>
+        </ul>
+      </div>
+      <div class="tension-col pressure">
+        <h4>Áp lực</h4>
+        <ul>
+          <li>Chính sách cấm xây lò mới</li>
+          <li>Lò cũ phải hoạt động liên tục — ngừng = mất giấy phép</li>
+          <li>Giá đất và nguyên liệu tăng liên tục</li>
+          <li>Khu dân cư mới xung quanh gây áp lực môi trường</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SUCCESSION ========== -->
+<section class="succession" id="succession">
+  <div class="succession-inner">
+    <div class="label">Kế nghiệp · Code 1</div>
+    <h2>Đang truyền nghề</h2>
+    <p class="quote">"Nắng Ceramics hỗ trợ truyền nghề cho các bạn sinh viên — sinh viên có thể trở thành nhân viên, hay mở thương hiệu riêng. Mình muốn chia sẻ kỹ thuật, không giữ cho riêng mình."</p>
+    <span class="quote-cite">— Huỳnh Xuân Huỳnh</span>
+    <p class="subtext">Tại 29 tuổi, Huỳnh vừa là nghệ nhân trẻ nhất trong mẫu vừa là người duy nhất chủ động xây dựng tương lai cho nghề. Mô hình của anh — truyền nghề như dự án cộng đồng, không phải di sản gia đình — là điểm khác biệt quan trọng nhất trong cả chuyến thực địa.</p>
+    <button class="cta">Bạn muốn học gốm Lái Thiêu? <span class="cta-arrow">→</span> Liên hệ qua mapme</button>
+  </div>
+</section>
+
+<!-- ========== MAP — Province-level ========== -->
+<section class="map-section" id="map">
+  <div class="map-inner">
+    <div>
+      <div class="kicker" style="margin-bottom:12px"><span class="pill">Vị trí</span></div>
+      <h2>Lái Thiêu · Bình Dương</h2>
+      <p>Xưởng nằm tại Lái Thiêu, thị xã Thuận An, Bình Dương — trung tâm gốm Nam Bộ một thế kỷ trước, nay vây quanh bởi khu dân cư mới.</p>
+      <div class="map-note">Tọa độ chính xác chưa được ghi lại trong chuyến này. Hiển thị vùng cấp tỉnh.</div>
+    </div>
+    <div id="miniMap"></div>
+  </div>
+</section>
+
+<!-- ========== RELATED ========== -->
+<section class="related">
+  <div class="related-inner">
+    <h2>Hộ liên quan</h2>
+    <p class="sub">Cùng chuyến thực địa 01/04/2026 · cùng nghề gốm · cùng câu hỏi về tương lai.</p>
+    <div class="related-grid">
+      <a class="related-card" href="#">
+        <div class="fam">Gốm Lái Thiêu</div>
+        <h4>Huê Anh — Tư Thố</h4>
+        <p class="meta">Bình Dương · từ 1981 · Hàng xóm — bán qua thương lái, không có thương hiệu</p>
+        <span class="badge none"><span class="dot"></span>Chưa có người kế</span>
+      </a>
+      <a class="related-card" href="#">
+        <div class="fam">Nhang</div>
+        <h4>Nguyễn Cát Phụi Thuý</h4>
+        <p class="meta">Củ Chi · 30+ năm · Hợp tác xã 47 hộ · TikTok + bán sỉ</p>
+        <span class="badge active"><span class="dot"></span>Đang truyền nghề</span>
+      </a>
+      <a class="related-card" href="household-detail-basket-weaving.html">
+        <div class="fam">Đan lát</div>
+        <h4>Lê Thị Huých</h4>
+        <p class="meta">Củ Chi · 70+ năm · Người thợ đan lát cuối cùng — xuất khẩu Đức</p>
+        <span class="badge last"><span class="dot"></span>Thế hệ cuối</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>mapme · Bản đồ làng nghề Việt Nam</p>
+  <p>Dữ liệu công khai dưới giấy phép <a href="#">CC BY-NC 4.0</a> · <a href="#">Quay lại bản đồ</a> · <a href="#">Đóng góp dữ liệu</a></p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+/* ========== Province-level map (Lái Thiêu, Bình Dương) ========== */
+const HOME = [10.94, 106.71]; // ~Lái Thiêu, Thuận An, Bình Dương
+const map = L.map('miniMap', { zoomControl: true, scrollWheelZoom: false, attributionControl: true }).setView(HOME, 11);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd', maxZoom: 19,
+  attribution: '© OpenStreetMap · © CARTO Voyager'
+}).addTo(map);
+
+// Dashed circle — approximate, GPS unknown
+L.circle(HOME, {
+  radius: 6000, color: '#c4623a', weight: 2, opacity: .85,
+  fillColor: '#c4623a', fillOpacity: .08, dashArray: '5,7'
+}).addTo(map).bindPopup('<strong>Lái Thiêu · Bình Dương</strong><br/>Tọa độ chính xác chưa được ghi lại');
+
+L.marker(HOME, {
+  icon: L.divIcon({ className: '', html: '<div class="home-marker"></div>', iconSize: [18,18], iconAnchor: [9,9] })
+}).addTo(map).bindPopup('<strong>Huỳnh Xuân Huỳnh — Nắng Ceramics</strong><br/>Lái Thiêu, Bình Dương');
+
+/* ========== Sticky section nav ========== */
+const sectionNav = document.getElementById('sectionNav');
+const hero = document.getElementById('hero');
+const navLinks = document.querySelectorAll('.section-nav a');
+const sections = ['artisan','story','layout','process','materials','economy','succession']
+  .map(id => document.getElementById(id))
+  .filter(Boolean);
+
+const heroObserver = new IntersectionObserver(([entry]) => {
+  if (entry.isIntersecting) sectionNav.classList.remove('show');
+  else sectionNav.classList.add('show');
+}, { threshold: 0.1 });
+heroObserver.observe(hero);
+
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(a => a.classList.toggle('active', a.dataset.target === id));
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+sections.forEach(s => sectionObserver.observe(s));
+
+/* ========== Zone diagram interactions ========== */
+const zoneTooltip = document.getElementById('zoneTooltip');
+const layoutDiagram = document.getElementById('layoutDiagram');
+const zoneRects = document.querySelectorAll('.layout-svg .zone');
+const zoneLegendItems = document.querySelectorAll('#zoneLegend .zl');
+
+function highlightZone(letter, on) {
+  zoneRects.forEach(g => {
+    const rect = g.querySelector('rect');
+    if (g.dataset.zone === letter) {
+      if (on) rect.style.filter = 'drop-shadow(0 0 18px rgba(196,98,58,.35))';
+      else rect.style.filter = '';
+    }
+  });
+  zoneLegendItems.forEach(zl => {
+    zl.classList.toggle('active', on && zl.dataset.zone === letter);
+  });
+}
+
+zoneRects.forEach(g => {
+  const letter = g.dataset.zone;
+  g.addEventListener('mouseenter', (e) => {
+    highlightZone(letter, true);
+    if (letter === 'E') {
+      const rect = g.querySelector('rect').getBoundingClientRect();
+      const dRect = layoutDiagram.getBoundingClientRect();
+      zoneTooltip.style.left = (rect.left - dRect.left + rect.width/2) + 'px';
+      zoneTooltip.style.top = (rect.top - dRect.top) + 'px';
+      zoneTooltip.classList.add('show');
+    }
+  });
+  g.addEventListener('mouseleave', () => {
+    highlightZone(letter, false);
+    zoneTooltip.classList.remove('show');
+  });
+});
+
+zoneLegendItems.forEach(zl => {
+  zl.addEventListener('mouseenter', () => highlightZone(zl.dataset.zone, true));
+  zl.addEventListener('mouseleave', () => highlightZone(zl.dataset.zone, false));
+});
+</script>
+
+</body>
+</html>
