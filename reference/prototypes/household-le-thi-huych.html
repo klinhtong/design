@@ -407,26 +407,12 @@
 
   /* ========== FOOTER ========== */
   footer{padding:60px 24px 60px;background:var(--bg-3);color:var(--paper-mute);font-size:13px;border-top:1px solid var(--border)}
-  .footer-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:36px}
-  footer h5{font-family:"Manrope";font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper);margin:0 0 12px;font-weight:600}
-  footer p,footer li{line-height:1.6;font-size:12.5px;margin:0 0 6px}
-  footer ul{list-style:none;padding:0;margin:0}
-  footer ul li{padding:6px 0;display:flex;gap:10px}
-  footer ul li .icon{flex-shrink:0;width:18px;text-align:center}
-  .foot-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
-  .foot-actions button{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:9px 16px;border-radius:999px;font-size:12px;cursor:pointer;text-align:left}
-  .foot-actions button:hover{border-color:var(--accent);color:var(--accent)}
-  .citation-block{max-width:1080px;margin:36px auto 0;border-top:1px solid var(--border);padding-top:20px}
-  .cit-toggle{background:transparent;border:0;color:var(--paper-mute);font-size:11px;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:8px}
-  .cit-toggle:hover{color:var(--paper)}
-  .cit-toggle .chev{transition:transform .25s}
-  .cit-toggle.open .chev{transform:rotate(180deg)}
-  .citation-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
-  .citation-body.open{max-height:200px}
-  .citation-body-inner{font-family:"Fraunces",serif;font-style:italic;font-size:13px;color:var(--paper-dim);line-height:1.6;padding:14px 0;border-left:2px solid var(--accent-line);padding-left:14px;margin-top:10px}
-  .footer-foot{max-width:1080px;margin:32px auto 0;border-top:1px solid var(--border);padding-top:20px;text-align:center;color:var(--paper-mute);font-size:11.5px;letter-spacing:.04em}
-  .footer-foot a{color:var(--paper-dim);border-bottom-color:transparent;margin:0 6px}
-  @media (max-width:780px){.footer-inner{grid-template-columns:1fr;gap:28px}}
+  .footer-inner{max-width:1080px;margin:0 auto}
+  .footer-brand{max-width:620px;display:flex;flex-direction:column;gap:18px}
+  .footer-logo{width:132px;height:auto;display:block}
+  .footer-copy{font-size:15px;line-height:1.7;color:var(--paper-dim);margin:0;text-wrap:pretty}
+  .footer-email{font-size:15px;color:var(--paper);text-decoration:none;border-bottom:1px solid transparent;align-self:flex-start}
+  .footer-email:hover{border-bottom-color:var(--paper)}
 
   /* ========== STICKY MOBILE ACTION BAR ========== */
   .mobile-action-bar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(23,19,14,.96);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:12px 16px;display:none;transform:translateY(100%);transition:transform .28s ease}
@@ -980,40 +966,11 @@
 <!-- ========== FOOTER ========== -->
 <footer>
   <div class="footer-inner">
-    <div>
-      <h5>Phương pháp</h5>
-      <p>Trang này được biên soạn từ phỏng vấn ngày 01/04/2026 (Phiên A004), phiên âm bằng faster-whisper large-v3, biên tập với hỗ trợ của Claude Sonnet 4.6. Trích dẫn nguồn đầy đủ ở mỗi đoạn. Bản gốc tiếng Việt được lưu giữ.</p>
-      <p style="margin-top:10px;color:var(--paper-mute)">Schema: <code style="font-family:inherit">stg__craft_survey v1</code></p>
+    <div class="footer-brand">
+      <img class="footer-logo" src="../../logo.svg" alt="mấp mé">
+      <p class="footer-copy">mấp mé - bản đồ dữ liệu giúp liên kết tri thức địa phương và phát triển giải pháp bằng cách tập trung bạn với những con người, sáng kiến và tổ chức chung tay tìm giải pháp.</p>
+      <a class="footer-email" href="mailto:hello@mapme.asia">hello@mapme.asia</a>
     </div>
-    <div>
-      <h5>Khoảng trống dữ liệu</h5>
-      <ul>
-        <li><span class="icon">📍</span><span>Tọa độ GPS chính xác — chưa ghi lại</span></li>
-        <li><span class="icon">📷</span><span>Một số ảnh quy trình — chưa có</span></li>
-        <li><span class="icon">📏</span><span>Diện tích xưởng — ước tính</span></li>
-        <li><span class="icon">💰</span><span>Số liệu tài chính — ẩn để bảo vệ nghệ nhân</span></li>
-      </ul>
-    </div>
-    <div>
-      <h5>Hành động</h5>
-      <div class="foot-actions">
-        <button data-action="correction">Báo lỗi / chỉnh sửa</button>
-        <button data-action="download">Tải dữ liệu (JSON/CSV)</button>
-        <button class="cit-toggle" data-toggle="cit">Trích dẫn (BibTeX, APA) <span class="chev">▾</span></button>
-      </div>
-    </div>
-  </div>
-
-  <div class="citation-block">
-    <div class="citation-body" id="cit">
-      <div class="citation-body-inner">
-        mapme. (2026). <em>Lê Thị Huých — Đan lát, TP. Hồ Chí Minh.</em> Craft Village Field Record. Retrieved from mapme.vn/c/basket-weaving-le-thi-huych
-      </div>
-    </div>
-  </div>
-
-  <div class="footer-foot">
-    mapme · Bản đồ làng nghề Việt Nam · Dữ liệu công khai dưới giấy phép <a href="#">CC BY-NC 4.0</a> · <a href="#">Quay lại bản đồ</a> · <a href="#">Đóng góp dữ liệu</a>
   </div>
 </footer>
 
@@ -1109,17 +1066,6 @@ document.querySelectorAll('.source-toggle').forEach(btn => {
       btn.classList.toggle('open');
       btn.querySelector('span:first-child').textContent =
         btn.classList.contains('open') ? 'Ẩn nguồn gốc' : 'Xem nguồn gốc';
-    }
-  });
-});
-
-/* ========== Footer citation toggle ========== */
-document.querySelectorAll('.cit-toggle').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const target = document.getElementById(btn.dataset.toggle);
-    if (target) {
-      target.classList.toggle('open');
-      btn.classList.toggle('open');
     }
   });
 });

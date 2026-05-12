@@ -184,13 +184,13 @@ Until those arrive, optimize for product clarity and design feasibility rather t
 <claude-mem-context>
 # Memory Context
 
-# [design] recent context, 2026-05-12 2:26pm GMT+7
+# [design] recent context, 2026-05-12 5:43pm GMT+7
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 25 obs (10,865t read) | 324,721t work | 97% savings
+Stats: 42 obs (17,064t read) | 438,659t work | 96% savings
 
 ### May 11, 2026
 621 3:24p 🔵 Mapme Platform — Mission, Scope, and Role Defined
@@ -218,6 +218,24 @@ Stats: 25 obs (10,865t read) | 324,721t work | 97% savings
 664 5:25p ✅ household-detail-brief-v2.md — Final "Đặt hàng" Sweep Complete, All Appendix Samples Updated
 667 5:28p 🟣 New Design Brief — craft-household-index-brief-v1.md Created
 670 " 🟣 New Claude Design Instruction — craft-household-index prototype v1
+### May 12, 2026
+702 3:06p 🟣 mapme Household Detail Page v2 — Both Prototypes Completed
+704 3:07p 🔵 mapme/design Repo File Locations Confirmed + AGENTS.md Uncommitted
+705 " 🔵 household-huynh-xuan-huynh.html CTA Uses Commerce Language Despite Reframe
+707 3:08p 🔴 Nắng Ceramics Prototype CTA Audit — "Đặt mua" Needs Replacement Throughout
+710 " 🔵 Complete Fix Map — "Đặt mua" Occurrences in Nắng Ceramics Prototype
+711 " 🔴 Nắng Ceramics Prototype — Commerce CTA Language Fully Replaced
+714 3:14p 🔵 mapme Prototype Footer + Connections Section — Full Structure Confirmed
+715 3:16p 🔵 mapme Prototype Interactive JS Layer — Full Component Inventory
+717 " ✅ Both Prototypes — Footer Replaced with mapme Brand Block
+721 5:33p 🟣 mapme Household Detail — 3D GLB Model Integration into Studio Floor Plan Placeholder
+722 " 🔵 mapme huynh-xuan-huynh Prototype — Existing Layout Section Uses SVG Floor Plan with Zone Interaction
+724 " 🔵 mapme GLB Integration — Key Constraints: 47MB File, Spline/Three.js Specified in Brief, No Existing Renderer
+726 5:34p 🔵 mapme Layout Section — Zone Map Mismatch + Tooltip Only Triggers on Zone E
+728 5:36p ⚖️ mapme Studio Layout Section — SVG Primary, GLB Progressive Enhancement via CDN
+730 " ⚖️ mapme Studio Layout — GLB Loads On-Click via "Xem mô hình 3D" CTA
+732 5:40p 🟣 mapme Household Detail — On-Click GLB 3D Viewer Added Below SVG Floor Plan
+733 " 🔴 mapme GLB Loader — Error Recovery Fixed: modelRequested + modelViewerReady Reset on Failure
 
-Access 325k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 439k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

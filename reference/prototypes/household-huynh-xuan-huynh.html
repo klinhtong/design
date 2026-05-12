@@ -222,6 +222,11 @@
   .layout-inner .sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 22px}
   .layout-stat{font-family:"Fraunces",Georgia,serif;font-size:18px;color:var(--paper);margin:0 0 22px;letter-spacing:-.01em}
   .layout-stat .accent{color:var(--accent)}
+  .layout-tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 22px}
+  .layout-toggle{display:inline-flex;align-items:center;gap:10px;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:12.5px;letter-spacing:.04em;cursor:pointer;transition:transform .15s,border-color .15s,color .15s}
+  .layout-toggle:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+  .layout-toggle .arr{font-size:14px;color:var(--accent)}
+  .layout-helper{font-size:12px;color:var(--paper-mute);line-height:1.5;max-width:320px}
 
   .layout-diagram{position:relative;background:
     radial-gradient(ellipse at 50% 50%,rgba(196,98,58,.06) 0,transparent 60%),
@@ -253,6 +258,24 @@
   .zone-legend .lbadge{width:26px;height:26px;border-radius:6px;border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:14px;color:var(--accent);background:var(--accent-soft)}
   .zone-legend .zl-name{font-size:13px;font-weight:600;color:var(--paper);margin:0 0 4px}
   .zone-legend .zl-desc{font-size:12px;color:var(--paper-mute);line-height:1.5;margin:0}
+  .layout-3d-panel{margin-top:18px;background:var(--bg-3);border:1px solid var(--border);border-radius:16px;padding:18px;display:none}
+  .layout-3d-panel.show{display:block}
+  .layout-3d-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+  .layout-3d-title{margin:0;font-size:14px;font-weight:600;color:var(--paper);letter-spacing:.01em}
+  .layout-3d-sub{margin:4px 0 0;font-size:12px;color:var(--paper-mute);line-height:1.5}
+  .layout-3d-status{font-size:11.5px;color:var(--paper-mute);background:rgba(255,255,255,.03);border:1px solid var(--border);padding:8px 12px;border-radius:999px}
+  .layout-3d-status[data-state="loading"]{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+  .layout-3d-status[data-state="error"]{color:var(--warn);border-color:rgba(196,154,48,.35);background:rgba(196,154,48,.08)}
+  .layout-3d-status[data-state="blocked"]{color:var(--warn);border-color:rgba(196,154,48,.35);background:rgba(196,154,48,.08)}
+  .layout-3d-viewport{position:relative;min-height:420px;border-radius:14px;overflow:hidden;background:
+    radial-gradient(circle at 50% 30%,rgba(196,98,58,.1) 0,transparent 48%),
+    linear-gradient(180deg,#120a06 0%,#1a0f09 100%);
+    border:1px solid rgba(196,98,58,.18)}
+  .layout-3d-viewport model-viewer{width:100%;height:420px;--progress-bar-color:var(--accent);--poster-color:transparent;background:transparent}
+  .layout-3d-note{position:absolute;inset:auto 18px 18px 18px;font-size:11.5px;color:var(--paper-mute);line-height:1.5;padding:10px 12px;border-radius:10px;background:rgba(8,8,8,.46);border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(8px)}
+  .layout-3d-help{margin-top:12px;padding:12px 14px;border-radius:12px;border:1px dashed rgba(196,154,48,.35);background:rgba(196,154,48,.08);font-size:12px;line-height:1.6;color:var(--paper-dim);display:none}
+  .layout-3d-help.show{display:block}
+  .layout-3d-help code{font-size:11px;color:var(--paper)}
   @media (max-width:900px){.layout-inner{grid-template-columns:1fr}}
 
   .process{padding:64px 24px;border-bottom:1px solid var(--border)}
@@ -390,26 +413,12 @@
   @media (max-width:780px){.conn-grid{grid-template-columns:1fr}}
 
   footer{padding:60px 24px 60px;background:var(--bg-3);color:var(--paper-mute);font-size:13px;border-top:1px solid var(--border)}
-  .footer-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:36px}
-  footer h5{font-family:"Manrope";font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper);margin:0 0 12px;font-weight:600}
-  footer p,footer li{line-height:1.6;font-size:12.5px;margin:0 0 6px}
-  footer ul{list-style:none;padding:0;margin:0}
-  footer ul li{padding:6px 0;display:flex;gap:10px}
-  footer ul li .icon{flex-shrink:0;width:18px;text-align:center}
-  .foot-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
-  .foot-actions button{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:9px 16px;border-radius:999px;font-size:12px;cursor:pointer;text-align:left}
-  .foot-actions button:hover{border-color:var(--accent);color:var(--accent)}
-  .citation-block{max-width:1080px;margin:36px auto 0;border-top:1px solid var(--border);padding-top:20px}
-  .cit-toggle{background:transparent;border:0;color:var(--paper-mute);font-size:11px;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:8px}
-  .cit-toggle:hover{color:var(--paper)}
-  .cit-toggle .chev{transition:transform .25s}
-  .cit-toggle.open .chev{transform:rotate(180deg)}
-  .citation-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
-  .citation-body.open{max-height:200px}
-  .citation-body-inner{font-family:"Fraunces",serif;font-style:italic;font-size:13px;color:var(--paper-dim);line-height:1.6;padding:14px 0;border-left:2px solid var(--accent-line);padding-left:14px;margin-top:10px}
-  .footer-foot{max-width:1080px;margin:32px auto 0;border-top:1px solid var(--border);padding-top:20px;text-align:center;color:var(--paper-mute);font-size:11.5px;letter-spacing:.04em}
-  .footer-foot a{color:var(--paper-dim);border-bottom-color:transparent;margin:0 6px}
-  @media (max-width:780px){.footer-inner{grid-template-columns:1fr;gap:28px}}
+  .footer-inner{max-width:1080px;margin:0 auto}
+  .footer-brand{max-width:620px;display:flex;flex-direction:column;gap:18px}
+  .footer-logo{width:132px;height:auto;display:block}
+  .footer-copy{font-size:15px;line-height:1.7;color:var(--paper-dim);margin:0;text-wrap:pretty}
+  .footer-email{font-size:15px;color:var(--paper);text-decoration:none;border-bottom:1px solid transparent;align-self:flex-start}
+  .footer-email:hover{border-bottom-color:var(--paper)}
 
   .mobile-action-bar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(23,19,14,.96);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:12px 16px;display:none;transform:translateY(100%);transition:transform .28s ease}
   .mobile-action-bar.show{transform:translateY(0)}
@@ -454,7 +463,7 @@
   <div class="actions">
     <button class="btn">Lưu</button>
     <button class="btn">Chia sẻ</button>
-    <button class="btn primary" data-action="message">Đặt mua</button>
+    <button class="btn primary" data-action="message">Nhắn tin</button>
   </div>
 </nav>
 
@@ -491,7 +500,7 @@
     <h1 class="title">Huỳnh Xuân Huỳnh<br><em>"Tôi không cứu nghề. Tôi chỉ làm việc."</em></h1>
     <p class="dek">Hai mươi chín tuổi. Tám năm xây dựng. Người sáng lập <em style="font-style:normal;color:var(--accent)">Nắng Ceramics</em> — studio gốm hiện đại tại Lái Thiêu, nơi truyền thống gốm hai trăm năm gặp một thế hệ thợ trẻ đang chủ động chọn ở lại.</p>
     <div class="triad">
-      <button class="primary" data-action="commission">Đặt mua sản phẩm</button>
+      <button class="primary" data-action="commission">Hỏi về đặt riêng / hợp tác</button>
       <button class="ghost" data-action="workshop">Đăng ký workshop</button>
       <button class="ghost" data-action="visit">Tham quan studio</button>
     </div>
@@ -531,7 +540,7 @@
       </div>
       <p class="credit">Ghi âm ngày 01/04/2026 · Phiên A007 · Phiên dịch: mapme</p>
       <div class="artisan-actions">
-        <button class="primary" data-action="commission">Đặt mua sản phẩm</button>
+        <button class="primary" data-action="commission">Hỏi về đặt riêng / hợp tác</button>
         <button class="ghost" data-action="download">Tải dữ liệu</button>
       </div>
     </div>
@@ -628,10 +637,17 @@
 <section class="layout-section" id="layout" data-screen-label="06 Layout">
   <div class="layout-inner">
     <div>
-      <div class="kicker" style="margin-bottom:12px"><span class="pill">Sơ đồ studio · SVG fallback</span></div>
+      <div class="kicker" style="margin-bottom:12px"><span class="pill">Sơ đồ studio · SVG chính</span></div>
       <h2>Bảy khu vực, một quy trình</h2>
       <p class="sub">Nắng Ceramics nhỏ nhưng đầy đủ: từ kho đất đến lò củi, mọi công đoạn đều diễn ra dưới một mái.</p>
       <p class="layout-stat"><span class="accent">~180 m²</span> · Lái Thiêu, Bình Dương</p>
+      <div class="layout-tools">
+        <button class="layout-toggle" id="glbToggle" type="button">
+          <span>Xem mô hình 3D</span>
+          <span class="arr">→</span>
+        </button>
+        <p class="layout-helper">Mô hình `.glb` là lớp xem thêm. Chỉ tải khi bạn mở để giữ trang nhẹ hơn.</p>
+      </div>
 
       <div class="layout-diagram" id="layoutDiagram">
         <svg class="layout-svg" viewBox="0 0 600 480" preserveAspectRatio="xMidYMid meet">
@@ -732,6 +748,23 @@
           <div class="zt-name">Khu men</div>
           <div class="zt-desc">Pha men và vẽ tay. Mỗi mẻ men là một công thức riêng của Nắng. Đây là nơi tạo nên chữ ký studio.</div>
           <div class="zt-quote">"Lớp men là chữ ký người thợ. Không có công thức — có sự kiên nhẫn."</div>
+        </div>
+      </div>
+
+      <div class="layout-3d-panel" id="layout3dPanel" aria-live="polite">
+        <div class="layout-3d-head">
+          <div>
+            <p class="layout-3d-title">Mô hình 3D studio</p>
+            <p class="layout-3d-sub">Bản xem không thay thế sơ đồ SVG. Dùng để cảm nhận không gian, chiều sâu và tỷ lệ tổng thể của studio.</p>
+          </div>
+          <div class="layout-3d-status" id="layout3dStatus" data-state="idle">Sẵn sàng tải mô hình 47 MB</div>
+        </div>
+        <div class="layout-3d-viewport">
+          <model-viewer id="layout3dViewer" camera-controls touch-action="pan-y" interaction-prompt="none" exposure="1" shadow-intensity=".55" style="display:none"></model-viewer>
+          <div class="layout-3d-note">Mô hình tải theo yêu cầu. Nếu 3D không mở được, sơ đồ studio ở trên vẫn là bản đọc chính.</div>
+        </div>
+        <div class="layout-3d-help" id="layout3dHelp">
+          Bạn đang mở trang bằng <code>file://</code>. Trình duyệt thường chặn tải `.glb` ở chế độ này. Hãy mở thư mục <code>reference/prototypes</code> bằng một local server, ví dụ <code>python3 -m http.server 8123</code>, rồi truy cập <code>http://localhost:8123/household-huynh-xuan-huynh.html</code>.
         </div>
       </div>
     </div>
@@ -870,7 +903,7 @@
 
     <div class="engage-row">
       <span class="erlabel">Liên hệ hợp tác</span>
-      <button class="engage-btn" data-action="commission">Đặt mua / đặt riêng <span class="arr">→</span></button>
+      <button class="engage-btn" data-action="commission">Hỏi về đặt riêng / hợp tác <span class="arr">→</span></button>
       <button class="engage-btn" data-action="workshop">Đăng ký workshop <span class="arr">→</span></button>
       <button class="engage-btn" data-action="retail">Hợp tác bán lẻ <span class="arr">→</span></button>
     </div>
@@ -991,53 +1024,24 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <div>
-      <h5>Phương pháp</h5>
-      <p>Trang này được biên soạn từ phỏng vấn ngày 01/04/2026 (Phiên A007), phiên âm bằng faster-whisper large-v3, biên tập với hỗ trợ của Claude Sonnet 4.6. Trích dẫn nguồn đầy đủ ở mỗi đoạn. Bản gốc tiếng Việt được lưu giữ.</p>
-      <p style="margin-top:10px;color:var(--paper-mute)">Schema: <code style="font-family:inherit">stg__craft_survey v1</code></p>
+    <div class="footer-brand">
+      <img class="footer-logo" src="../../logo.svg" alt="mấp mé">
+      <p class="footer-copy">mấp mé - bản đồ dữ liệu giúp liên kết tri thức địa phương và phát triển giải pháp bằng cách tập trung bạn với những con người, sáng kiến và tổ chức chung tay tìm giải pháp.</p>
+      <a class="footer-email" href="mailto:hello@mapme.asia">hello@mapme.asia</a>
     </div>
-    <div>
-      <h5>Khoảng trống dữ liệu</h5>
-      <ul>
-        <li><span class="icon">📍</span><span>Tọa độ GPS chính xác — chưa ghi lại</span></li>
-        <li><span class="icon">📷</span><span>Một số ảnh chi tiết men — chưa có</span></li>
-        <li><span class="icon">💰</span><span>Số liệu tài chính — ẩn để bảo vệ nghệ nhân</span></li>
-        <li><span class="icon">📊</span><span>Doanh thu workshop — chưa được ghi nhận tách biệt</span></li>
-      </ul>
-    </div>
-    <div>
-      <h5>Hành động</h5>
-      <div class="foot-actions">
-        <button data-action="correction">Báo lỗi / chỉnh sửa</button>
-        <button data-action="download">Tải dữ liệu (JSON/CSV)</button>
-        <button class="cit-toggle" data-toggle="cit">Trích dẫn (BibTeX, APA) <span class="chev">▾</span></button>
-      </div>
-    </div>
-  </div>
-
-  <div class="citation-block">
-    <div class="citation-body" id="cit">
-      <div class="citation-body-inner">
-        mapme. (2026). <em>Huỳnh Xuân Huỳnh — Nắng Ceramics, Lái Thiêu, Bình Dương.</em> Craft Village Field Record. Retrieved from mapme.vn/c/ceramics-nang-huynh-xuan-huynh
-      </div>
-    </div>
-  </div>
-
-  <div class="footer-foot">
-    mapme · Bản đồ làng nghề Việt Nam · Dữ liệu công khai dưới giấy phép <a href="#">CC BY-NC 4.0</a> · <a href="#">Quay lại bản đồ</a> · <a href="#">Đóng góp dữ liệu</a>
   </div>
 </footer>
 
 <!-- MOBILE BAR -->
 <div class="mobile-action-bar" id="mobileBar">
-  <button data-action="commission">Đặt mua / liên hệ Nắng Ceramics</button>
+  <button data-action="message">Nhắn tin Nắng Ceramics</button>
 </div>
 
 <!-- MODAL -->
 <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal">
     <button class="modal-close" id="modalClose" aria-label="Đóng">×</button>
-    <h3 id="modalTitle">Liên hệ Nắng Ceramics</h3>
+    <h3 id="modalTitle">Nhắn tin Nắng Ceramics</h3>
     <p class="modal-sub">Mapme chuyển lời nhắn của bạn đến nghệ nhân và phản hồi trong vòng 3 ngày.</p>
     <form id="actionForm" onsubmit="event.preventDefault();submitForm()">
       <div class="form-field">
@@ -1051,7 +1055,7 @@
       <div class="form-field">
         <label>Loại liên hệ</label>
         <div class="radio-row" id="contactType">
-          <label><input type="radio" name="contact" value="commission" checked>Đặt mua / đặt riêng</label>
+          <label><input type="radio" name="contact" value="commission" checked>Đặt riêng / hợp tác</label>
           <label><input type="radio" name="contact" value="workshop">Workshop</label>
           <label><input type="radio" name="contact" value="visit">Tham quan</label>
           <label><input type="radio" name="contact" value="retail">Hợp tác bán lẻ</label>
@@ -1120,16 +1124,6 @@ document.querySelectorAll('.source-toggle').forEach(btn => {
   });
 });
 
-document.querySelectorAll('.cit-toggle').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const target = document.getElementById(btn.dataset.toggle);
-    if (target) {
-      target.classList.toggle('open');
-      btn.classList.toggle('open');
-    }
-  });
-});
-
 document.querySelectorAll('.waveform').forEach(wf => {
   const N = 56;
   let html = '';
@@ -1144,6 +1138,14 @@ const zoneTooltip = document.getElementById('zoneTooltip');
 const layoutDiagram = document.getElementById('layoutDiagram');
 const zoneRects = document.querySelectorAll('.layout-svg .zone');
 const zoneLegendItems = document.querySelectorAll('#zoneLegend .zl');
+const glbToggle = document.getElementById('glbToggle');
+const layout3dPanel = document.getElementById('layout3dPanel');
+const layout3dViewer = document.getElementById('layout3dViewer');
+const layout3dStatus = document.getElementById('layout3dStatus');
+const layout3dHelp = document.getElementById('layout3dHelp');
+const glbAssetPath = 'src/250511_XAC_THUYEN_Sketchup_v02.glb';
+let modelViewerReady;
+let modelRequested = false;
 
 function highlightZone(letter, on) {
   zoneLegendItems.forEach(zl => {
@@ -1172,6 +1174,101 @@ zoneLegendItems.forEach(zl => {
   zl.addEventListener('mouseleave', () => highlightZone(zl.dataset.zone, false));
 });
 
+function setLayout3dStatus(state, text) {
+  layout3dStatus.dataset.state = state;
+  layout3dStatus.textContent = text;
+}
+
+function setLayout3dHelp(show) {
+  layout3dHelp.classList.toggle('show', show);
+}
+
+function setGlbToggleLabel(open) {
+  glbToggle.innerHTML = open
+    ? '<span>Ẩn mô hình 3D</span><span class="arr">↑</span>'
+    : '<span>Xem mô hình 3D</span><span class="arr">→</span>';
+}
+
+function loadModelViewerRuntime() {
+  if (modelViewerReady) return modelViewerReady;
+
+  modelViewerReady = new Promise((resolve, reject) => {
+    if (window.customElements && window.customElements.get('model-viewer')) {
+      resolve();
+      return;
+    }
+
+    const existing = document.querySelector('script[data-model-viewer-runtime]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(), { once: true });
+      existing.addEventListener('error', () => reject(new Error('runtime-load-failed')), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = 'https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js';
+    script.dataset.modelViewerRuntime = 'true';
+    script.addEventListener('load', () => resolve(), { once: true });
+    script.addEventListener('error', () => reject(new Error('runtime-load-failed')), { once: true });
+    document.head.appendChild(script);
+  }).catch((error) => {
+    modelViewerReady = null;
+    throw error;
+  });
+
+  return modelViewerReady;
+}
+
+function mountLayoutModel() {
+  if (modelRequested) return;
+  if (window.location.protocol === 'file:') {
+    setLayout3dHelp(true);
+    setLayout3dStatus('blocked', 'Mở trang qua localhost để xem mô hình 3D');
+    return;
+  }
+
+  modelRequested = true;
+  setLayout3dHelp(false);
+  setLayout3dStatus('loading', 'Đang tải trình xem 3D…');
+
+  loadModelViewerRuntime()
+    .then(() => {
+      layout3dViewer.style.display = 'block';
+      setLayout3dStatus('loading', 'Đang tải mô hình studio…');
+      layout3dViewer.setAttribute('camera-orbit', '45deg 68deg 3.4m');
+      layout3dViewer.setAttribute('min-camera-orbit', 'auto auto 1.6m');
+      layout3dViewer.setAttribute('max-camera-orbit', 'auto auto 8m');
+      layout3dViewer.setAttribute('src', glbAssetPath);
+    })
+    .catch(() => {
+      modelRequested = false;
+      setLayout3dHelp(false);
+      setLayout3dStatus('error', 'Không thể tải trình xem 3D. Dùng sơ đồ SVG ở trên.');
+    });
+}
+
+layout3dViewer.addEventListener('load', () => {
+  setLayout3dHelp(false);
+  setLayout3dStatus('ready', 'Mô hình 3D đã sẵn sàng để xoay / phóng to');
+});
+
+layout3dViewer.addEventListener('error', () => {
+  modelRequested = false;
+  setLayout3dHelp(false);
+  setLayout3dStatus('error', 'Không thể tải mô hình `.glb`. Dùng sơ đồ SVG ở trên.');
+});
+
+glbToggle.addEventListener('click', () => {
+  const open = layout3dPanel.classList.toggle('show');
+  setGlbToggleLabel(open);
+
+  if (!open) return;
+
+  layout3dPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  mountLayoutModel();
+});
+
 document.querySelectorAll('.lens-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     const lens = tab.dataset.lens;
@@ -1185,8 +1282,8 @@ const modalClose = document.getElementById('modalClose');
 const modalTitle = document.getElementById('modalTitle');
 const toast = document.getElementById('toast');
 const actionLabels = {
-  message: 'Liên hệ Nắng Ceramics',
-  commission: 'Đặt mua sản phẩm',
+  message: 'Nhắn tin Nắng Ceramics',
+  commission: 'Hỏi về đặt riêng / hợp tác',
   workshop: 'Đăng ký workshop làm gốm',
   visit: 'Đăng ký tham quan studio',
   retail: 'Đề xuất hợp tác bán lẻ',
