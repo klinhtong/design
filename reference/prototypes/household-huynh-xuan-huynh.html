@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Huỳnh Xuân Huỳnh — Nắng Ceramics · Lái Thiêu · mapme</title>
+<meta name="description" content="Huỳnh Xuân Huỳnh — 29 tuổi, người sáng lập Nắng Ceramics tại Lái Thiêu. Tám năm, ba học việc, một lò củi truyền thống. Đang truyền nghề." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#17130e; --bg-2:#1e1913; --bg-3:#26201a;
+    --paper:#f5ecde; --paper-dim:#d8cfbe; --paper-mute:#9a9081;
+    --ink:#1a1410;
+    --border:rgba(245,236,222,.1); --border-strong:rgba(245,236,222,.22);
+
+    /* === Terracotta accent (Nắng Ceramics) === */
+    --accent:#c4623a;
+    --accent-2:#a04d2a;
+    --accent-soft:rgba(196,98,58,.16);
+    --accent-line:rgba(196,98,58,.36);
+
+    /* Succession color — code 1 (đang truyền) = green */
+    --succ:#6b9a3a;
+    --succ-soft:rgba(107,154,58,.16);
+    --succ-line:rgba(107,154,58,.5);
+
+    --warn:#c49a30; --risk:#c46030; --ok:#6b9a3a;
+    --maxw:880px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--paper);
+    font-family:"Manrope",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
+    font-feature-settings:"ss01","cv11"}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-line)}
+  a:hover{border-bottom-color:var(--accent)}
+  img{max-width:100%;display:block}
+  button{font-family:inherit}
+
+  nav.top{position:sticky;top:0;z-index:60;background:rgba(23,19,14,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;font-size:13.5px}
+  nav.top .logo{display:inline-flex;align-items:center;gap:8px;color:var(--paper);border:0;font-weight:600}
+  nav.top .logo em{font-style:normal;color:var(--accent)}
+  nav.top .crumbs{color:var(--paper-mute);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  nav.top .crumbs a{color:var(--paper-mute);border:0}
+  nav.top .crumbs a:hover{color:var(--paper)}
+  nav.top .crumbs .sep{opacity:.5}
+  nav.top .actions{margin-left:auto;display:flex;gap:8px}
+  nav.top .btn{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:6px 12px;border-radius:999px;font-size:12.5px;cursor:pointer}
+  nav.top .btn:hover{background:var(--bg-3)}
+  nav.top .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:500}
+  @media (max-width:780px){nav.top .crumbs{display:none}nav.top .actions .btn:not(.primary){display:none}}
+
+  .section-nav{position:sticky;top:53px;z-index:40;background:rgba(23,19,14,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+    transform:translateY(-100%);opacity:0;transition:transform .28s ease,opacity .28s ease;pointer-events:none}
+  .section-nav.show{transform:translateY(0);opacity:1;pointer-events:auto}
+  .section-nav-inner{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .section-nav-inner::-webkit-scrollbar{display:none}
+  .section-nav a{flex-shrink:0;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--paper-mute);padding:14px 10px;border:0;border-bottom:2px solid transparent;font-weight:500}
+  .section-nav a:hover{color:var(--paper)}
+  .section-nav a.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* HERO — terracotta palette */
+  .hero{position:relative;min-height:80vh;display:flex;align-items:flex-end;overflow:hidden;background:#0c0a07}
+  .hero-bg{position:absolute;inset:0;background:
+    radial-gradient(ellipse at 22% 38%,rgba(196,98,58,.36) 0,transparent 55%),
+    radial-gradient(ellipse at 80% 80%,rgba(160,77,42,.28) 0,transparent 55%),
+    linear-gradient(135deg,#1f1108 0%,#3d1d10 28%,#7a3a1c 55%,#c4623a 100%)}
+  .hero-bg::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 18% 28%,rgba(245,200,170,.32) 0,transparent 30%),
+    radial-gradient(circle at 88% 22%,rgba(0,0,0,.4) 0,transparent 50%),
+    linear-gradient(to bottom,transparent 35%,rgba(23,19,14,.88) 100%)}
+  .hero-noise{position:absolute;inset:0;opacity:.1;mix-blend-mode:overlay;background-image:
+    repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 1px,transparent 1px 6px),
+    repeating-linear-gradient(25deg,rgba(0,0,0,.05) 0 1px,transparent 1px 9px)}
+  .hero-content{position:relative;padding:56px 24px 60px;max-width:var(--maxw);margin:0 auto;width:100%;z-index:2}
+  .kicker{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .kicker .pill{background:var(--accent-soft);border:1px solid var(--accent-line);padding:3px 10px;border-radius:999px;color:var(--accent)}
+  .kicker .loc{color:var(--paper-mute)}
+  h1.title{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(40px,6vw,76px);line-height:1.04;letter-spacing:-.025em;margin:0 0 18px;color:var(--paper)}
+  h1.title em{font-style:italic;color:var(--accent);font-weight:400;font-size:.78em;display:block;margin-top:8px}
+  .dek{font-family:"Fraunces",Georgia,serif;font-size:clamp(18px,2vw,22px);font-weight:300;line-height:1.5;max-width:640px;color:var(--paper-dim);margin:0 0 28px}
+  .triad{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px}
+  .triad button{font-size:13.5px;padding:11px 20px;border-radius:999px;cursor:pointer;font-weight:500;letter-spacing:.01em;transition:transform .15s,background .15s,border-color .15s}
+  .triad .primary{background:var(--accent);color:var(--ink);border:1px solid var(--accent)}
+  .triad .primary:hover{background:var(--paper);border-color:var(--paper)}
+  .triad .ghost{background:rgba(23,19,14,.5);color:var(--paper);border:1px solid rgba(245,236,222,.32);backdrop-filter:blur(4px)}
+  .triad .ghost:hover{background:rgba(23,19,14,.8);border-color:var(--accent)}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:32px;font-size:13px;color:var(--paper-mute);padding-top:22px;border-top:1px solid var(--border)}
+  .hero-meta div{display:flex;flex-direction:column;gap:4px}
+  .hero-meta label{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;opacity:.75}
+  .hero-meta strong{color:var(--paper);font-weight:500;font-size:14px}
+
+  /* succession badge — green for code 1 */
+  .succ-badge{position:absolute;top:24px;right:24px;z-index:3;display:inline-flex;align-items:center;gap:9px;
+    background:var(--succ-soft);border:1px solid var(--succ-line);color:#a8d27a;
+    font-size:12px;font-weight:600;letter-spacing:.06em;padding:8px 14px;border-radius:999px;text-transform:uppercase;backdrop-filter:blur(6px);cursor:help}
+  .succ-badge .dot{width:7px;height:7px;border-radius:50%;background:#8fbc4e;box-shadow:0 0 10px rgba(143,188,78,.7)}
+  .succ-tip{position:absolute;top:48px;right:24px;z-index:4;max-width:260px;
+    background:rgba(23,19,14,.96);border:1px solid var(--succ-line);border-radius:10px;padding:10px 14px;
+    font-family:"Manrope";font-size:12px;color:var(--paper-dim);line-height:1.5;
+    opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .18s,transform .18s;backdrop-filter:blur(8px)}
+  .succ-badge:hover + .succ-tip,.succ-badge:focus + .succ-tip,.succ-tip.show{opacity:1;transform:translateY(0)}
+  @media (max-width:780px){
+    .succ-badge{top:14px;right:14px;font-size:10.5px;padding:6px 11px}
+    .succ-tip{top:42px;right:14px;max-width:220px}
+  }
+
+  .facts{max-width:var(--maxw);margin:0 auto;padding:36px 24px;display:grid;grid-template-columns:repeat(6,1fr);gap:0;border-bottom:1px solid var(--border)}
+  .fact{padding:14px 16px;border-left:1px solid var(--border)}
+  .fact:first-child{border-left:0;padding-left:0}
+  .fact .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:6px}
+  .fact .v{font-family:"Fraunces",Georgia,serif;font-size:19px;font-weight:400;letter-spacing:-.01em;color:var(--paper);line-height:1.18}
+  .fact .v.muted{color:var(--paper-mute);font-style:italic;font-size:15px}
+  @media (max-width:780px){.facts{grid-template-columns:repeat(2,1fr);padding:24px 20px}
+    .fact{border-left:0;border-top:1px solid var(--border);padding:14px 0}
+    .fact:nth-child(odd){padding-right:14px}
+    .fact:nth-child(even){padding-left:14px;border-left:1px solid var(--border)}
+    .fact:first-child,.fact:nth-child(2){border-top:0}}
+
+  .artisan{max-width:var(--maxw);margin:0 auto;padding:72px 24px 24px}
+  .artisan-card{display:grid;grid-template-columns:240px 1fr;gap:36px;align-items:start;background:var(--bg-2);border:1px solid var(--border);border-radius:18px;padding:30px;position:relative}
+  .artisan-portrait{aspect-ratio:3/4;border-radius:12px;background:
+    linear-gradient(160deg,#1f1108 0%,#4a2410 35%,#a04d2a 75%,#e0916b 100%);position:relative;overflow:hidden}
+  .artisan-portrait::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 38% 32%,rgba(245,200,170,.4) 0,transparent 32%),
+    radial-gradient(circle at 60% 88%,rgba(0,0,0,.5) 0,transparent 50%),
+    repeating-linear-gradient(118deg,rgba(255,255,255,.03) 0 1px,transparent 1px 5px)}
+  .artisan-portrait .corner-label{position:absolute;left:10px;bottom:10px;z-index:2;font-size:9.5px;color:rgba(245,236,222,.85);letter-spacing:.05em;text-transform:uppercase;background:rgba(0,0,0,.45);padding:4px 8px;border-radius:6px;backdrop-filter:blur(4px)}
+  .artisan-meta .kicker{margin-bottom:10px}
+  .artisan h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 5px;letter-spacing:-.015em}
+  .artisan .role{color:var(--paper-mute);font-size:13px;margin:0 0 22px}
+  .quote-with-audio{display:flex;align-items:flex-start;gap:12px;margin:0 0 14px}
+  .quote-with-audio .qtext{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:20px;line-height:1.5;color:var(--paper);font-weight:300;flex:1;margin:0;text-wrap:pretty}
+  .audio-play{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent);padding:7px 12px 7px 10px;border-radius:999px;font-size:12px;cursor:pointer;letter-spacing:.02em;white-space:nowrap;margin-top:6px;transition:background .15s}
+  .audio-play:hover{background:var(--accent);color:var(--ink)}
+  .audio-play .play-glyph{display:inline-block;width:0;height:0;border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent;margin-right:2px}
+  .credit{font-size:12.5px;color:var(--paper-mute);margin:0 0 22px}
+  .artisan-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .artisan-actions button{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:8px 14px;border-radius:999px;font-size:12.5px;cursor:pointer}
+  .artisan-actions button.primary{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:500}
+  .artisan-actions button.ghost{color:var(--paper-mute)}
+  .artisan-actions button:hover{background:var(--bg-3);color:var(--paper)}
+  .artisan-actions button.primary:hover{background:var(--accent-2);color:var(--paper)}
+  @media (max-width:780px){.artisan-card{grid-template-columns:1fr;gap:22px}.artisan-portrait{max-width:200px}}
+
+  /* MEDIA GALLERY */
+  .gallery{padding:64px 24px;background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .gallery-inner{max-width:1240px;margin:0 auto}
+  .gallery h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .gallery .gsub{color:var(--paper-mute);font-size:13.5px;margin:0 0 28px}
+  .ggrid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+  .gitem{position:relative;border-radius:12px;overflow:hidden;background:var(--bg-3);border:1px solid var(--border);min-height:180px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;transition:transform .2s,border-color .2s}
+  .gitem:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .gitem img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .gitem .gbg{position:absolute;inset:0;z-index:0}
+  .gitem .gbg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.7) 100%);pointer-events:none}
+  .gitem .gcap{position:relative;z-index:2;padding:14px 16px;font-family:"Manrope";font-size:12.5px;line-height:1.45;color:var(--paper);background:linear-gradient(to top,rgba(23,19,14,.92) 0%,rgba(23,19,14,.65) 60%,transparent 100%)}
+  .gitem .gcap em{font-style:normal;color:var(--paper-mute);font-size:11px;display:block;margin-top:3px;letter-spacing:.03em}
+  .gitem .gchip{position:absolute;top:10px;left:10px;z-index:3;font-size:9.5px;color:rgba(245,236,222,.85);background:rgba(0,0,0,.55);backdrop-filter:blur(4px);padding:4px 9px;border-radius:6px;letter-spacing:.05em;text-transform:uppercase;font-weight:500}
+  .gitem.span-8{grid-column:span 8}
+  .gitem.span-6{grid-column:span 6}
+  .gitem.span-4{grid-column:span 4}
+  .gitem.h-tall{min-height:380px}
+  .gitem.h-med{min-height:260px}
+  .gitem.h-short{min-height:180px}
+
+  /* terracotta craft gradients */
+  .gbg.bg-wheel{background:linear-gradient(135deg,#1f1108 0%,#3d1d10 40%,#7a3a1c 80%,#c4623a 100%)}
+  .gbg.bg-detail{background:linear-gradient(150deg,#4a2410 0%,#a04d2a 60%,#e0916b 100%)}
+  .gbg.bg-studio{background:
+    repeating-linear-gradient(95deg,rgba(224,145,107,.16) 0 2px,transparent 2px 16px),
+    linear-gradient(135deg,#26201a 0%,#4a2410 50%,#7a3a1c 100%)}
+  .gbg.bg-kiln{background:
+    radial-gradient(circle at 30% 70%,rgba(255,160,80,.45) 0,transparent 55%),
+    linear-gradient(135deg,#1a0d05 0%,#3d1d10 40%,#7a3a1c 80%,#c46030 100%)}
+  .gbg.bg-audio{background:linear-gradient(135deg,#100804 0%,#1f1108 50%,#3d1d10 100%)}
+  .gbg.bg-video{background:linear-gradient(135deg,#1f1108 0%,#4a2410 40%,#a04d2a 80%,#26201a 100%)}
+
+  .waveform{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:3px;z-index:1;padding:0 60px}
+  .waveform .bar{width:3px;background:var(--accent);opacity:.6;border-radius:2px}
+  .playover{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;width:60px;height:60px;border-radius:50%;background:rgba(196,98,58,.94);display:flex;align-items:center;justify-content:center;color:var(--ink);padding-left:5px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+  .playover .play-glyph{width:0;height:0;border-left:14px solid currentColor;border-top:9px solid transparent;border-bottom:9px solid transparent}
+  .durbadge{position:absolute;bottom:12px;right:12px;z-index:3;font-size:10.5px;color:rgba(245,236,222,.92);background:rgba(0,0,0,.6);padding:3px 9px;border-radius:6px;letter-spacing:.03em}
+  .gitem img.broken,.gitem img[data-broken="true"]{display:none}
+
+  @media (max-width:780px){
+    .ggrid{grid-template-columns:1fr;gap:12px}
+    .gitem.span-8,.gitem.span-6,.gitem.span-4{grid-column:span 1}
+    .gitem.h-tall{min-height:280px}
+    .gitem.h-med{min-height:220px}
+  }
+
+  article.story{max-width:680px;margin:0 auto;padding:72px 24px 32px;position:relative}
+  article.story h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(30px,4vw,40px);letter-spacing:-.02em;line-height:1.15;margin:0 0 28px;color:var(--paper)}
+  article.story h3{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:22px;margin:44px 0 14px;letter-spacing:-.01em;color:var(--paper)}
+  article.story p{font-family:"Fraunces",Georgia,serif;font-size:18.5px;line-height:1.7;margin:0 0 22px;color:var(--paper-dim);font-weight:300;text-wrap:pretty}
+  article.story p.lead{font-size:22px;line-height:1.55;color:var(--paper)}
+  article.story p.lead::first-letter{font-size:72px;float:left;font-weight:400;line-height:.85;margin:8px 12px 0 -2px;color:var(--accent);font-family:"Fraunces",Georgia,serif}
+  article.story blockquote{border:0;margin:48px 0;padding:0;text-align:center}
+  article.story blockquote p{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:28px;line-height:1.35;color:var(--paper);font-weight:300;letter-spacing:-.01em;max-width:680px;margin:0 auto 14px;text-wrap:balance}
+  article.story blockquote cite{font-style:normal;font-size:13px;color:var(--paper-mute);letter-spacing:.04em;text-transform:uppercase}
+  article.story blockquote .translation{font-style:normal;font-size:13px;color:var(--paper-mute);max-width:560px;margin:14px auto 0;line-height:1.55;font-family:"Manrope"}
+
+  .source-toggle{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:transparent;border:1px solid var(--border-strong);color:var(--paper-mute);padding:8px 14px;border-radius:999px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:"Manrope"}
+  .source-toggle:hover{border-color:var(--accent);color:var(--accent)}
+  .source-toggle .chev{transition:transform .25s}
+  .source-toggle.open .chev{transform:rotate(180deg)}
+  .source-panel{max-height:0;overflow:hidden;transition:max-height .35s ease;margin-top:14px}
+  .source-panel.open{max-height:600px}
+  .source-panel-inner{background:var(--bg-2);border:1px dashed var(--border-strong);border-radius:12px;padding:20px 22px;margin-top:6px}
+  .source-panel h4{font-family:"Manrope";font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin:0 0 12px;font-weight:600}
+  .source-panel .src-quote{font-family:"Fraunces",serif;font-style:italic;font-size:15px;color:var(--paper-dim);line-height:1.55;margin:0 0 14px;padding-left:14px;border-left:2px solid var(--accent-line)}
+  .source-panel .src-meta{font-family:"Manrope";font-size:11px;color:var(--paper-mute);letter-spacing:.04em}
+  .source-panel .ph-note{font-family:"Manrope";font-size:11px;color:var(--warn);background:rgba(196,154,48,.08);border:1px dashed rgba(196,154,48,.35);padding:8px 12px;border-radius:8px;margin-top:14px;line-height:1.5}
+
+  .layout-section{background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:64px 24px}
+  .layout-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:36px;align-items:start}
+  .layout-inner h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .layout-inner .sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 22px}
+  .layout-stat{font-family:"Fraunces",Georgia,serif;font-size:18px;color:var(--paper);margin:0 0 22px;letter-spacing:-.01em}
+  .layout-stat .accent{color:var(--accent)}
+
+  .layout-diagram{position:relative;background:
+    radial-gradient(ellipse at 50% 50%,rgba(196,98,58,.06) 0,transparent 60%),
+    var(--bg-3);
+    border:1px solid var(--border);border-radius:16px;padding:28px;aspect-ratio:5/4;
+    background-image:
+      linear-gradient(rgba(196,98,58,.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(196,98,58,.04) 1px,transparent 1px);
+    background-size:32px 32px}
+  .layout-svg{width:100%;height:100%;display:block;overflow:visible}
+  .zone-rect{fill:var(--bg-2);stroke:var(--accent);stroke-width:1.5;transition:fill .25s,stroke-width .25s,filter .25s;cursor:pointer}
+  .zone-rect.dashed{stroke-dasharray:6 5}
+  .zone-rect:hover{fill:rgba(196,98,58,.1);stroke-width:2.5;filter:drop-shadow(0 0 16px rgba(196,98,58,.28))}
+  .zone-badge{font-family:"Fraunces",serif;font-size:16px;font-weight:500;fill:var(--accent);pointer-events:none}
+  .zone-label{font-size:9.5px;font-weight:600;fill:var(--paper);letter-spacing:.04em;pointer-events:none;text-transform:uppercase}
+  .zone-sub{font-size:9px;fill:var(--paper-mute);pointer-events:none}
+
+  .compass{position:absolute;right:16px;bottom:16px;width:56px;height:56px;color:var(--paper-mute)}
+  .zone-tooltip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--accent);border-radius:12px;padding:14px 16px;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.4);opacity:0;transform:translate(-50%,-12px) scale(.96);transition:opacity .18s,transform .18s;z-index:5}
+  .zone-tooltip.show{opacity:1;transform:translate(-50%,-100%) scale(1)}
+  .zone-tooltip .zt-name{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+  .zone-tooltip .zt-desc{font-size:12.5px;color:var(--paper-dim);line-height:1.5;margin-bottom:10px}
+  .zone-tooltip .zt-quote{font-family:"Fraunces",serif;font-style:italic;font-size:14px;color:var(--paper);line-height:1.4;border-top:1px solid var(--border);padding-top:10px}
+
+  .zone-legend{display:flex;flex-direction:column}
+  .zone-legend .zl{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--border);align-items:start;cursor:pointer;transition:background .15s}
+  .zone-legend .zl:first-child{border-top:0;padding-top:0}
+  .zone-legend .zl:hover,.zone-legend .zl.active{background:rgba(196,98,58,.06)}
+  .zone-legend .lbadge{width:26px;height:26px;border-radius:6px;border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:14px;color:var(--accent);background:var(--accent-soft)}
+  .zone-legend .zl-name{font-size:13px;font-weight:600;color:var(--paper);margin:0 0 4px}
+  .zone-legend .zl-desc{font-size:12px;color:var(--paper-mute);line-height:1.5;margin:0}
+  @media (max-width:900px){.layout-inner{grid-template-columns:1fr}}
+
+  .process{padding:64px 24px;border-bottom:1px solid var(--border)}
+  .process-inner{max-width:1080px;margin:0 auto}
+  .process-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+  .process h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;margin:0 0 6px;letter-spacing:-.02em}
+  .process .sub{color:var(--paper-mute);margin:0;font-size:13.5px}
+  .time-badge{font-size:11.5px;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line);padding:8px 14px;border-radius:999px;letter-spacing:.04em;text-align:right;line-height:1.3}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .step{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:22px;position:relative;transition:border-color .2s,transform .2s}
+  .step:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .step-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .step .num{font-family:"Fraunces",Georgia,serif;font-size:42px;font-weight:300;color:var(--accent);line-height:1;letter-spacing:-.04em}
+  .step-thumb{width:56px;height:56px;border-radius:8px;background:linear-gradient(140deg,#1f1108 0%,#4a2410 50%,#a04d2a 100%);border:1px solid var(--accent-line);position:relative;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--accent)}
+  .step-thumb::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(245,200,170,.3) 0,transparent 50%)}
+  .step-thumb svg{position:relative;z-index:1;width:24px;height:24px}
+  .step h4{margin:0 0 6px;font-size:15px;font-weight:500;letter-spacing:-.005em;color:var(--paper)}
+  .step p{margin:0;color:var(--paper-mute);font-size:13.5px;line-height:1.55}
+  @media (max-width:780px){.steps{grid-template-columns:1fr}}
+
+  .materials{padding:64px 24px;background:var(--bg-2);border-bottom:1px solid var(--border)}
+  .materials-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+  .materials h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em;grid-column:1/-1}
+  .materials .section-sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 22px;grid-column:1/-1}
+  .flow{display:flex;flex-direction:column;align-items:stretch}
+  .flow-node{background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;position:relative}
+  .flow-node.origin{border-color:var(--ok);background:linear-gradient(180deg,rgba(107,154,58,.08) 0,var(--bg-3) 100%)}
+  .flow-node.workshop{border-color:var(--accent);background:linear-gradient(180deg,rgba(196,98,58,.08) 0,var(--bg-3) 100%)}
+  .flow-node .fn-tag{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:6px}
+  .flow-node.origin .fn-tag{color:var(--ok)}
+  .flow-node.workshop .fn-tag{color:var(--accent)}
+  .flow-node .fn-name{font-family:"Fraunces",serif;font-size:18px;color:var(--paper);margin:0 0 4px;letter-spacing:-.01em}
+  .flow-node .fn-sub{font-size:12.5px;color:var(--paper-mute);margin:0;line-height:1.45}
+  .flow-arrow{padding:14px 0 14px 28px;border-left:1px dashed var(--border-strong);margin-left:24px;color:var(--paper-mute);font-size:12px;letter-spacing:.04em}
+  .flow-arrow::before{content:"↓ ";color:var(--accent)}
+
+  .risk-panel{background:var(--bg-3);border:1px solid var(--border);border-radius:14px;padding:24px}
+  .risk-panel h3{font-family:"Fraunces",serif;font-weight:500;font-size:18px;margin:0 0 12px}
+  .risk-level{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--paper);background:rgba(196,154,48,.12);border:1px solid rgba(196,154,48,.4);padding:6px 12px;border-radius:999px;margin-bottom:18px}
+  .risk-level .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 8px var(--warn)}
+  .risk-panel ul{list-style:none;padding:0;margin:0 0 20px}
+  .risk-panel li{font-size:13px;color:var(--paper-dim);padding:8px 0 8px 18px;line-height:1.5;position:relative;border-top:1px solid var(--border)}
+  .risk-panel li:first-child{border-top:0}
+  .risk-panel li::before{content:"";position:absolute;left:0;top:14px;width:6px;height:6px;border-radius:50%;background:var(--warn)}
+  .risk-panel li em{color:var(--paper-mute);font-style:italic;font-family:"Fraunces",serif}
+  .env-deps{font-size:12.5px;color:var(--paper-dim);line-height:1.6;border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px}
+  .env-deps strong{color:var(--paper-mute);font-weight:500;text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;display:block;margin-bottom:4px}
+  .waste{font-size:11.5px;color:var(--paper-mute);line-height:1.55;border-top:1px solid var(--border);padding-top:12px;margin-bottom:18px}
+  .waste strong{color:var(--paper-mute);text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;display:block;margin-bottom:4px;font-weight:500}
+
+  .chainlink{border-top:1px solid var(--border);padding-top:18px;margin-top:6px}
+  .chainlink h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin:0 0 12px;font-weight:600}
+  .chainlink-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(196,98,58,.07);border:1px solid var(--accent-line);border-radius:10px;cursor:pointer;transition:background .15s,transform .15s}
+  .chainlink-card:hover{background:rgba(196,98,58,.13);transform:translateX(2px)}
+  .chainlink-card .icon{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);border:1px solid var(--accent-line);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0;font-size:14px}
+  .chainlink-card .body{flex:1;min-width:0}
+  .chainlink-card .body .ln-name{font-family:"Fraunces",serif;font-size:14.5px;color:var(--paper);margin:0 0 2px}
+  .chainlink-card .body .ln-why{font-size:11.5px;color:var(--paper-mute);margin:0;line-height:1.45}
+  .chainlink-card .arrow{color:var(--accent);font-size:18px;flex-shrink:0}
+  @media (max-width:780px){.materials-inner{grid-template-columns:1fr}}
+
+  .econ{padding:80px 24px;background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 100%);border-bottom:1px solid var(--border)}
+  .econ-inner{max-width:var(--maxw);margin:0 auto}
+  .econ h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .econ .section-sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 36px}
+  .sentiment{text-align:center;margin:24px 0 48px;padding:36px 24px;background:var(--bg-2);border:1px solid var(--border);border-radius:16px}
+  .sentiment .label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-mute);margin-bottom:14px}
+  .sentiment .word{font-family:"Fraunces",serif;font-style:italic;font-weight:400;font-size:clamp(48px,7vw,80px);color:var(--ok);line-height:1;letter-spacing:-.025em;margin-bottom:18px}
+  .sentiment .quote{font-family:"Fraunces",serif;font-style:italic;font-size:18px;color:var(--paper-dim);line-height:1.5;max-width:560px;margin:0 auto;font-weight:300}
+
+  .business-model{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:36px;background:var(--bg-3)}
+  .bm-cell{padding:22px 24px;border-left:1px solid var(--border)}
+  .bm-cell:first-child{border-left:0}
+  .bm-cell .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:8px}
+  .bm-cell .v{font-family:"Fraunces",serif;font-size:17px;line-height:1.35;color:var(--paper);letter-spacing:-.005em}
+  @media (max-width:780px){.business-model{grid-template-columns:1fr}.bm-cell{border-left:0;border-top:1px solid var(--border)}.bm-cell:first-child{border-top:0}}
+
+  .tension{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--bg-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:32px}
+  .tension-col{padding:24px 26px}
+  .tension-col.strength{border-right:1px solid var(--border)}
+  .tension-col h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px;font-weight:600}
+  .tension-col.strength h4{color:var(--ok)}
+  .tension-col.pressure h4{color:var(--warn)}
+  .tension-col ul{list-style:none;padding:0;margin:0}
+  .tension-col li{font-size:13.5px;color:var(--paper-dim);padding:9px 0 9px 18px;line-height:1.5;position:relative;border-top:1px solid var(--border)}
+  .tension-col li:first-child{border-top:0}
+  .tension-col.strength li::before{content:"+";position:absolute;left:0;top:9px;color:var(--ok);font-family:"Fraunces",serif;font-size:16px;line-height:1}
+  .tension-col.pressure li::before{content:"−";position:absolute;left:0;top:9px;color:var(--warn);font-family:"Fraunces",serif;font-size:16px;line-height:1}
+  @media (max-width:780px){.tension{grid-template-columns:1fr}.tension-col.strength{border-right:0;border-bottom:1px solid var(--border)}}
+
+  .engage-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .engage-row .erlabel{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-mute);margin-right:6px}
+  .engage-btn{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:11px 18px;border-radius:999px;font-size:13px;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .engage-btn:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  .engage-btn .arr{color:var(--accent);font-size:14px}
+
+  .succession{padding:96px 24px;text-align:center;border-bottom:1px solid var(--border);background:
+    radial-gradient(ellipse at 50% 50%,rgba(107,154,58,.08) 0,transparent 60%),
+    radial-gradient(ellipse at 50% 90%,rgba(107,154,58,.05) 0,transparent 70%),
+    var(--bg);position:relative}
+  .succession::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(107,154,58,.3) 50%,transparent 100%)}
+  .succession-inner{max-width:640px;margin:0 auto}
+  .succession .label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-mute);margin-bottom:18px}
+  .succession h2{font-family:"Fraunces",serif;font-weight:300;font-style:italic;font-size:clamp(48px,7vw,84px);line-height:1.05;color:var(--succ);margin:0 0 30px;letter-spacing:-.02em}
+  .succession .quote{font-family:"Fraunces",serif;font-style:italic;font-size:22px;line-height:1.5;color:var(--paper);margin:0 0 14px;font-weight:300}
+  .succession .quote-cite{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--paper-mute);margin-bottom:36px;display:block}
+  .succession .subtext{font-family:"Fraunces",serif;font-size:18px;line-height:1.6;color:var(--paper-dim);margin:0 auto 42px;font-weight:300;max-width:560px}
+  .succession .cta{display:inline-flex;align-items:center;gap:10px;font-size:14px;background:var(--accent);border:1px solid var(--accent);padding:14px 24px;border-radius:999px;cursor:pointer;font-weight:500;color:var(--ink);transition:transform .15s,background .15s}
+  .succession .cta:hover{background:var(--paper);transform:translateY(-2px)}
+  .succession .cta-arrow{font-size:16px}
+
+  .connections{padding:72px 24px;background:var(--bg-2);border-bottom:1px solid var(--border)}
+  .conn-inner{max-width:1080px;margin:0 auto}
+  .conn-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px;margin-bottom:24px}
+  .connections h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .connections .sub{color:var(--paper-mute);font-size:13.5px;margin:0;max-width:520px}
+  .lens-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+  .lens-tabs::-webkit-scrollbar{display:none}
+  .lens-tab{flex-shrink:0;background:transparent;border:1px solid var(--border);color:var(--paper-mute);padding:9px 16px;border-radius:999px;font-size:12.5px;cursor:pointer;letter-spacing:.02em;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+  .lens-tab:hover{color:var(--paper);border-color:var(--border-strong)}
+  .lens-tab.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .lens-tab .count{font-size:10.5px;color:var(--paper-mute);background:rgba(245,236,222,.05);padding:1px 6px;border-radius:999px}
+  .lens-tab.active .count{color:var(--accent);background:rgba(196,98,58,.12)}
+  .lens-pane{display:none;animation:fadeIn .25s ease}
+  .lens-pane.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .conn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .conn-card{background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:22px;text-decoration:none;color:var(--paper);display:block;cursor:pointer;transition:transform .2s,border-color .2s}
+  .conn-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .conn-card .lenspill{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:999px;margin-bottom:14px;font-weight:600;border:1px solid var(--accent-line)}
+  .conn-card h4{font-family:"Fraunces",serif;font-weight:500;font-size:18px;margin:0 0 4px;letter-spacing:-.005em;color:var(--paper)}
+  .conn-card .meta{font-size:12px;color:var(--paper-mute);margin:0 0 12px;line-height:1.45}
+  .conn-card .why{font-size:13px;color:var(--paper-dim);line-height:1.55;margin:0 0 14px;text-wrap:pretty}
+  .conn-card .date{font-size:10.5px;letter-spacing:.06em;color:var(--paper-mute);text-transform:uppercase;border-top:1px solid var(--border);padding-top:12px}
+  @media (max-width:780px){.conn-grid{grid-template-columns:1fr}}
+
+  footer{padding:60px 24px 60px;background:var(--bg-3);color:var(--paper-mute);font-size:13px;border-top:1px solid var(--border)}
+  .footer-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:36px}
+  footer h5{font-family:"Manrope";font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper);margin:0 0 12px;font-weight:600}
+  footer p,footer li{line-height:1.6;font-size:12.5px;margin:0 0 6px}
+  footer ul{list-style:none;padding:0;margin:0}
+  footer ul li{padding:6px 0;display:flex;gap:10px}
+  footer ul li .icon{flex-shrink:0;width:18px;text-align:center}
+  .foot-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+  .foot-actions button{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:9px 16px;border-radius:999px;font-size:12px;cursor:pointer;text-align:left}
+  .foot-actions button:hover{border-color:var(--accent);color:var(--accent)}
+  .citation-block{max-width:1080px;margin:36px auto 0;border-top:1px solid var(--border);padding-top:20px}
+  .cit-toggle{background:transparent;border:0;color:var(--paper-mute);font-size:11px;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:8px}
+  .cit-toggle:hover{color:var(--paper)}
+  .cit-toggle .chev{transition:transform .25s}
+  .cit-toggle.open .chev{transform:rotate(180deg)}
+  .citation-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .citation-body.open{max-height:200px}
+  .citation-body-inner{font-family:"Fraunces",serif;font-style:italic;font-size:13px;color:var(--paper-dim);line-height:1.6;padding:14px 0;border-left:2px solid var(--accent-line);padding-left:14px;margin-top:10px}
+  .footer-foot{max-width:1080px;margin:32px auto 0;border-top:1px solid var(--border);padding-top:20px;text-align:center;color:var(--paper-mute);font-size:11.5px;letter-spacing:.04em}
+  .footer-foot a{color:var(--paper-dim);border-bottom-color:transparent;margin:0 6px}
+  @media (max-width:780px){.footer-inner{grid-template-columns:1fr;gap:28px}}
+
+  .mobile-action-bar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(23,19,14,.96);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:12px 16px;display:none;transform:translateY(100%);transition:transform .28s ease}
+  .mobile-action-bar.show{transform:translateY(0)}
+  .mobile-action-bar button{width:100%;background:var(--accent);color:var(--ink);border:0;padding:14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer}
+  @media (max-width:780px){.mobile-action-bar{display:block}body{padding-bottom:72px}}
+
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
+  .modal-backdrop.show{display:flex}
+  .modal{background:var(--bg-2);border:1px solid var(--border-strong);border-radius:18px;max-width:480px;width:100%;padding:32px;position:relative;animation:slideUp .25s ease}
+  @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal h3{font-family:"Fraunces",serif;font-weight:400;font-size:24px;margin:0 0 6px;letter-spacing:-.01em}
+  .modal .modal-sub{color:var(--paper-mute);font-size:13px;margin:0 0 24px}
+  .modal-close{position:absolute;top:18px;right:18px;background:transparent;border:0;color:var(--paper-mute);font-size:24px;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+  .modal-close:hover{color:var(--paper);background:var(--bg-3)}
+  .form-field{margin-bottom:16px}
+  .form-field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--paper-mute);margin-bottom:6px;font-weight:600}
+  .form-field input,.form-field textarea,.form-field select{width:100%;background:var(--bg-3);border:1px solid var(--border);color:var(--paper);padding:11px 14px;border-radius:8px;font-family:inherit;font-size:13.5px;line-height:1.5;outline:none;transition:border-color .15s}
+  .form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:var(--accent)}
+  .form-field textarea{min-height:90px;resize:vertical}
+  .radio-row{display:flex;flex-wrap:wrap;gap:8px}
+  .radio-row label{display:inline-flex;align-items:center;gap:6px;background:var(--bg-3);border:1px solid var(--border);padding:8px 14px;border-radius:999px;font-size:12px;cursor:pointer;color:var(--paper-dim);text-transform:none;letter-spacing:0;font-weight:400;margin:0}
+  .radio-row input[type="radio"]{accent-color:var(--accent);margin:0}
+  .radio-row label:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .modal-submit{width:100%;background:var(--accent);color:var(--ink);border:0;padding:14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+  .modal-submit:hover{background:var(--paper)}
+
+  .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);z-index:200;background:var(--bg-3);border:1px solid var(--accent);color:var(--paper);padding:14px 22px;border-radius:999px;font-size:13px;box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;transition:opacity .25s,transform .25s;max-width:90%;text-align:center;line-height:1.4}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast::before{content:"✓ ";color:var(--accent);font-weight:600}
+</style>
+</head>
+<body data-household="huynh-xuan-huynh">
+
+<nav class="top">
+  <a class="logo" href="#"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;flex-shrink:0"><path d="M50 52 L88 31 L88 71 L50 92 Z" fill="#7B3FEB"/><path d="M12 31 L50 52 L50 92 L12 71 Z" fill="#A370F7"/><path d="M50 8 L88 31 L50 52 L12 31 Z" fill="#6E9834"/><path d="M50 8 Q70 16 88 31 Q66 24 50 32 Q34 24 12 31 Q30 16 50 8 Z" fill="#B6D86E"/></svg><span>map<em>me</em></span></a>
+  <div class="crumbs">
+    <a href="#">Bản đồ</a><span class="sep">/</span>
+    <a href="#">Bình Dương</a><span class="sep">/</span>
+    <a href="#">Gốm Lái Thiêu</a><span class="sep">/</span>
+    <span style="color:var(--paper)">Huỳnh Xuân Huỳnh</span>
+  </div>
+  <div class="actions">
+    <button class="btn">Lưu</button>
+    <button class="btn">Chia sẻ</button>
+    <button class="btn primary" data-action="message">Đặt mua</button>
+  </div>
+</nav>
+
+<div class="section-nav" id="sectionNav">
+  <div class="section-nav-inner">
+    <a href="#artisan" data-target="artisan">Nghệ nhân</a>
+    <a href="#story" data-target="story">Câu chuyện</a>
+    <a href="#layout" data-target="layout">Xưởng 3D</a>
+    <a href="#process" data-target="process">Quy trình</a>
+    <a href="#materials" data-target="materials">Vật liệu</a>
+    <a href="#economy" data-target="economy">Kinh tế</a>
+    <a href="#succession" data-target="succession">Kế nghiệp</a>
+    <a href="#connections" data-target="connections">Kết nối</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero" data-screen-label="01 Hero">
+  <div class="hero-bg"></div>
+  <div class="hero-noise"></div>
+
+  <button class="succ-badge" aria-describedby="succ-tip" tabindex="0">
+    <span class="dot"></span>Đang truyền nghề
+  </button>
+  <div class="succ-tip" id="succ-tip" role="tooltip">
+    Actively training apprentices — succession is happening in real time. 3 students under 25.
+  </div>
+
+  <div class="hero-content">
+    <div class="kicker">
+      <span class="pill">Gốm Lái Thiêu</span>
+      <span class="loc">Lái Thiêu · Bình Dương · Đông Nam Bộ</span>
+    </div>
+    <h1 class="title">Huỳnh Xuân Huỳnh<br><em>"Tôi không cứu nghề. Tôi chỉ làm việc."</em></h1>
+    <p class="dek">Hai mươi chín tuổi. Tám năm xây dựng. Người sáng lập <em style="font-style:normal;color:var(--accent)">Nắng Ceramics</em> — studio gốm hiện đại tại Lái Thiêu, nơi truyền thống gốm hai trăm năm gặp một thế hệ thợ trẻ đang chủ động chọn ở lại.</p>
+    <div class="triad">
+      <button class="primary" data-action="commission">Đặt mua sản phẩm</button>
+      <button class="ghost" data-action="workshop">Đăng ký workshop</button>
+      <button class="ghost" data-action="visit">Tham quan studio</button>
+    </div>
+    <div class="hero-meta">
+      <div><label>Sinh năm</label><strong>1997</strong></div>
+      <div><label>Kinh nghiệm</label><strong>8 năm · sáng lập</strong></div>
+      <div><label>Vật liệu chính</label><strong>Đất sét Bình Dương</strong></div>
+      <div><label>Trạng thái</label><strong>Đang phát triển</strong></div>
+    </div>
+  </div>
+</section>
+
+<section class="facts" data-screen-label="02 Quick facts">
+  <div class="fact"><div class="k">Tỉnh/TP</div><div class="v">Bình Dương</div></div>
+  <div class="fact"><div class="k">Nghề</div><div class="v">Gốm Lái Thiêu</div></div>
+  <div class="fact"><div class="k">Sinh năm</div><div class="v">1997</div></div>
+  <div class="fact"><div class="k">Kinh nghiệm</div><div class="v">8 năm</div></div>
+  <div class="fact"><div class="k">Studio</div><div class="v">~180 m²</div></div>
+  <div class="fact"><div class="k">Kế nghiệp</div><div class="v">3 học việc</div></div>
+</section>
+
+<!-- ARTISAN -->
+<section class="artisan" id="artisan" data-screen-label="03 Artisan">
+  <div class="artisan-card">
+    <div class="artisan-portrait">
+      <span class="corner-label">Ảnh: chuyến thực địa tiếp theo</span>
+    </div>
+    <div class="artisan-meta">
+      <div class="kicker"><span class="pill">Nghệ nhân</span></div>
+      <h2>Huỳnh Xuân Huỳnh</h2>
+      <p class="role">Gốm Lái Thiêu · 8 năm sáng lập · sinh 1997</p>
+      <div class="quote-with-audio">
+        <p class="qtext">"Mọi người nghĩ gốm là di sản phải bảo tồn. Tôi muốn gốm sống — sống bằng chính nó, không phải bằng lòng thương."</p>
+        <button class="audio-play" aria-label="Nghe nghệ nhân nói — bản ghi 42 giây" data-audio="sig-quote">
+          <span class="play-glyph"></span>42s
+        </button>
+      </div>
+      <p class="credit">Ghi âm ngày 01/04/2026 · Phiên A007 · Phiên dịch: mapme</p>
+      <div class="artisan-actions">
+        <button class="primary" data-action="commission">Đặt mua sản phẩm</button>
+        <button class="ghost" data-action="download">Tải dữ liệu</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEDIA GALLERY -->
+<section class="gallery" data-screen-label="04 Media gallery">
+  <div class="gallery-inner">
+    <h2>Hình ảnh, ghi âm &amp; video</h2>
+    <p class="gsub">Chuyến thực địa 01/04/2026 · ảnh và video đang biên tập — placeholders sẽ được thay thế bằng tư liệu thực.</p>
+
+    <div class="ggrid">
+      <figure class="gitem span-8 h-tall">
+        <div class="gbg bg-wheel"></div>
+                <span class="gchip">📷 Ảnh sẽ được liên kết</span>
+        <figcaption class="gcap">Huỳnh tại bàn xoay — buổi sáng tại studio.<em>Khu C · 01/04/2026</em></figcaption>
+      </figure>
+
+      <figure class="gitem span-4 h-tall">
+        <div class="gbg bg-detail"></div>
+                <span class="gchip">📷 Ảnh sẽ được liên kết</span>
+        <figcaption class="gcap">Bát mới vuốt phơi trên kệ — chờ đủ độ ẩm để đến lò nung sơ.<em>Chi tiết · Khu D</em></figcaption>
+      </figure>
+
+      <figure class="gitem span-6 h-med audio-tile">
+        <div class="gbg bg-audio"></div>
+        <div class="waveform" aria-hidden="true"></div>
+        <button class="playover" aria-label="Phát ghi âm: Huỳnh nói về ba người học việc"><span class="play-glyph"></span></button>
+        <span class="gchip">🎧 Ghi âm A007</span>
+        <span class="durbadge">0:42</span>
+        <figcaption class="gcap">Huỳnh kể về ba học việc hiện tại.<em>Chữ ký giọng nói · Phiên A007</em></figcaption>
+      </figure>
+
+      <figure class="gitem span-6 h-med">
+        <div class="gbg bg-studio"></div>
+                <span class="gchip">📷 Ảnh sẽ được liên kết</span>
+        <figcaption class="gcap">Ba học việc trong giờ làm — Khu C trở thành lớp học vào buổi chiều.<em>Khu C · 01/04/2026</em></figcaption>
+      </figure>
+
+      <figure class="gitem span-4 h-med">
+        <div class="gbg bg-kiln"></div>
+                <span class="gchip">📷 Ảnh sẽ được liên kết</span>
+        <figcaption class="gcap">Lò củi — nung chính, 1240°C, ~14 giờ liên tục.<em>Khu F · Mỗi 3 tuần</em></figcaption>
+      </figure>
+
+      <figure class="gitem span-8 h-med">
+        <div class="gbg bg-video"></div>
+        <button class="playover" aria-label="Phát video: nung lò củi"><span class="play-glyph"></span></button>
+        <span class="gchip">▶ Video</span>
+        <span class="durbadge">1:30</span>
+        <figcaption class="gcap">Một mẻ nung lò củi — từ chuẩn bị củi đến khi lò ngủ.<em>Walk-through · Khu F</em></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<article class="story" id="story" data-screen-label="05 Story">
+  <h2>Một người trẻ chọn ở lại</h2>
+
+  <p class="lead">Lái Thiêu từng là cái nôi của gốm sứ Nam Bộ. Hai trăm năm trước, lò đầu tiên đã đỏ lửa ở đây. Hôm nay, phần lớn các xưởng đã đóng. Huỳnh, 29 tuổi, không kế nghiệp một xưởng — bà mở một xưởng mới.</p>
+
+  <p>Sau khi tốt nghiệp Đại học Mỹ thuật TP. HCM, Huỳnh có những lựa chọn quen thuộc của thế hệ mình: thiết kế nội thất, agency, công ty xuất khẩu. Bà chọn về Lái Thiêu — nơi mẹ bà từng làm phụ ở một xưởng cũ — và thuê một mảnh đất 180 mét vuông để mở studio nhỏ.</p>
+
+  <p>Tám năm sau, Nắng Ceramics có ba thợ học việc. Hai người là con của những thợ gốm Lái Thiêu đã nghỉ làm. Một người là sinh viên xuống thực tập rồi ở lại. Tất cả đều trẻ hơn 25. Họ tự đến xin học — bà không tìm họ.</p>
+
+  <blockquote>
+    <p>"Hồi mới về, mọi người cười. Sao học đại học lại về làm gốm. Bây giờ thì các cô chú trong xóm gửi con cháu đến."</p>
+    <cite>— Huỳnh Xuân Huỳnh, Lái Thiêu, 01/04/2026</cite>
+    <div class="translation">When I first came back, people laughed. Why come back to do pottery after university? Now the neighbours send their kids over.</div>
+  </blockquote>
+
+  <h3>Lò củi — kiểu Lái Thiêu</h3>
+
+  <p>Khác với lò gas đang phổ biến, Nắng Ceramics dùng lò củi kiểu cũ — cùng kiểu lò các nghệ nhân Lái Thiêu thế hệ trước dùng. Nung lâu hơn. Tốn củi hơn. Khó kiểm soát hơn. Nhưng cho lớp men có sắc thái khó mô phỏng — chỗ đậm, chỗ nhạt, chỗ chảy ra do hơi tro củi. Đó là dấu hiệu duy nhất ai cũng nhận ra ngay: đây là gốm Lái Thiêu thật.</p>
+
+  <button class="source-toggle" data-toggle="source-1">
+    <span>Xem nguồn gốc</span><span class="chev">▾</span>
+  </button>
+  <div class="source-panel" id="source-1">
+    <div class="source-panel-inner">
+      <h4>Trích đoạn nguồn — Phiên A007, đoạn 09:12–11:30</h4>
+      <p class="src-quote">"Hồi mới về Lái Thiêu, mọi người cười… 'Sao học đại học lại về làm gốm.' Tôi cũng không biết trả lời gì."</p>
+      <p class="src-meta">Huỳnh Xuân Huỳnh · 01/04/2026 · 09:35</p>
+      <p class="src-quote">"Ba người học việc hiện tại, có hai người là con của cô chú đã nghỉ làm gốm. Họ tự đến xin. Tôi không phải tìm họ. Tôi chỉ phải làm việc tốt để họ ở lại."</p>
+      <p class="src-meta">Huỳnh Xuân Huỳnh · 01/04/2026 · 22:10</p>
+      <div class="ph-note">[Trích đoạn nguồn — sẽ liên kết trực tiếp với transcript khi raw data layer phát hành.]</div>
+    </div>
+  </div>
+</article>
+
+<!-- LAYOUT -->
+<section class="layout-section" id="layout" data-screen-label="06 Layout">
+  <div class="layout-inner">
+    <div>
+      <div class="kicker" style="margin-bottom:12px"><span class="pill">Sơ đồ studio · SVG fallback</span></div>
+      <h2>Bảy khu vực, một quy trình</h2>
+      <p class="sub">Nắng Ceramics nhỏ nhưng đầy đủ: từ kho đất đến lò củi, mọi công đoạn đều diễn ra dưới một mái.</p>
+      <p class="layout-stat"><span class="accent">~180 m²</span> · Lái Thiêu, Bình Dương</p>
+
+      <div class="layout-diagram" id="layoutDiagram">
+        <svg class="layout-svg" viewBox="0 0 600 480" preserveAspectRatio="xMidYMid meet">
+          <g class="zone" data-zone="A">
+            <rect class="zone-rect" x="30" y="30" width="160" height="100" rx="10"/>
+            <text class="zone-badge" x="46" y="56">A</text>
+            <text class="zone-label" x="70" y="54">KHO ĐẤT SÉT</text>
+            <text class="zone-sub" x="46" y="74">Bao đất sét xếp ngăn</text>
+            <g opacity=".22" stroke="#c4623a" stroke-width="1" fill="none">
+              <rect x="48" y="88" width="40" height="28" rx="2"/><rect x="96" y="88" width="40" height="28" rx="2"/><rect x="144" y="88" width="34" height="28" rx="2"/>
+            </g>
+          </g>
+          <g class="zone" data-zone="B">
+            <rect class="zone-rect" x="210" y="30" width="170" height="100" rx="10"/>
+            <text class="zone-badge" x="226" y="56">B</text>
+            <text class="zone-label" x="250" y="54">LỌC &amp; NHÀO</text>
+            <text class="zone-sub" x="226" y="74">Pug-mill · bể lọc</text>
+            <g opacity=".25" stroke="#c4623a" stroke-width="1" fill="none">
+              <circle cx="260" cy="105" r="14"/><circle cx="320" cy="105" r="14"/>
+              <line x1="274" y1="105" x2="306" y2="105"/>
+            </g>
+          </g>
+          <g class="zone" data-zone="C" id="zoneC">
+            <rect class="zone-rect" x="400" y="30" width="170" height="160" rx="10"/>
+            <text class="zone-badge" x="416" y="56">C</text>
+            <text class="zone-label" x="440" y="54">KHU TẠO HÌNH</text>
+            <text class="zone-sub" x="416" y="74">Bàn xoay · slab</text>
+            <g opacity=".35" stroke="#c4623a" stroke-width="1" fill="none">
+              <circle cx="440" cy="115" r="14"/><circle cx="500" cy="115" r="14"/>
+              <circle cx="440" cy="165" r="14"/><circle cx="500" cy="165" r="14"/>
+            </g>
+          </g>
+          <g class="zone" data-zone="D">
+            <rect class="zone-rect dashed" x="30" y="150" width="160" height="120" rx="10"/>
+            <text class="zone-badge" x="46" y="176">D</text>
+            <text class="zone-label" x="70" y="174">PHƠI &amp; SẤY</text>
+            <text class="zone-sub" x="46" y="194">Kệ phơi nhiều tầng</text>
+            <g opacity=".3" stroke="#c4623a" stroke-width="1" fill="none">
+              <line x1="50" y1="208" x2="170" y2="208"/><line x1="50" y1="226" x2="170" y2="226"/>
+              <line x1="50" y1="244" x2="170" y2="244"/>
+              <circle cx="70" cy="216" r="3"/><circle cx="100" cy="216" r="3"/><circle cx="130" cy="216" r="3"/>
+              <circle cx="70" cy="234" r="3"/><circle cx="100" cy="234" r="3"/><circle cx="130" cy="234" r="3"/>
+            </g>
+          </g>
+          <g class="zone" data-zone="E" id="zoneE">
+            <rect class="zone-rect" x="210" y="150" width="170" height="120" rx="10"
+                  style="stroke:var(--accent);stroke-width:2.2;fill:rgba(196,98,58,.08)"/>
+            <text class="zone-badge" x="226" y="176">E</text>
+            <text class="zone-label" x="250" y="174">KHU MEN</text>
+            <text class="zone-sub" x="226" y="194">Pha men · vẽ tay</text>
+            <text x="226" y="244" style="fill:var(--accent);font-style:italic;font-family:Fraunces,serif;font-size:11px">★ vùng tinh hoa của studio</text>
+          </g>
+          <g class="zone" data-zone="F">
+            <rect class="zone-rect" x="400" y="210" width="170" height="120" rx="10"/>
+            <text class="zone-badge" x="416" y="236">F</text>
+            <text class="zone-label" x="440" y="234">LÒ CỦI</text>
+            <text class="zone-sub" x="416" y="254">1240°C · ~14 giờ</text>
+            <g>
+              <rect x="430" y="268" width="110" height="50" rx="6" fill="none" stroke="#c4623a" stroke-width="1.4"/>
+              <rect x="438" y="280" width="94" height="32" rx="2" fill="rgba(196,98,58,.18)"/>
+              <line x1="450" y1="280" x2="450" y2="312" stroke="#c4623a" stroke-width=".6"/>
+              <line x1="475" y1="280" x2="475" y2="312" stroke="#c4623a" stroke-width=".6"/>
+              <line x1="500" y1="280" x2="500" y2="312" stroke="#c4623a" stroke-width=".6"/>
+              <circle cx="485" cy="296" r="3.5" fill="#ff8a40" opacity=".7"/>
+            </g>
+          </g>
+          <g class="zone" data-zone="G">
+            <rect class="zone-rect dashed" x="30" y="290" width="350" height="80" rx="10"/>
+            <text class="zone-badge" x="46" y="316">G</text>
+            <text class="zone-label" x="70" y="314">SHOWROOM &amp; CỬA RA</text>
+            <text class="zone-sub" x="46" y="334">Khách tham quan · bán lẻ</text>
+            <g opacity=".35" stroke="#c4623a" stroke-width="1" fill="none">
+              <rect x="60" y="346" width="22" height="14" rx="1"/><rect x="92" y="346" width="22" height="14" rx="1"/>
+              <rect x="124" y="346" width="22" height="14" rx="1"/><rect x="156" y="346" width="22" height="14" rx="1"/>
+              <rect x="220" y="346" width="22" height="14" rx="1"/><rect x="252" y="346" width="22" height="14" rx="1"/>
+              <rect x="284" y="346" width="22" height="14" rx="1"/><rect x="316" y="346" width="22" height="14" rx="1"/>
+            </g>
+          </g>
+          <g opacity=".22" stroke="#c4623a" stroke-width="1" stroke-dasharray="3 4" fill="none">
+            <path d="M 190 80 L 210 80"/><path d="M 295 130 L 295 150"/>
+            <path d="M 380 80 L 400 80"/><path d="M 295 270 L 295 290"/>
+            <path d="M 380 210 L 400 270"/><path d="M 380 350 L 400 290"/>
+          </g>
+          <g opacity=".5">
+            <text class="zone-sub" x="46" y="420" style="fill:#c4623a;font-size:9.5px;font-style:italic">Studio mở năm 2018 · mở rộng năm 2022</text>
+          </g>
+        </svg>
+        <div class="compass" aria-label="N/S">
+          <svg viewBox="0 0 56 56">
+            <circle cx="28" cy="28" r="22" fill="none" stroke="currentColor" stroke-width="1" opacity=".4"/>
+            <path d="M28 10 L32 28 L28 24 L24 28 Z" fill="#c4623a"/>
+            <path d="M28 46 L32 28 L28 32 L24 28 Z" fill="currentColor" opacity=".5"/>
+            <text x="28" y="9" text-anchor="middle" font-family="Manrope" font-size="9" font-weight="600" fill="#c4623a">N</text>
+            <text x="28" y="55" text-anchor="middle" font-family="Manrope" font-size="9" fill="currentColor" opacity=".55">S</text>
+          </svg>
+        </div>
+        <div class="zone-tooltip" id="zoneTooltip">
+          <div class="zt-name">Khu men</div>
+          <div class="zt-desc">Pha men và vẽ tay. Mỗi mẻ men là một công thức riêng của Nắng. Đây là nơi tạo nên chữ ký studio.</div>
+          <div class="zt-quote">"Lớp men là chữ ký người thợ. Không có công thức — có sự kiên nhẫn."</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="zone-legend" id="zoneLegend">
+      <div class="zl" data-zone="A"><div class="lbadge">A</div><div><p class="zl-name">Kho đất sét</p><p class="zl-desc">Đất sét Bình Dương đóng bao, xếp theo loại (đất bụi, đất men, đất xương). Nguồn cách ~5km.</p></div></div>
+      <div class="zl" data-zone="B"><div class="lbadge">B</div><div><p class="zl-name">Lọc &amp; nhào</p><p class="zl-desc">Bể lọc đất loại bỏ tạp chất. Máy pug-mill nhào đất đến độ ẩm phù hợp. Ủ 3–7 ngày trước khi dùng.</p></div></div>
+      <div class="zl" data-zone="C"><div class="lbadge">C</div><div><p class="zl-name">Khu tạo hình</p><p class="zl-desc">Bốn bàn xoay điện cộng bàn slab. Buổi sáng Huỳnh làm; buổi chiều thành lớp học cho ba học việc.</p></div></div>
+      <div class="zl" data-zone="D"><div class="lbadge">D</div><div><p class="zl-name">Phơi &amp; sấy</p><p class="zl-desc">Kệ phơi nhiều tầng. Sấy chậm trong bóng — quá nóng = nứt. Mất 3–7 ngày tùy độ dày.</p></div></div>
+      <div class="zl" data-zone="E"><div class="lbadge">E</div><div><p class="zl-name">Khu men ★</p><p class="zl-desc">Phòng pha men và vẽ tay. Tay nghề cao nhất. Mỗi mẻ men là công thức riêng — không sao chép được.</p></div></div>
+      <div class="zl" data-zone="F"><div class="lbadge">F</div><div><p class="zl-name">Lò củi</p><p class="zl-desc">Nung chính ở 1240°C trong ~14 giờ. Đốt củi tạp địa phương. Mỗi 3 tuần một mẻ.</p></div></div>
+      <div class="zl" data-zone="G"><div class="lbadge">G</div><div><p class="zl-name">Showroom &amp; cửa ra</p><p class="zl-desc">Khu trưng bày bán lẻ. Đón khách tham quan và workshop dạy nghề cuối tuần.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="process" data-screen-label="07 Process">
+  <div class="process-inner">
+    <div class="process-head">
+      <div>
+        <h2>Quy trình làm một chiếc bát gốm</h2>
+        <p class="sub">Bảy công đoạn — từ đất sét Bình Dương đến sản phẩm hoàn thiện.</p>
+      </div>
+      <div class="time-badge">Thời gian sản xuất: 14–18 ngày<br>Mỗi mẻ nung lò củi: 3 tuần</div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-head"><div class="num">01</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 18 Q5 8 12 8 Q19 8 19 18 Z"/><path d="M8 13 L16 13"/></svg></div></div><h4>Chuẩn bị đất</h4><p>Đất sét Bình Dương được nhập từ mỏ cách ~5km. Lọc qua bể nước để loại tạp chất.</p></div>
+      <div class="step"><div class="step-head"><div class="num">02</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><path d="M9 12 Q12 9 15 12 Q12 15 9 12"/></svg></div></div><h4>Nhào &amp; ủ</h4><p>Pug-mill nhào đến độ ẩm đồng đều. Ủ 3–7 ngày — đất "nghỉ" để dẻo hơn khi vuốt.</p></div>
+      <div class="step"><div class="step-head"><div class="num">03</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="14" r="6"/><circle cx="12" cy="14" r="3"/><path d="M12 5 L12 8"/></svg></div></div><h4>Tạo hình</h4><p>Bàn xoay điện cho dáng tròn; bàn slab cho dáng vuông/dẹt. Buổi chiều, học việc thực tập.</p></div>
+      <div class="step"><div class="step-head"><div class="num">04</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="9" r="3"/><path d="M12 13 L12 19 M5 19 L19 19"/></svg></div></div><h4>Phơi &amp; sấy</h4><p>Sấy chậm trong bóng tránh nứt. 3–7 ngày tùy độ dày — không ép tiến độ.</p></div>
+      <div class="step"><div class="step-head"><div class="num">05</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="9" rx="1"/><path d="M8 10 L8 6 L16 6 L16 10 M9 14 L11 14 M13 14 L15 14"/></svg></div></div><h4>Nung sơ</h4><p>Lò điện 800°C — gốm cứng lại để có thể cầm và tráng men mà không rã.</p></div>
+      <div class="step"><div class="step-head"><div class="num">06</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 16 Q12 6 19 16"/><path d="M8 16 L8 19 M16 16 L16 19 M5 19 L19 19"/></svg></div></div><h4>Tráng men &amp; vẽ</h4><p>Nhúng men hoặc vẽ tay. Mỗi sản phẩm là khác — không có khuôn men. Tay nghề cao nhất.</p></div>
+      <div class="step"><div class="step-head"><div class="num">07</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="1"/><circle cx="12" cy="12.5" r="3" fill="#c4623a" stroke="none" opacity=".6"/><path d="M6 6 L6 4 M18 6 L18 4"/></svg></div></div><h4>Nung chính — lò củi</h4><p>1240°C trong ~14 giờ. Đốt củi liên tục. Tro củi tạo nên sắc thái không thể mô phỏng.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- MATERIALS -->
+<section class="materials" id="materials" data-screen-label="08 Materials">
+  <div class="materials-inner">
+    <h2>Nguyên liệu &amp; chuỗi cung ứng</h2>
+    <p class="section-sub">Đất sét địa phương vẫn còn — nhưng nguồn củi cho lò ngày càng khó. Một chuỗi cung gần như đóng kín, với hai điểm dễ bị tổn thương.</p>
+
+    <div class="flow">
+      <div class="flow-node origin">
+        <div class="fn-tag">● Nguồn (gần · bền vững)</div>
+        <div class="fn-name">Mỏ đất sét Bình Dương</div>
+        <div class="fn-sub">Cách Lái Thiêu ~5 km · trữ lượng còn 50+ năm</div>
+      </div>
+      <div class="flow-arrow">Xe tải nhỏ · chở đất theo tuần</div>
+      <div class="flow-node">
+        <div class="fn-tag">Trung gian</div>
+        <div class="fn-name">Đại lý đất sét địa phương</div>
+        <div class="fn-sub">Cung cấp 3 loại: đất bụi, đất men, đất xương · hợp đồng tháng</div>
+      </div>
+      <div class="flow-arrow">~30 phút vận chuyển</div>
+      <div class="flow-node workshop">
+        <div class="fn-tag">● Studio</div>
+        <div class="fn-name">Nắng Ceramics</div>
+        <div class="fn-sub">Lái Thiêu · Bình Dương · ~180 m²</div>
+      </div>
+    </div>
+
+    <div class="risk-panel">
+      <h3>Rủi ro nguồn cung</h3>
+      <div class="risk-level"><span class="dot"></span>Trung bình</div>
+      <ul>
+        <li>Đất sét: nguồn ổn định và gần — không phải mối lo</li>
+        <li>Củi cho lò: ngày càng đắt và khó <em>("củi tạp địa phương giờ phải đặt trước")</em></li>
+        <li>Men nhập một phần từ Nhật — phụ thuộc tỷ giá và logistics</li>
+      </ul>
+      <div class="env-deps">
+        <strong>Phụ thuộc môi trường</strong>
+        Phơi trong bóng (không cần nắng trực tiếp) · gió nhẹ giúp sấy đều<br>
+        <em style="color:var(--ok);font-style:normal">Lợi thế:</em> ít phụ thuộc thời tiết hơn nghề thủ công phơi ngoài
+      </div>
+      <div class="waste">
+        <strong>Phế liệu</strong>
+        Đất phế: tái sử dụng 100% · Men thừa: pha lại mẻ sau · Tro củi: bón vườn studio
+      </div>
+
+      <div class="chainlink">
+        <h4>Hộ khác cùng vùng nguyên liệu</h4>
+        <a class="chainlink-card" href="#" style="text-decoration:none">
+          <div class="icon">→</div>
+          <div class="body">
+            <p class="ln-name">Gốm Tư Thố — Huê Anh · Lái Thiêu</p>
+            <p class="ln-why">Cùng nguồn đất sét Bình Dương, cùng kiểu lò củi truyền thống.</p>
+          </div>
+          <div class="arrow">→</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ECONOMY -->
+<section class="econ" id="economy" data-screen-label="09 Economy">
+  <div class="econ-inner">
+    <h2>Chân dung kinh tế</h2>
+    <p class="section-sub">Một studio nhỏ, một mô hình lai: bán lẻ, đơn riêng, workshop. Bán trực tiếp đến người tiêu dùng. Lần đầu tiên, sau tám năm, lợi nhuận cho phép đầu tư.</p>
+
+    <div class="sentiment">
+      <div class="label">Cảm nhận kinh tế</div>
+      <div class="word">Bền vững</div>
+      <p class="quote">"Năm thứ tám, lần đầu tiên tôi tin được mình có thể làm cái này cả đời."</p>
+    </div>
+
+    <div class="business-model">
+      <div class="bm-cell"><div class="k">Kênh bán hàng</div><div class="v">DTC qua Instagram &amp; studio<br><span style="color:var(--paper-mute);font-size:14px">+ đơn riêng + workshop</span></div></div>
+      <div class="bm-cell"><div class="k">Lao động</div><div class="v">3 học việc full-time <span style="color:var(--paper-mute);font-size:14px">+ 1 cộng tác bán thời gian</span></div></div>
+      <div class="bm-cell"><div class="k">Thị trường</div><div class="v">Trong nước<br><span style="color:var(--paper-mute);font-size:14px">TP HCM, Hà Nội, Đà Nẵng · xuất nhỏ Nhật</span></div></div>
+    </div>
+
+    <div class="tension">
+      <div class="tension-col strength">
+        <h4>Sức mạnh</h4>
+        <ul>
+          <li>Mô hình DTC — biên lợi nhuận cao, ít phụ thuộc trung gian</li>
+          <li>Đang có học việc — kế nghiệp đang diễn ra</li>
+          <li>Brand kể được câu chuyện riêng, cộng đồng người mua trung thành</li>
+          <li>Cộng đồng gốm trẻ liên kết quốc tế (Nhật, Hàn)</li>
+        </ul>
+      </div>
+      <div class="tension-col pressure">
+        <h4>Áp lực</h4>
+        <ul>
+          <li>Quy mô nhỏ — phụ thuộc một người là chính</li>
+          <li>Củi cho lò ngày càng đắt</li>
+          <li>Chưa có hệ thống KCS chuyên nghiệp — phụ thuộc bà kiểm</li>
+          <li>Vừa thiết kế, vừa sản xuất, vừa vận hành — áp lực thời gian</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="engage-row">
+      <span class="erlabel">Liên hệ hợp tác</span>
+      <button class="engage-btn" data-action="commission">Đặt mua / đặt riêng <span class="arr">→</span></button>
+      <button class="engage-btn" data-action="workshop">Đăng ký workshop <span class="arr">→</span></button>
+      <button class="engage-btn" data-action="retail">Hợp tác bán lẻ <span class="arr">→</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- SUCCESSION (code 1, green) -->
+<section class="succession" id="succession" data-screen-label="10 Succession">
+  <div class="succession-inner">
+    <div class="label">Kế nghiệp · Code 1</div>
+    <h2>Một thế hệ mới</h2>
+    <p class="quote">"Ba người học việc hiện tại — họ tự đến. Tôi không phải tìm họ. Tôi chỉ phải làm việc tốt để họ ở lại."</p>
+    <span class="quote-cite">— Huỳnh Xuân Huỳnh</span>
+    <p class="subtext">Hai trong ba học việc là con của thợ gốm Lái Thiêu đã nghỉ làm. Họ tự đến xin học — chứng minh rằng kế nghiệp không phải lúc nào cũng theo dòng máu, mà đôi khi theo cảm hứng. Đây là một trong số ít hộ trong mạng lưới mapme đang truyền nghề một cách chủ động.</p>
+    <button class="cta" data-action="workshop">Bạn muốn học làm gốm? <span class="cta-arrow">→</span> Đăng ký workshop tại Nắng Ceramics</button>
+  </div>
+</section>
+
+<!-- CONNECTIONS -->
+<section class="connections" id="connections" data-screen-label="11 Connections">
+  <div class="conn-inner">
+    <div class="conn-head">
+      <div>
+        <h2>Kết nối</h2>
+        <p class="sub">Hộ này không tồn tại một mình. Bốn ống kính kết nối nó với các hộ khác trong mạng lưới mapme.</p>
+      </div>
+    </div>
+
+    <div class="lens-tabs" role="tablist">
+      <button class="lens-tab" data-lens="trip" role="tab">Cùng chuyến đi <span class="count">3</span></button>
+      <button class="lens-tab" data-lens="craft" role="tab">Cùng nghề <span class="count">1</span></button>
+      <button class="lens-tab" data-lens="region" role="tab">Cùng vùng <span class="count">2</span></button>
+      <button class="lens-tab active" data-lens="theme" role="tab">Cùng câu chuyện <span class="count">2</span></button>
+    </div>
+
+    <!-- Same theme — default -->
+    <div class="lens-pane active" data-lens="theme">
+      <div class="conn-grid">
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Cùng "đang truyền nghề"</span>
+          <h4>Nguyễn Cát Phụi Thuý</h4>
+          <p class="meta">Nhang · Bến Tre · Hợp tác xã 47 hộ</p>
+          <p class="why">Hai mô hình kế nghiệp khác nhau — Huỳnh đào tạo cá nhân từng học việc, Phụi Thuý mở rộng qua hợp tác xã. Cùng kết luận: truyền nghề là làm việc tốt đủ để người trẻ muốn ở lại.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+        <a class="conn-card" href="household-le-thi-huych.html" style="text-decoration:none">
+          <span class="lenspill">Đối lập kế nghiệp</span>
+          <h4>Lê Thị Huých</h4>
+          <p class="meta">Đan lát · Củ Chi · TP HCM</p>
+          <p class="why">Hai đầu của cùng câu hỏi. Bà Huých dừng — không ai tiếp. Huỳnh mở — ba người tự đến. Cùng vùng, cùng chuyến đi.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Same trip -->
+    <div class="lens-pane" data-lens="trip">
+      <div class="conn-grid">
+        <a class="conn-card" href="household-le-thi-huych.html" style="text-decoration:none">
+          <span class="lenspill">Đối lập kế nghiệp</span>
+          <h4>Lê Thị Huých</h4>
+          <p class="meta">Đan lát · Củ Chi · TP HCM</p>
+          <p class="why">Cùng chuyến 01/04 — Code 3 (thế hệ cuối) đối lập với Code 1 (đang truyền).</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Cùng tỉnh</span>
+          <h4>Nghệ nhân Đại &amp; Thái Thị Thanh</h4>
+          <p class="meta">Mành tre lacquered · Bình Dương</p>
+          <p class="why">Cùng chuyến 01/04 — cùng tỉnh Bình Dương, khác nghề, khác mô hình.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Cùng nghề gốm</span>
+          <h4>Gốm Tư Thố — Huê Anh</h4>
+          <p class="meta">Gốm Lái Thiêu · Bình Dương</p>
+          <p class="why">Cùng chuyến 01/04 — cùng nghề gốm Lái Thiêu, đối lập về kế nghiệp.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Same craft -->
+    <div class="lens-pane" data-lens="craft">
+      <div class="conn-grid">
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Gốm Lái Thiêu</span>
+          <h4>Gốm Tư Thố — Huê Anh</h4>
+          <p class="meta">Gốm truyền thống · Lái Thiêu · Bình Dương</p>
+          <p class="why">Một thế hệ trước Huỳnh. Cùng nguồn đất sét, cùng kiểu lò củi — nhưng không có người kế. Đối chiếu hai chiến lược trong cùng một nghề.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Same region -->
+    <div class="lens-pane" data-lens="region">
+      <div class="conn-grid">
+        <a class="conn-card" href="household-le-thi-huych.html" style="text-decoration:none">
+          <span class="lenspill">Đông Nam Bộ</span>
+          <h4>Lê Thị Huých</h4>
+          <p class="meta">Đan lát · Củ Chi · TP HCM</p>
+          <p class="why">Cùng vùng Đông Nam Bộ. Hai con đường — một dừng, một mở. Cùng câu hỏi: nghề thủ công có thể sống tiếp bằng cách nào?</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Cùng tỉnh Bình Dương</span>
+          <h4>Nghệ nhân Đại &amp; Thái Thị Thanh</h4>
+          <p class="meta">Mành tre lacquered · Bình Dương</p>
+          <p class="why">Cùng tỉnh Bình Dương. Khác nghề, khác quy mô — nhưng cùng câu chuyện thợ thủ công địa phương tìm kênh xuất khẩu mới.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <h5>Phương pháp</h5>
+      <p>Trang này được biên soạn từ phỏng vấn ngày 01/04/2026 (Phiên A007), phiên âm bằng faster-whisper large-v3, biên tập với hỗ trợ của Claude Sonnet 4.6. Trích dẫn nguồn đầy đủ ở mỗi đoạn. Bản gốc tiếng Việt được lưu giữ.</p>
+      <p style="margin-top:10px;color:var(--paper-mute)">Schema: <code style="font-family:inherit">stg__craft_survey v1</code></p>
+    </div>
+    <div>
+      <h5>Khoảng trống dữ liệu</h5>
+      <ul>
+        <li><span class="icon">📍</span><span>Tọa độ GPS chính xác — chưa ghi lại</span></li>
+        <li><span class="icon">📷</span><span>Một số ảnh chi tiết men — chưa có</span></li>
+        <li><span class="icon">💰</span><span>Số liệu tài chính — ẩn để bảo vệ nghệ nhân</span></li>
+        <li><span class="icon">📊</span><span>Doanh thu workshop — chưa được ghi nhận tách biệt</span></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Hành động</h5>
+      <div class="foot-actions">
+        <button data-action="correction">Báo lỗi / chỉnh sửa</button>
+        <button data-action="download">Tải dữ liệu (JSON/CSV)</button>
+        <button class="cit-toggle" data-toggle="cit">Trích dẫn (BibTeX, APA) <span class="chev">▾</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="citation-block">
+    <div class="citation-body" id="cit">
+      <div class="citation-body-inner">
+        mapme. (2026). <em>Huỳnh Xuân Huỳnh — Nắng Ceramics, Lái Thiêu, Bình Dương.</em> Craft Village Field Record. Retrieved from mapme.vn/c/ceramics-nang-huynh-xuan-huynh
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-foot">
+    mapme · Bản đồ làng nghề Việt Nam · Dữ liệu công khai dưới giấy phép <a href="#">CC BY-NC 4.0</a> · <a href="#">Quay lại bản đồ</a> · <a href="#">Đóng góp dữ liệu</a>
+  </div>
+</footer>
+
+<!-- MOBILE BAR -->
+<div class="mobile-action-bar" id="mobileBar">
+  <button data-action="commission">Đặt mua / liên hệ Nắng Ceramics</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <button class="modal-close" id="modalClose" aria-label="Đóng">×</button>
+    <h3 id="modalTitle">Liên hệ Nắng Ceramics</h3>
+    <p class="modal-sub">Mapme chuyển lời nhắn của bạn đến nghệ nhân và phản hồi trong vòng 3 ngày.</p>
+    <form id="actionForm" onsubmit="event.preventDefault();submitForm()">
+      <div class="form-field">
+        <label for="f-name">Tên của bạn</label>
+        <input id="f-name" type="text" placeholder="Họ và tên" required>
+      </div>
+      <div class="form-field">
+        <label for="f-email">Email</label>
+        <input id="f-email" type="email" placeholder="email@example.com" required>
+      </div>
+      <div class="form-field">
+        <label>Loại liên hệ</label>
+        <div class="radio-row" id="contactType">
+          <label><input type="radio" name="contact" value="commission" checked>Đặt mua / đặt riêng</label>
+          <label><input type="radio" name="contact" value="workshop">Workshop</label>
+          <label><input type="radio" name="contact" value="visit">Tham quan</label>
+          <label><input type="radio" name="contact" value="retail">Hợp tác bán lẻ</label>
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="f-msg">Lời nhắn</label>
+        <textarea id="f-msg" placeholder="Bạn muốn nói với nghệ nhân điều gì?"></textarea>
+      </div>
+      <button type="submit" class="modal-submit">Gửi qua mapme</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast">Cảm ơn bạn. Mapme sẽ chuyển lời nhắn tới Nắng Ceramics và phản hồi trong vòng 3 ngày.</div>
+
+<script>
+const sectionNav = document.getElementById('sectionNav');
+const mobileBar = document.getElementById('mobileBar');
+const hero = document.getElementById('hero');
+const navLinks = document.querySelectorAll('.section-nav a');
+const sectionIds = ['artisan','story','layout','process','materials','economy','succession','connections'];
+const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+
+const heroObserver = new IntersectionObserver(([entry]) => {
+  if (entry.isIntersecting) {
+    sectionNav.classList.remove('show');
+    mobileBar.classList.remove('show');
+  } else {
+    sectionNav.classList.add('show');
+    mobileBar.classList.add('show');
+  }
+}, { threshold: 0.1 });
+heroObserver.observe(hero);
+
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(a => a.classList.toggle('active', a.dataset.target === id));
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+sections.forEach(s => sectionObserver.observe(s));
+
+const succBadge = document.querySelector('.succ-badge');
+const succTip = document.getElementById('succ-tip');
+succBadge.addEventListener('click', (e) => {
+  e.preventDefault();
+  succTip.classList.toggle('show');
+});
+document.addEventListener('click', (e) => {
+  if (!succBadge.contains(e.target) && !succTip.contains(e.target)) succTip.classList.remove('show');
+});
+
+document.querySelectorAll('.source-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const targetId = btn.dataset.toggle;
+    const panel = document.getElementById(targetId);
+    if (panel) {
+      panel.classList.toggle('open');
+      btn.classList.toggle('open');
+      btn.querySelector('span:first-child').textContent =
+        btn.classList.contains('open') ? 'Ẩn nguồn gốc' : 'Xem nguồn gốc';
+    }
+  });
+});
+
+document.querySelectorAll('.cit-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = document.getElementById(btn.dataset.toggle);
+    if (target) {
+      target.classList.toggle('open');
+      btn.classList.toggle('open');
+    }
+  });
+});
+
+document.querySelectorAll('.waveform').forEach(wf => {
+  const N = 56;
+  let html = '';
+  for (let i = 0; i < N; i++) {
+    const h = 10 + Math.sin(i * 0.4) * 14 + Math.random() * 20;
+    html += `<span class="bar" style="height:${Math.max(4, Math.abs(h))}px"></span>`;
+  }
+  wf.innerHTML = html;
+});
+
+const zoneTooltip = document.getElementById('zoneTooltip');
+const layoutDiagram = document.getElementById('layoutDiagram');
+const zoneRects = document.querySelectorAll('.layout-svg .zone');
+const zoneLegendItems = document.querySelectorAll('#zoneLegend .zl');
+
+function highlightZone(letter, on) {
+  zoneLegendItems.forEach(zl => {
+    zl.classList.toggle('active', on && zl.dataset.zone === letter);
+  });
+}
+zoneRects.forEach(g => {
+  const letter = g.dataset.zone;
+  g.addEventListener('mouseenter', () => {
+    highlightZone(letter, true);
+    if (letter === 'E') {
+      const rect = g.querySelector('rect').getBoundingClientRect();
+      const dRect = layoutDiagram.getBoundingClientRect();
+      zoneTooltip.style.left = (rect.left - dRect.left + rect.width/2) + 'px';
+      zoneTooltip.style.top = (rect.top - dRect.top) + 'px';
+      zoneTooltip.classList.add('show');
+    }
+  });
+  g.addEventListener('mouseleave', () => {
+    highlightZone(letter, false);
+    zoneTooltip.classList.remove('show');
+  });
+});
+zoneLegendItems.forEach(zl => {
+  zl.addEventListener('mouseenter', () => highlightZone(zl.dataset.zone, true));
+  zl.addEventListener('mouseleave', () => highlightZone(zl.dataset.zone, false));
+});
+
+document.querySelectorAll('.lens-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const lens = tab.dataset.lens;
+    document.querySelectorAll('.lens-tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.lens-pane').forEach(p => p.classList.toggle('active', p.dataset.lens === lens));
+  });
+});
+
+const modal = document.getElementById('modalBackdrop');
+const modalClose = document.getElementById('modalClose');
+const modalTitle = document.getElementById('modalTitle');
+const toast = document.getElementById('toast');
+const actionLabels = {
+  message: 'Liên hệ Nắng Ceramics',
+  commission: 'Đặt mua sản phẩm',
+  workshop: 'Đăng ký workshop làm gốm',
+  visit: 'Đăng ký tham quan studio',
+  retail: 'Đề xuất hợp tác bán lẻ',
+  download: 'Tải dữ liệu hộ nghệ nhân',
+  correction: 'Báo lỗi / chỉnh sửa'
+};
+
+document.querySelectorAll('[data-action]').forEach(el => {
+  el.addEventListener('click', () => {
+    const action = el.dataset.action;
+    if (action === 'download') {
+      showToast('Đang chuẩn bị gói dữ liệu (JSON/CSV/BibTeX) — bạn sẽ nhận email khi sẵn sàng.');
+      return;
+    }
+    modalTitle.textContent = actionLabels[action] || 'Liên hệ qua mapme';
+    const radio = document.querySelector(`input[name="contact"][value="${action}"]`);
+    if (radio) radio.checked = true;
+    else document.querySelector('input[name="contact"][value="commission"]').checked = true;
+    modal.classList.add('show');
+  });
+});
+
+function closeModal(){ modal.classList.remove('show'); }
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+function submitForm() {
+  closeModal();
+  showToast('Cảm ơn bạn. Mapme sẽ chuyển lời nhắn tới Nắng Ceramics và phản hồi trong vòng 3 ngày.');
+  document.getElementById('actionForm').reset();
+  document.querySelector('input[name="contact"][value="commission"]').checked = true;
+}
+
+function showToast(msg) {
+  toast.textContent = '';
+  toast.appendChild(document.createTextNode(msg));
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 4500);
+}
+
+document.querySelectorAll('.audio-play, .playover').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showToast('Bản ghi âm sẽ phát khi tư liệu thực được liên kết.');
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lê Thị Huých — Đan lát · Củ Chi · mapme</title>
+<meta name="description" content="Lê Thị Huých — bảy mươi năm tre trúc, người thợ đan lát cuối cùng tại Củ Chi. Xưởng 4.000m² xuất khẩu sang Đức. Không có người kế nghiệp." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#17130e; --bg-2:#1e1913; --bg-3:#26201a;
+    --paper:#f5ecde; --paper-dim:#d8cfbe; --paper-mute:#9a9081;
+    --ink:#1a1410;
+    --border:rgba(245,236,222,.1); --border-strong:rgba(245,236,222,.22);
+
+    /* === Per-household accent — change THIS to re-skin === */
+    --accent:#8fad5a;
+    --accent-2:#6f8c40;
+    --accent-soft:rgba(143,173,90,.15);
+    --accent-line:rgba(143,173,90,.3);
+
+    /* Succession color for this household (code 3) */
+    --succ:#9a3a3a;
+    --succ-soft:rgba(154,58,58,.16);
+    --succ-line:rgba(154,58,58,.5);
+
+    --warn:#c49a30; --risk:#c46030; --ok:#6b9a3a;
+    --maxw:880px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--paper);
+    font-family:"Manrope",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
+    font-feature-settings:"ss01","cv11"}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-line)}
+  a:hover{border-bottom-color:var(--accent)}
+  img{max-width:100%;display:block}
+  button{font-family:inherit}
+
+  /* ========== TOP NAV ========== */
+  nav.top{position:sticky;top:0;z-index:60;background:rgba(23,19,14,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;font-size:13.5px}
+  nav.top .logo{display:inline-flex;align-items:center;gap:8px;color:var(--paper);border:0;font-weight:600}
+  nav.top .logo em{font-style:normal;color:var(--accent)}
+  nav.top .crumbs{color:var(--paper-mute);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  nav.top .crumbs a{color:var(--paper-mute);border:0}
+  nav.top .crumbs a:hover{color:var(--paper)}
+  nav.top .crumbs .sep{opacity:.5}
+  nav.top .actions{margin-left:auto;display:flex;gap:8px}
+  nav.top .btn{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:6px 12px;border-radius:999px;font-size:12.5px;cursor:pointer}
+  nav.top .btn:hover{background:var(--bg-3)}
+  nav.top .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:500}
+  @media (max-width:780px){nav.top .crumbs{display:none}nav.top .actions .btn:not(.primary){display:none}}
+
+  /* ========== STICKY SECTION NAV ========== */
+  .section-nav{position:sticky;top:53px;z-index:40;background:rgba(23,19,14,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+    transform:translateY(-100%);opacity:0;transition:transform .28s ease,opacity .28s ease;pointer-events:none}
+  .section-nav.show{transform:translateY(0);opacity:1;pointer-events:auto}
+  .section-nav-inner{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .section-nav-inner::-webkit-scrollbar{display:none}
+  .section-nav a{flex-shrink:0;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--paper-mute);padding:14px 10px;border:0;border-bottom:2px solid transparent;font-weight:500}
+  .section-nav a:hover{color:var(--paper)}
+  .section-nav a.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* ========== HERO ========== */
+  .hero{position:relative;min-height:80vh;display:flex;align-items:flex-end;overflow:hidden;background:#0c0a07}
+  .hero-bg{position:absolute;inset:0;background:
+    radial-gradient(ellipse at 25% 40%,rgba(143,173,90,.32) 0,transparent 55%),
+    radial-gradient(ellipse at 80% 80%,rgba(107,138,58,.25) 0,transparent 55%),
+    linear-gradient(135deg,#1a2010 0%,#2d3d18 30%,#4a6124 60%,#6b8a3a 100%);filter:saturate(1.05)}
+  .hero-bg::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 18% 28%,rgba(220,235,170,.32) 0,transparent 30%),
+    radial-gradient(circle at 88% 22%,rgba(0,0,0,.4) 0,transparent 50%),
+    linear-gradient(to bottom,transparent 35%,rgba(23,19,14,.88) 100%)}
+  .hero-noise{position:absolute;inset:0;opacity:.1;mix-blend-mode:overlay;background-image:
+    repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 1px,transparent 1px 6px),
+    repeating-linear-gradient(25deg,rgba(0,0,0,.05) 0 1px,transparent 1px 9px)}
+  .hero-content{position:relative;padding:56px 24px 60px;max-width:var(--maxw);margin:0 auto;width:100%;z-index:2}
+  .kicker{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .kicker .pill{background:var(--accent-soft);border:1px solid var(--accent-line);padding:3px 10px;border-radius:999px;color:var(--accent)}
+  .kicker .loc{color:var(--paper-mute)}
+  h1.title{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(40px,6vw,76px);line-height:1.04;letter-spacing:-.025em;margin:0 0 18px;color:var(--paper)}
+  h1.title em{font-style:italic;color:var(--accent);font-weight:400;font-size:.78em;display:block;margin-top:8px}
+  .dek{font-family:"Fraunces",Georgia,serif;font-size:clamp(18px,2vw,22px);font-weight:300;line-height:1.5;max-width:640px;color:var(--paper-dim);margin:0 0 28px}
+  .triad{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 32px}
+  .triad button{font-size:13.5px;padding:11px 20px;border-radius:999px;cursor:pointer;font-weight:500;letter-spacing:.01em;transition:transform .15s,background .15s,border-color .15s}
+  .triad .primary{background:var(--accent);color:var(--ink);border:1px solid var(--accent)}
+  .triad .primary:hover{background:var(--paper);border-color:var(--paper)}
+  .triad .ghost{background:rgba(23,19,14,.5);color:var(--paper);border:1px solid rgba(245,236,222,.32);backdrop-filter:blur(4px)}
+  .triad .ghost:hover{background:rgba(23,19,14,.8);border-color:var(--accent)}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:32px;font-size:13px;color:var(--paper-mute);padding-top:22px;border-top:1px solid var(--border)}
+  .hero-meta div{display:flex;flex-direction:column;gap:4px}
+  .hero-meta label{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;opacity:.75}
+  .hero-meta strong{color:var(--paper);font-weight:500;font-size:14px}
+
+  /* Succession badge top-right with tooltip */
+  .succ-badge{position:absolute;top:24px;right:24px;z-index:3;display:inline-flex;align-items:center;gap:9px;
+    background:var(--succ-soft);border:1px solid var(--succ-line);color:#e69b9b;
+    font-size:12px;font-weight:600;letter-spacing:.06em;padding:8px 14px;border-radius:999px;text-transform:uppercase;backdrop-filter:blur(6px);cursor:help}
+  .succ-badge .dot{width:7px;height:7px;border-radius:50%;background:#c4585a;box-shadow:0 0 10px rgba(196,88,90,.7)}
+  .succ-tip{position:absolute;top:48px;right:24px;z-index:4;max-width:260px;
+    background:rgba(23,19,14,.96);border:1px solid var(--succ-line);border-radius:10px;padding:10px 14px;
+    font-family:"Manrope";font-size:12px;color:var(--paper-dim);line-height:1.5;
+    opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .18s,transform .18s;backdrop-filter:blur(8px)}
+  .succ-badge:hover + .succ-tip,.succ-badge:focus + .succ-tip,.succ-tip.show{opacity:1;transform:translateY(0)}
+  @media (max-width:780px){
+    .succ-badge{top:14px;right:14px;font-size:10.5px;padding:6px 11px}
+    .succ-tip{top:42px;right:14px;max-width:220px}
+  }
+
+  /* ========== FACTS STRIP ========== */
+  .facts{max-width:var(--maxw);margin:0 auto;padding:36px 24px;display:grid;grid-template-columns:repeat(6,1fr);gap:0;border-bottom:1px solid var(--border)}
+  .fact{padding:14px 16px;border-left:1px solid var(--border)}
+  .fact:first-child{border-left:0;padding-left:0}
+  .fact .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:6px}
+  .fact .v{font-family:"Fraunces",Georgia,serif;font-size:19px;font-weight:400;letter-spacing:-.01em;color:var(--paper);line-height:1.18}
+  .fact .v.muted{color:var(--paper-mute);font-style:italic;font-size:15px}
+  @media (max-width:780px){.facts{grid-template-columns:repeat(2,1fr);padding:24px 20px}
+    .fact{border-left:0;border-top:1px solid var(--border);padding:14px 0}
+    .fact:nth-child(odd){padding-right:14px}
+    .fact:nth-child(even){padding-left:14px;border-left:1px solid var(--border)}
+    .fact:first-child,.fact:nth-child(2){border-top:0}}
+
+  /* ========== ARTISAN CARD ========== */
+  .artisan{max-width:var(--maxw);margin:0 auto;padding:72px 24px 24px}
+  .artisan-card{display:grid;grid-template-columns:240px 1fr;gap:36px;align-items:start;background:var(--bg-2);border:1px solid var(--border);border-radius:18px;padding:30px;position:relative}
+  .artisan-portrait{aspect-ratio:3/4;border-radius:12px;background:
+    linear-gradient(160deg,#1a2010 0%,#3d4f1d 35%,#6b8a3a 75%,#a8c265 100%);position:relative;overflow:hidden}
+  .artisan-portrait::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 38% 32%,rgba(220,235,170,.4) 0,transparent 32%),
+    radial-gradient(circle at 60% 88%,rgba(0,0,0,.5) 0,transparent 50%),
+    repeating-linear-gradient(118deg,rgba(255,255,255,.03) 0 1px,transparent 1px 5px)}
+  .artisan-portrait .corner-label{position:absolute;left:10px;bottom:10px;z-index:2;font-size:9.5px;color:rgba(245,236,222,.85);letter-spacing:.05em;text-transform:uppercase;background:rgba(0,0,0,.45);padding:4px 8px;border-radius:6px;backdrop-filter:blur(4px)}
+  .artisan-meta .kicker{margin-bottom:10px}
+  .artisan h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 5px;letter-spacing:-.015em}
+  .artisan .role{color:var(--paper-mute);font-size:13px;margin:0 0 22px}
+  .quote-with-audio{display:flex;align-items:flex-start;gap:12px;margin:0 0 14px}
+  .quote-with-audio .qtext{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:20px;line-height:1.5;color:var(--paper);font-weight:300;flex:1;margin:0;text-wrap:pretty}
+  .audio-play{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent);padding:7px 12px 7px 10px;border-radius:999px;font-size:12px;cursor:pointer;letter-spacing:.02em;white-space:nowrap;margin-top:6px;transition:background .15s}
+  .audio-play:hover{background:var(--accent);color:var(--ink)}
+  .audio-play .play-glyph{display:inline-block;width:0;height:0;border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent;margin-right:2px}
+  .credit{font-size:12.5px;color:var(--paper-mute);margin:0 0 22px}
+  .artisan-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .artisan-actions button{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:8px 14px;border-radius:999px;font-size:12.5px;cursor:pointer}
+  .artisan-actions button.primary{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:500}
+  .artisan-actions button.ghost{color:var(--paper-mute)}
+  .artisan-actions button:hover{background:var(--bg-3);color:var(--paper)}
+  .artisan-actions button.primary:hover{background:var(--accent-2);color:var(--paper)}
+  @media (max-width:780px){.artisan-card{grid-template-columns:1fr;gap:22px}.artisan-portrait{max-width:200px}}
+
+  /* ========== MEDIA GALLERY (12-col real-mix grid) ========== */
+  .gallery{padding:64px 24px;background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .gallery-inner{max-width:1240px;margin:0 auto}
+  .gallery h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .gallery .gsub{color:var(--paper-mute);font-size:13.5px;margin:0 0 28px}
+  .ggrid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+  .gitem{position:relative;border-radius:12px;overflow:hidden;background:var(--bg-3);border:1px solid var(--border);min-height:180px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;transition:transform .2s,border-color .2s}
+  .gitem:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .gitem img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .gitem .gbg{position:absolute;inset:0;z-index:0}
+  .gitem .gbg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.7) 100%);pointer-events:none}
+  .gitem .gcap{position:relative;z-index:2;padding:14px 16px;font-family:"Manrope";font-size:12.5px;line-height:1.45;color:var(--paper);background:linear-gradient(to top,rgba(23,19,14,.92) 0%,rgba(23,19,14,.65) 60%,transparent 100%)}
+  .gitem .gcap em{font-style:normal;color:var(--paper-mute);font-size:11px;display:block;margin-top:3px;letter-spacing:.03em}
+  .gitem .gchip{position:absolute;top:10px;left:10px;z-index:3;font-size:9.5px;color:rgba(245,236,222,.85);background:rgba(0,0,0,.55);backdrop-filter:blur(4px);padding:4px 9px;border-radius:6px;letter-spacing:.05em;text-transform:uppercase;font-weight:500}
+  .gitem .gtype{position:absolute;top:10px;right:10px;z-index:3;width:28px;height:28px;border-radius:6px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:13px}
+  .gitem.span-8{grid-column:span 8}
+  .gitem.span-6{grid-column:span 6}
+  .gitem.span-4{grid-column:span 4}
+  .gitem.h-tall{min-height:380px}
+  .gitem.h-med{min-height:260px}
+  .gitem.h-short{min-height:180px}
+
+  /* Craft gradient placeholders — bamboo */
+  .gbg.bg-workshop{background:linear-gradient(135deg,#1a2010 0%,#2d3d18 40%,#4a6124 80%,#6b8a3a 100%)}
+  .gbg.bg-detail{background:linear-gradient(150deg,#3d4f1d 0%,#6b8a3a 60%,#a8c265 100%)}
+  .gbg.bg-drying{background:
+    repeating-linear-gradient(95deg,rgba(168,194,101,.18) 0 2px,transparent 2px 14px),
+    linear-gradient(135deg,#26201a 0%,#3d4f1d 50%,#5a7228 100%)}
+  .gbg.bg-product{background:linear-gradient(140deg,#26201a 0%,#3d4f1d 40%,#5a7228 80%,#8fad5a 100%)}
+  .gbg.bg-audio{background:linear-gradient(135deg,#0d0f08 0%,#1a2010 50%,#2d3d18 100%)}
+  .gbg.bg-video{background:linear-gradient(135deg,#1a2010 0%,#3d4f1d 40%,#6b8a3a 80%,#26201a 100%)}
+
+  /* Audio waveform stand-in */
+  .waveform{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:3px;z-index:1;padding:0 60px}
+  .waveform .bar{width:3px;background:var(--accent);opacity:.55;border-radius:2px}
+  .playover{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;width:60px;height:60px;border-radius:50%;background:rgba(143,173,90,.92);display:flex;align-items:center;justify-content:center;color:var(--ink);padding-left:5px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+  .playover .play-glyph{width:0;height:0;border-left:14px solid currentColor;border-top:9px solid transparent;border-bottom:9px solid transparent}
+  .durbadge{position:absolute;bottom:12px;right:12px;z-index:3;font-size:10.5px;color:rgba(245,236,222,.92);background:rgba(0,0,0,.6);padding:3px 9px;border-radius:6px;letter-spacing:.03em}
+
+  /* hide broken <img> so the gradient bg shows through */
+  .gitem img.broken,.gitem img[data-broken="true"]{display:none}
+
+  @media (max-width:780px){
+    .ggrid{grid-template-columns:1fr;gap:12px}
+    .gitem.span-8,.gitem.span-6,.gitem.span-4{grid-column:span 1}
+    .gitem.h-tall{min-height:280px}
+    .gitem.h-med{min-height:220px}
+  }
+
+  /* ========== STORY ========== */
+  article.story{max-width:680px;margin:0 auto;padding:72px 24px 32px;position:relative}
+  article.story h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(30px,4vw,40px);letter-spacing:-.02em;line-height:1.15;margin:0 0 28px;color:var(--paper)}
+  article.story h3{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:22px;margin:44px 0 14px;letter-spacing:-.01em;color:var(--paper)}
+  article.story p{font-family:"Fraunces",Georgia,serif;font-size:18.5px;line-height:1.7;margin:0 0 22px;color:var(--paper-dim);font-weight:300;text-wrap:pretty}
+  article.story p.lead{font-size:22px;line-height:1.55;color:var(--paper)}
+  article.story p.lead::first-letter{font-size:72px;float:left;font-weight:400;line-height:.85;margin:8px 12px 0 -2px;color:var(--accent);font-family:"Fraunces",Georgia,serif}
+  article.story blockquote{border:0;margin:48px 0;padding:0;text-align:center}
+  article.story blockquote p{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:28px;line-height:1.35;color:var(--paper);font-weight:300;letter-spacing:-.01em;max-width:680px;margin:0 auto 14px;text-wrap:balance}
+  article.story blockquote cite{font-style:normal;font-size:13px;color:var(--paper-mute);letter-spacing:.04em;text-transform:uppercase}
+  article.story blockquote .translation{font-style:normal;font-size:13px;color:var(--paper-mute);max-width:560px;margin:14px auto 0;line-height:1.55;font-family:"Manrope"}
+
+  .source-toggle{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:transparent;border:1px solid var(--border-strong);color:var(--paper-mute);padding:8px 14px;border-radius:999px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:"Manrope"}
+  .source-toggle:hover{border-color:var(--accent);color:var(--accent)}
+  .source-toggle .chev{transition:transform .25s}
+  .source-toggle.open .chev{transform:rotate(180deg)}
+  .source-panel{max-height:0;overflow:hidden;transition:max-height .35s ease;margin-top:14px}
+  .source-panel.open{max-height:600px}
+  .source-panel-inner{background:var(--bg-2);border:1px dashed var(--border-strong);border-radius:12px;padding:20px 22px;margin-top:6px}
+  .source-panel h4{font-family:"Manrope";font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin:0 0 12px;font-weight:600}
+  .source-panel .src-quote{font-family:"Fraunces",serif;font-style:italic;font-size:15px;color:var(--paper-dim);line-height:1.55;margin:0 0 14px;padding-left:14px;border-left:2px solid var(--accent-line)}
+  .source-panel .src-meta{font-family:"Manrope";font-size:11px;color:var(--paper-mute);letter-spacing:.04em}
+  .source-panel .ph-note{font-family:"Manrope";font-size:11px;color:var(--warn);background:rgba(196,154,48,.08);border:1px dashed rgba(196,154,48,.35);padding:8px 12px;border-radius:8px;margin-top:14px;line-height:1.5}
+
+  /* ========== 3D HOUSEHOLD LAYOUT (fallback diagram) ========== */
+  .layout-section{background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:64px 24px}
+  .layout-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:36px;align-items:start}
+  .layout-inner h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .layout-inner .sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 22px}
+  .layout-stat{font-family:"Fraunces",Georgia,serif;font-size:18px;color:var(--paper);margin:0 0 22px;letter-spacing:-.01em}
+  .layout-stat .accent{color:var(--accent)}
+
+  .layout-diagram{position:relative;background:
+    radial-gradient(ellipse at 50% 50%,rgba(143,173,90,.05) 0,transparent 60%),
+    var(--bg-3);
+    border:1px solid var(--border);border-radius:16px;padding:28px;aspect-ratio:5/4;
+    background-image:
+      linear-gradient(rgba(143,173,90,.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(143,173,90,.04) 1px,transparent 1px);
+    background-size:32px 32px}
+  .layout-svg{width:100%;height:100%;display:block;overflow:visible}
+  .zone-rect{fill:var(--bg-2);stroke:var(--accent);stroke-width:1.5;transition:fill .25s,stroke-width .25s,filter .25s;cursor:pointer}
+  .zone-rect.dashed{stroke-dasharray:6 5}
+  .zone-rect:hover{fill:rgba(143,173,90,.1);stroke-width:2.5;filter:drop-shadow(0 0 16px rgba(143,173,90,.25))}
+  .zone-badge{font-family:"Fraunces",serif;font-size:18px;font-weight:500;fill:var(--accent);pointer-events:none}
+  .zone-label{font-size:10.5px;font-weight:600;fill:var(--paper);letter-spacing:.04em;pointer-events:none;text-transform:uppercase}
+  .zone-sub{font-size:9.5px;fill:var(--paper-mute);pointer-events:none}
+
+  .compass{position:absolute;right:16px;bottom:16px;width:56px;height:56px;color:var(--paper-mute)}
+
+  .zone-tooltip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--accent);border-radius:12px;padding:14px 16px;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.4);
+    opacity:0;transform:translate(-50%,-12px) scale(.96);transition:opacity .18s,transform .18s;z-index:5}
+  .zone-tooltip.show{opacity:1;transform:translate(-50%,-100%) scale(1)}
+  .zone-tooltip .zt-name{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+  .zone-tooltip .zt-desc{font-size:12.5px;color:var(--paper-dim);line-height:1.5;margin-bottom:10px}
+  .zone-tooltip .zt-quote{font-family:"Fraunces",serif;font-style:italic;font-size:14px;color:var(--paper);line-height:1.4;border-top:1px solid var(--border);padding-top:10px}
+
+  .zone-legend{display:flex;flex-direction:column}
+  .zone-legend .zl{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--border);align-items:start;cursor:pointer;transition:background .15s}
+  .zone-legend .zl:first-child{border-top:0;padding-top:0}
+  .zone-legend .zl:hover,.zone-legend .zl.active{background:rgba(143,173,90,.06)}
+  .zone-legend .lbadge{width:26px;height:26px;border-radius:6px;border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:14px;color:var(--accent);background:var(--accent-soft)}
+  .zone-legend .zl-name{font-size:13px;font-weight:600;color:var(--paper);margin:0 0 4px}
+  .zone-legend .zl-desc{font-size:12px;color:var(--paper-mute);line-height:1.5;margin:0}
+  @media (max-width:900px){.layout-inner{grid-template-columns:1fr}}
+
+  /* ========== PROCESS ========== */
+  .process{padding:64px 24px;border-bottom:1px solid var(--border)}
+  .process-inner{max-width:1080px;margin:0 auto}
+  .process-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+  .process h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:32px;margin:0 0 6px;letter-spacing:-.02em}
+  .process .sub{color:var(--paper-mute);margin:0;font-size:13.5px}
+  .time-badge{font-size:11.5px;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line);padding:8px 14px;border-radius:999px;letter-spacing:.04em;text-align:right;line-height:1.3}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .step{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:22px;position:relative;transition:border-color .2s,transform .2s}
+  .step:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .step-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .step .num{font-family:"Fraunces",Georgia,serif;font-size:42px;font-weight:300;color:var(--accent);line-height:1;letter-spacing:-.04em}
+  .step-thumb{width:56px;height:56px;border-radius:8px;background:linear-gradient(140deg,#1a2010 0%,#3d4f1d 50%,#6b8a3a 100%);border:1px solid var(--accent-line);position:relative;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--accent)}
+  .step-thumb::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(220,235,170,.3) 0,transparent 50%)}
+  .step-thumb svg{position:relative;z-index:1;width:24px;height:24px}
+  .step h4{margin:0 0 6px;font-size:15px;font-weight:500;letter-spacing:-.005em;color:var(--paper)}
+  .step p{margin:0;color:var(--paper-mute);font-size:13.5px;line-height:1.55}
+  @media (max-width:780px){.steps{grid-template-columns:1fr}}
+
+  /* ========== MATERIALS ========== */
+  .materials{padding:64px 24px;background:var(--bg-2);border-bottom:1px solid var(--border)}
+  .materials-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+  .materials h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em;grid-column:1/-1}
+  .materials .section-sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 22px;grid-column:1/-1}
+  .flow{display:flex;flex-direction:column;align-items:stretch}
+  .flow-node{background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;position:relative}
+  .flow-node.origin{border-color:var(--risk);background:linear-gradient(180deg,rgba(196,96,48,.08) 0,var(--bg-3) 100%)}
+  .flow-node.workshop{border-color:var(--accent);background:linear-gradient(180deg,rgba(143,173,90,.08) 0,var(--bg-3) 100%)}
+  .flow-node .fn-tag{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:6px}
+  .flow-node.origin .fn-tag{color:var(--risk)}
+  .flow-node.workshop .fn-tag{color:var(--accent)}
+  .flow-node .fn-name{font-family:"Fraunces",serif;font-size:18px;color:var(--paper);margin:0 0 4px;letter-spacing:-.01em}
+  .flow-node .fn-sub{font-size:12.5px;color:var(--paper-mute);margin:0;line-height:1.45}
+  .flow-arrow{padding:14px 0 14px 28px;border-left:1px dashed var(--border-strong);margin-left:24px;color:var(--paper-mute);font-size:12px;letter-spacing:.04em}
+  .flow-arrow::before{content:"↓ ";color:var(--accent)}
+
+  .risk-panel{background:var(--bg-3);border:1px solid var(--border);border-radius:14px;padding:24px}
+  .risk-panel h3{font-family:"Fraunces",serif;font-weight:500;font-size:18px;margin:0 0 12px}
+  .risk-level{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--paper);background:rgba(196,96,48,.12);border:1px solid rgba(196,96,48,.4);padding:6px 12px;border-radius:999px;margin-bottom:18px}
+  .risk-level .dot{width:8px;height:8px;border-radius:50%;background:var(--risk);box-shadow:0 0 8px var(--risk)}
+  .risk-panel ul{list-style:none;padding:0;margin:0 0 20px}
+  .risk-panel li{font-size:13px;color:var(--paper-dim);padding:8px 0 8px 18px;line-height:1.5;position:relative;border-top:1px solid var(--border)}
+  .risk-panel li:first-child{border-top:0}
+  .risk-panel li::before{content:"";position:absolute;left:0;top:14px;width:6px;height:6px;border-radius:50%;background:var(--risk)}
+  .risk-panel li em{color:var(--paper-mute);font-style:italic;font-family:"Fraunces",serif}
+  .env-deps{font-size:12.5px;color:var(--paper-dim);line-height:1.6;border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px}
+  .env-deps strong{color:var(--paper-mute);font-weight:500;text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;display:block;margin-bottom:4px}
+  .waste{font-size:11.5px;color:var(--paper-mute);line-height:1.55;border-top:1px solid var(--border);padding-top:12px;margin-bottom:18px}
+  .waste strong{color:var(--paper-mute);text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;display:block;margin-bottom:4px;font-weight:500}
+
+  /* Upstream/downstream household link */
+  .chainlink{border-top:1px solid var(--border);padding-top:18px;margin-top:6px}
+  .chainlink h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin:0 0 12px;font-weight:600}
+  .chainlink-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(143,173,90,.06);border:1px solid var(--accent-line);border-radius:10px;cursor:pointer;transition:background .15s,transform .15s}
+  .chainlink-card:hover{background:rgba(143,173,90,.12);transform:translateX(2px)}
+  .chainlink-card .icon{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);border:1px solid var(--accent-line);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0;font-size:14px}
+  .chainlink-card .body{flex:1;min-width:0}
+  .chainlink-card .body .ln-name{font-family:"Fraunces",serif;font-size:14.5px;color:var(--paper);margin:0 0 2px}
+  .chainlink-card .body .ln-why{font-size:11.5px;color:var(--paper-mute);margin:0;line-height:1.45}
+  .chainlink-card .arrow{color:var(--accent);font-size:18px;flex-shrink:0}
+  @media (max-width:780px){.materials-inner{grid-template-columns:1fr}}
+
+  /* ========== ECONOMIC PORTRAIT ========== */
+  .econ{padding:80px 24px;background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 100%);border-bottom:1px solid var(--border)}
+  .econ-inner{max-width:var(--maxw);margin:0 auto}
+  .econ h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .econ .section-sub{color:var(--paper-mute);font-size:13.5px;margin:0 0 36px}
+  .sentiment{text-align:center;margin:24px 0 48px;padding:36px 24px;background:var(--bg-2);border:1px solid var(--border);border-radius:16px}
+  .sentiment .label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-mute);margin-bottom:14px}
+  .sentiment .word{font-family:"Fraunces",serif;font-style:italic;font-weight:400;font-size:clamp(48px,7vw,80px);color:var(--warn);line-height:1;letter-spacing:-.025em;margin-bottom:18px}
+  .sentiment .quote{font-family:"Fraunces",serif;font-style:italic;font-size:18px;color:var(--paper-dim);line-height:1.5;max-width:560px;margin:0 auto;font-weight:300}
+
+  .business-model{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:36px;background:var(--bg-3)}
+  .bm-cell{padding:22px 24px;border-left:1px solid var(--border)}
+  .bm-cell:first-child{border-left:0}
+  .bm-cell .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-mute);margin-bottom:8px}
+  .bm-cell .v{font-family:"Fraunces",serif;font-size:17px;line-height:1.35;color:var(--paper);letter-spacing:-.005em}
+  @media (max-width:780px){.business-model{grid-template-columns:1fr}.bm-cell{border-left:0;border-top:1px solid var(--border)}.bm-cell:first-child{border-top:0}}
+
+  .tension{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--bg-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:32px}
+  .tension-col{padding:24px 26px}
+  .tension-col.strength{border-right:1px solid var(--border)}
+  .tension-col h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px;font-weight:600}
+  .tension-col.strength h4{color:var(--accent)}
+  .tension-col.pressure h4{color:var(--warn)}
+  .tension-col ul{list-style:none;padding:0;margin:0}
+  .tension-col li{font-size:13.5px;color:var(--paper-dim);padding:9px 0 9px 18px;line-height:1.5;position:relative;border-top:1px solid var(--border)}
+  .tension-col li:first-child{border-top:0}
+  .tension-col.strength li::before{content:"+";position:absolute;left:0;top:9px;color:var(--accent);font-family:"Fraunces",serif;font-size:16px;line-height:1}
+  .tension-col.pressure li::before{content:"−";position:absolute;left:0;top:9px;color:var(--warn);font-family:"Fraunces",serif;font-size:16px;line-height:1}
+  @media (max-width:780px){.tension{grid-template-columns:1fr}.tension-col.strength{border-right:0;border-bottom:1px solid var(--border)}}
+
+  .engage-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .engage-row .erlabel{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-mute);margin-right:6px}
+  .engage-btn{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:11px 18px;border-radius:999px;font-size:13px;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .engage-btn:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  .engage-btn .arr{color:var(--accent);font-size:14px}
+
+  /* ========== SUCCESSION ========== */
+  .succession{padding:96px 24px;text-align:center;border-bottom:1px solid var(--border);background:
+    radial-gradient(ellipse at 50% 50%,rgba(154,58,58,.08) 0,transparent 60%),
+    radial-gradient(ellipse at 50% 90%,rgba(154,58,58,.05) 0,transparent 70%),
+    var(--bg);position:relative}
+  .succession::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(154,58,58,.3) 50%,transparent 100%)}
+  .succession-inner{max-width:640px;margin:0 auto}
+  .succession .label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-mute);margin-bottom:18px}
+  .succession h2{font-family:"Fraunces",serif;font-weight:300;font-style:italic;font-size:clamp(48px,7vw,84px);line-height:1.05;color:var(--succ);margin:0 0 30px;letter-spacing:-.02em}
+  .succession .quote{font-family:"Fraunces",serif;font-style:italic;font-size:22px;line-height:1.5;color:var(--paper);margin:0 0 14px;font-weight:300}
+  .succession .quote-cite{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--paper-mute);margin-bottom:36px;display:block}
+  .succession .subtext{font-family:"Fraunces",serif;font-size:18px;line-height:1.6;color:var(--paper-dim);margin:0 auto 42px;font-weight:300;max-width:560px}
+  .succession .cta{display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--paper);background:var(--accent);border:1px solid var(--accent);padding:14px 24px;border-radius:999px;cursor:pointer;font-weight:500;color:var(--ink);transition:transform .15s,background .15s}
+  .succession .cta:hover{background:var(--paper);transform:translateY(-2px)}
+  .succession .cta-arrow{font-size:16px}
+
+  /* ========== CONNECTIONS ========== */
+  .connections{padding:72px 24px;background:var(--bg-2);border-bottom:1px solid var(--border)}
+  .conn-inner{max-width:1080px;margin:0 auto}
+  .conn-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px;margin-bottom:24px}
+  .connections h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .connections .sub{color:var(--paper-mute);font-size:13.5px;margin:0;max-width:520px}
+  .lens-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+  .lens-tabs::-webkit-scrollbar{display:none}
+  .lens-tab{flex-shrink:0;background:transparent;border:1px solid var(--border);color:var(--paper-mute);padding:9px 16px;border-radius:999px;font-size:12.5px;cursor:pointer;letter-spacing:.02em;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+  .lens-tab:hover{color:var(--paper);border-color:var(--border-strong)}
+  .lens-tab.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .lens-tab .count{font-size:10.5px;color:var(--paper-mute);background:rgba(245,236,222,.05);padding:1px 6px;border-radius:999px}
+  .lens-tab.active .count{color:var(--accent);background:rgba(143,173,90,.1)}
+  .lens-pane{display:none;animation:fadeIn .25s ease}
+  .lens-pane.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .conn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .conn-card{background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:22px;text-decoration:none;color:var(--paper);border-bottom:1px solid var(--border);display:block;cursor:pointer;transition:transform .2s,border-color .2s}
+  .conn-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .conn-card .lenspill{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:999px;margin-bottom:14px;font-weight:600;border:1px solid var(--accent-line)}
+  .conn-card h4{font-family:"Fraunces",serif;font-weight:500;font-size:18px;margin:0 0 4px;letter-spacing:-.005em;color:var(--paper)}
+  .conn-card .meta{font-size:12px;color:var(--paper-mute);margin:0 0 12px;line-height:1.45}
+  .conn-card .why{font-size:13px;color:var(--paper-dim);line-height:1.55;margin:0 0 14px;text-wrap:pretty}
+  .conn-card .date{font-size:10.5px;letter-spacing:.06em;color:var(--paper-mute);text-transform:uppercase;border-top:1px solid var(--border);padding-top:12px}
+  @media (max-width:780px){.conn-grid{grid-template-columns:1fr}}
+
+  /* ========== FOOTER ========== */
+  footer{padding:60px 24px 60px;background:var(--bg-3);color:var(--paper-mute);font-size:13px;border-top:1px solid var(--border)}
+  .footer-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:36px}
+  footer h5{font-family:"Manrope";font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper);margin:0 0 12px;font-weight:600}
+  footer p,footer li{line-height:1.6;font-size:12.5px;margin:0 0 6px}
+  footer ul{list-style:none;padding:0;margin:0}
+  footer ul li{padding:6px 0;display:flex;gap:10px}
+  footer ul li .icon{flex-shrink:0;width:18px;text-align:center}
+  .foot-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+  .foot-actions button{background:transparent;border:1px solid var(--border-strong);color:var(--paper);padding:9px 16px;border-radius:999px;font-size:12px;cursor:pointer;text-align:left}
+  .foot-actions button:hover{border-color:var(--accent);color:var(--accent)}
+  .citation-block{max-width:1080px;margin:36px auto 0;border-top:1px solid var(--border);padding-top:20px}
+  .cit-toggle{background:transparent;border:0;color:var(--paper-mute);font-size:11px;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:8px}
+  .cit-toggle:hover{color:var(--paper)}
+  .cit-toggle .chev{transition:transform .25s}
+  .cit-toggle.open .chev{transform:rotate(180deg)}
+  .citation-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .citation-body.open{max-height:200px}
+  .citation-body-inner{font-family:"Fraunces",serif;font-style:italic;font-size:13px;color:var(--paper-dim);line-height:1.6;padding:14px 0;border-left:2px solid var(--accent-line);padding-left:14px;margin-top:10px}
+  .footer-foot{max-width:1080px;margin:32px auto 0;border-top:1px solid var(--border);padding-top:20px;text-align:center;color:var(--paper-mute);font-size:11.5px;letter-spacing:.04em}
+  .footer-foot a{color:var(--paper-dim);border-bottom-color:transparent;margin:0 6px}
+  @media (max-width:780px){.footer-inner{grid-template-columns:1fr;gap:28px}}
+
+  /* ========== STICKY MOBILE ACTION BAR ========== */
+  .mobile-action-bar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(23,19,14,.96);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:12px 16px;display:none;transform:translateY(100%);transition:transform .28s ease}
+  .mobile-action-bar.show{transform:translateY(0)}
+  .mobile-action-bar button{width:100%;background:var(--accent);color:var(--ink);border:0;padding:14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer}
+  @media (max-width:780px){.mobile-action-bar{display:block}body{padding-bottom:72px}}
+
+  /* ========== ACTION MODAL ========== */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
+  .modal-backdrop.show{display:flex}
+  .modal{background:var(--bg-2);border:1px solid var(--border-strong);border-radius:18px;max-width:480px;width:100%;padding:32px;position:relative;animation:slideUp .25s ease}
+  @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal h3{font-family:"Fraunces",serif;font-weight:400;font-size:24px;margin:0 0 6px;letter-spacing:-.01em}
+  .modal .modal-sub{color:var(--paper-mute);font-size:13px;margin:0 0 24px}
+  .modal-close{position:absolute;top:18px;right:18px;background:transparent;border:0;color:var(--paper-mute);font-size:24px;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+  .modal-close:hover{color:var(--paper);background:var(--bg-3)}
+  .form-field{margin-bottom:16px}
+  .form-field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--paper-mute);margin-bottom:6px;font-weight:600}
+  .form-field input,.form-field textarea,.form-field select{width:100%;background:var(--bg-3);border:1px solid var(--border);color:var(--paper);padding:11px 14px;border-radius:8px;font-family:inherit;font-size:13.5px;line-height:1.5;outline:none;transition:border-color .15s}
+  .form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:var(--accent)}
+  .form-field textarea{min-height:90px;resize:vertical}
+  .radio-row{display:flex;flex-wrap:wrap;gap:8px}
+  .radio-row label{display:inline-flex;align-items:center;gap:6px;background:var(--bg-3);border:1px solid var(--border);padding:8px 14px;border-radius:999px;font-size:12px;cursor:pointer;color:var(--paper-dim);text-transform:none;letter-spacing:0;font-weight:400;margin:0}
+  .radio-row input[type="radio"]{accent-color:var(--accent);margin:0}
+  .radio-row label:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .modal-submit{width:100%;background:var(--accent);color:var(--ink);border:0;padding:14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+  .modal-submit:hover{background:var(--paper)}
+
+  /* ========== TOAST ========== */
+  .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);z-index:200;background:var(--bg-3);border:1px solid var(--accent);color:var(--paper);padding:14px 22px;border-radius:999px;font-size:13px;box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;transition:opacity .25s,transform .25s;max-width:90%;text-align:center;line-height:1.4}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast::before{content:"✓ ";color:var(--accent);font-weight:600}
+</style>
+</head>
+<body data-household="le-thi-huych">
+
+<nav class="top">
+  <a class="logo" href="#"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;flex-shrink:0"><path d="M50 52 L88 31 L88 71 L50 92 Z" fill="#7B3FEB"/><path d="M12 31 L50 52 L50 92 L12 71 Z" fill="#A370F7"/><path d="M50 8 L88 31 L50 52 L12 31 Z" fill="#6E9834"/><path d="M50 8 Q70 16 88 31 Q66 24 50 32 Q34 24 12 31 Q30 16 50 8 Z" fill="#B6D86E"/></svg><span>map<em>me</em></span></a>
+  <div class="crumbs">
+    <a href="#">Bản đồ</a><span class="sep">/</span>
+    <a href="#">TP. Hồ Chí Minh</a><span class="sep">/</span>
+    <a href="#">Đan lát</a><span class="sep">/</span>
+    <span style="color:var(--paper)">Lê Thị Huých</span>
+  </div>
+  <div class="actions">
+    <button class="btn">Lưu</button>
+    <button class="btn">Chia sẻ</button>
+    <button class="btn primary" data-action="message">Nhắn tin</button>
+  </div>
+</nav>
+
+<div class="section-nav" id="sectionNav">
+  <div class="section-nav-inner">
+    <a href="#artisan" data-target="artisan">Nghệ nhân</a>
+    <a href="#story" data-target="story">Câu chuyện</a>
+    <a href="#layout" data-target="layout">Xưởng 3D</a>
+    <a href="#process" data-target="process">Quy trình</a>
+    <a href="#materials" data-target="materials">Vật liệu</a>
+    <a href="#economy" data-target="economy">Kinh tế</a>
+    <a href="#succession" data-target="succession">Kế nghiệp</a>
+    <a href="#connections" data-target="connections">Kết nối</a>
+  </div>
+</div>
+
+<!-- ========== HERO ========== -->
+<section class="hero" id="hero" data-screen-label="01 Hero">
+  <div class="hero-bg"></div>
+  <div class="hero-noise"></div>
+
+  <button class="succ-badge" aria-describedby="succ-tip" tabindex="0">
+    <span class="dot"></span>Thế hệ cuối
+  </button>
+  <div class="succ-tip" id="succ-tip" role="tooltip">
+    Last-generation artisan — no successor in the family or workshop.
+  </div>
+
+  <div class="hero-content">
+    <div class="kicker">
+      <span class="pill">Đan lát</span>
+      <span class="loc">Củ Chi · TP. Hồ Chí Minh · Đồng bằng sông Cửu Long</span>
+    </div>
+    <h1 class="title">Lê Thị Huých<br><em>"Phải làm cho liền. Làm cho đẹp."</em></h1>
+    <p class="dek">Bảy mươi năm gắn bó với tre trúc, bà Huých là người thợ đan lát cuối cùng trong một ngôi làng từng có hơn một nghìn hộ làm nghề. Hôm nay, xưởng bà xuất khẩu sang Đức — và không có ai kế nghiệp.</p>
+    <div class="triad">
+      <button class="primary" data-action="message">Nhắn tin</button>
+      <button class="ghost" data-action="commission">Hợp tác / đặt làm</button>
+      <button class="ghost" data-action="learn">Học nghề</button>
+    </div>
+    <div class="hero-meta">
+      <div><label>Sinh năm</label><strong>1954</strong></div>
+      <div><label>Kinh nghiệm</label><strong>70+ năm</strong></div>
+      <div><label>Vật liệu chính</label><strong>Tre, trúc</strong></div>
+      <div><label>Trạng thái</label><strong>Đang hoạt động</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== QUICK FACTS STRIP ========== -->
+<section class="facts" data-screen-label="02 Quick facts">
+  <div class="fact"><div class="k">Tỉnh/TP</div><div class="v">TP. Hồ Chí Minh</div></div>
+  <div class="fact"><div class="k">Nghề</div><div class="v">Đan lát</div></div>
+  <div class="fact"><div class="k">Sinh năm</div><div class="v">1954</div></div>
+  <div class="fact"><div class="k">Kinh nghiệm</div><div class="v">70+ năm</div></div>
+  <div class="fact"><div class="k">Xưởng</div><div class="v">4.000 m²</div></div>
+  <div class="fact"><div class="k">Kế nghiệp</div><div class="v muted">Chưa có</div></div>
+</section>
+
+<!-- ========== THE ARTISAN ========== -->
+<section class="artisan" id="artisan" data-screen-label="03 Artisan">
+  <div class="artisan-card">
+    <div class="artisan-portrait">
+      <span class="corner-label">Ảnh: chuyến thực địa tiếp theo</span>
+    </div>
+    <div class="artisan-meta">
+      <div class="kicker"><span class="pill">Nghệ nhân</span></div>
+      <h2>Lê Thị Huých</h2>
+      <p class="role">Đan lát · 70 năm kinh nghiệm · sinh 1954</p>
+      <div class="quote-with-audio">
+        <p class="qtext">"Khó thì bây giờ chỉ cái gia công xi măng. Mình tráng xi măng là cái đó là khó… Phải làm cho liền. Làm cho đẹp."</p>
+        <button class="audio-play" aria-label="Nghe nghệ nhân nói — bản ghi 38 giây" data-audio="sig-quote">
+          <span class="play-glyph"></span>38s
+        </button>
+        <audio data-stub="true" aria-hidden="true" style="display:none"></audio>
+      </div>
+      <p class="credit">Ghi âm ngày 01/04/2026 · Phiên A004 · Phiên dịch: mapme</p>
+      <div class="artisan-actions">
+        <button class="primary" data-action="message">Nhắn tin nghệ nhân</button>
+        <button class="ghost" data-action="download">Tải dữ liệu</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MEDIA GALLERY ========== -->
+<section class="gallery" data-screen-label="04 Media gallery">
+  <div class="gallery-inner">
+    <h2>Hình ảnh, ghi âm &amp; video</h2>
+    <p class="gsub">Chuyến thực địa 01/04/2026 · ảnh và video đang biên tập — placeholders sẽ được thay thế bằng tư liệu thực.</p>
+
+    <div class="ggrid">
+      <!-- 1. HERO photograph (col-span 8) -->
+      <figure class="gitem span-8 h-tall">
+        <div class="gbg bg-workshop"></div>
+        <img src="placeholder/huych-cement-station.jpg" alt="Lê Thị Huých đứng tại khu tráng xi măng trong xưởng, mặc áo bà ba xanh, tay cầm dụng cụ thợ." onerror="this.dataset.broken='true'">
+        <span class="gchip">📷 Ảnh sẽ được liên kết</span>
+        <figcaption class="gcap">Lê Thị Huých tại khu tráng xi măng — nơi bà vẫn làm việc một mình.<em>Củ Chi · 01/04/2026</em></figcaption>
+      </figure>
+
+      <!-- 2. Detail photograph (col-span 4) -->
+      <figure class="gitem span-4 h-tall">
+        <div class="gbg bg-detail"></div>
+        <img src="placeholder/huych-hands-bamboo.jpg" alt="Hai bàn tay người thợ cầm bó nan trúc đã chẻ mỏng, ánh nắng chéo." onerror="this.dataset.broken='true'">
+        <span class="gchip">📷 Ảnh sẽ được liên kết</span>
+        <figcaption class="gcap">Tre đã phơi đủ độ ẩm — sẵn sàng vào máy chẻ nan.<em>Chi tiết · 01/04/2026</em></figcaption>
+      </figure>
+
+      <!-- 3. Audio clip (col-span 6) -->
+      <figure class="gitem span-6 h-med audio-tile">
+        <div class="gbg bg-audio"></div>
+        <div class="waveform" aria-hidden="true"></div>
+        <button class="playover" aria-label="Phát ghi âm: Bà Huých nói về công đoạn khó nhất"><span class="play-glyph"></span></button>
+        <span class="gchip">🎧 Ghi âm A004</span>
+        <span class="durbadge">0:38</span>
+        <figcaption class="gcap">Bà Huých nói về công đoạn khó nhất.<em>Chữ ký giọng nói · Phiên A004</em></figcaption>
+      </figure>
+
+      <!-- 4. Workshop photograph (col-span 6) -->
+      <figure class="gitem span-6 h-med">
+        <div class="gbg bg-drying"></div>
+        <img src="placeholder/huych-drying-yard.jpg" alt="Sân phơi trúc ngoài trời với nhiều bó tre xếp song song, không gian rộng." onerror="this.dataset.broken='true'">
+        <span class="gchip">📷 Ảnh sẽ được liên kết</span>
+        <figcaption class="gcap">Khoảng 1.500 m² của xưởng dành cho phơi trúc.<em>Khu A · 01/04/2026</em></figcaption>
+      </figure>
+
+      <!-- 5. Process photograph (col-span 4) -->
+      <figure class="gitem span-4 h-med">
+        <div class="gbg bg-product"></div>
+        <img src="placeholder/huych-container.jpg" alt="Container 40 feet được chất hàng tại bãi xe, công nhân đang gia cố." onerror="this.dataset.broken='true'">
+        <span class="gchip">📷 Ảnh sẽ được liên kết</span>
+        <figcaption class="gcap">Một trong 200+ container 40 feet xuất sang Đức mỗi năm.<em>Bãi container · Khu E</em></figcaption>
+      </figure>
+
+      <!-- 6. Video (col-span 8) -->
+      <figure class="gitem span-8 h-med">
+        <div class="gbg bg-video"></div>
+        <button class="playover" aria-label="Phát video: đi qua xưởng từ kho phơi đến phòng tráng xi măng"><span class="play-glyph"></span></button>
+        <span class="gchip">▶ Video</span>
+        <span class="durbadge">1:00</span>
+        <figcaption class="gcap">Đi qua xưởng từ kho phơi đến phòng tráng xi măng.<em>Walk-through · 01/04/2026</em></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ========== THE STORY ========== -->
+<article class="story" id="story" data-screen-label="05 Story">
+  <h2>Bốn thế hệ, một đôi tay</h2>
+
+  <p class="lead">Bà nội của bà Huých bắt đầu đan. Mẹ bà tiếp tục. Bà lớn lên trong xưởng, tay cầm nan trúc trước khi biết đọc. Làng Thái Mỹ, Củ Chi, từng có hơn một nghìn hộ làm nghề đan lát. Hôm nay chỉ còn một — bà.</p>
+
+  <p>Đỉnh cao là những năm xuất khẩu: hơn 200 container 40 feet mỗi năm, bán đi Đài Loan, mang về cả tỷ đồng. Năm 2014, chủ tịch nước đến thăm xưởng. Bà nhớ ngày đó như nhớ một giấc mơ sáng — không phải vì danh dự, mà vì lúc đó nghề còn sống.</p>
+
+  <p>Rồi Đài Loan chuyển sang nhựa. Mười sáu container hàng tồn — trị giá ba tỷ đồng — phải đốt theo lệnh. Bà kể chuyện này không có nước mắt, chỉ có cái giọng phẳng của người đã qua nhiều lần không ngờ mình vẫn đứng lại được.</p>
+
+  <blockquote>
+    <p>"Năm 2005, chồng mới mất. Tôi mượn tiền trả một trăm triệu để mở rộng đường cho xe container vào. Hai mươi cây vàng. Lúc đó tôi không có lựa chọn — hàng đang chờ."</p>
+    <cite>— Lê Thị Huých, Củ Chi, 01/04/2026</cite>
+    <div class="translation">In 2005, husband had just passed. Borrowed and paid 100M VND — 20 taels of gold — to widen the road so export containers could reach the workshop. No choice. Goods were waiting.</div>
+  </blockquote>
+
+  <h3>Tráng xi măng — dấu ấn của người thợ bậc thầy</h3>
+
+  <p>Đan nan là kỹ năng ai cũng học được sau vài tháng. Tráng xi măng bên trong sản phẩm — lớp lót giữ hình dáng, chống thấm, làm cho vật liệu sống lâu — là thứ mất hàng chục năm mới thành thạo. Bà mô tả nó bằng hai chữ: <em style="color:var(--paper);font-style:italic">liền</em> và <em style="color:var(--paper);font-style:italic">đẹp</em>. Không có chữ thứ ba.</p>
+
+  <button class="source-toggle" data-toggle="source-1">
+    <span>Xem nguồn gốc</span><span class="chev">▾</span>
+  </button>
+  <div class="source-panel" id="source-1">
+    <div class="source-panel-inner">
+      <h4>Trích đoạn nguồn — Phiên A004, đoạn 12:40–14:18</h4>
+      <p class="src-quote">"Hồi đó bà ngoại tôi đan… mẹ tôi cũng đan. Tôi mới sáu, bảy tuổi đã ngồi học chẻ nan rồi. Làng này hồi xưa cả ngàn hộ làm nghề, giờ còn mình tôi thôi."</p>
+      <p class="src-meta">Lê Thị Huých · 01/04/2026 · 13:02</p>
+      <p class="src-quote">"Năm 2014 chủ tịch nước tới đây. Tôi vẫn nhớ rõ. Lúc đó nghề còn sống mà, cả xưởng vui lắm."</p>
+      <p class="src-meta">Lê Thị Huých · 01/04/2026 · 17:25</p>
+      <div class="ph-note">[Trích đoạn nguồn — sẽ liên kết trực tiếp với transcript khi raw data layer phát hành.]</div>
+    </div>
+  </div>
+</article>
+
+<!-- ========== 3D HOUSEHOLD LAYOUT (SVG fallback) ========== -->
+<section class="layout-section" id="layout" data-screen-label="06 Layout">
+  <div class="layout-inner">
+    <div>
+      <div class="kicker" style="margin-bottom:12px"><span class="pill">Sơ đồ xưởng · SVG fallback</span></div>
+      <h2>Năm khu vực, một quy trình</h2>
+      <p class="sub">Xưởng bà Huých không phải một nhà máy — đó là một mạng lưới. Một số công đoạn diễn ra dưới mái che, một số phân tán đến nhà hàng xóm.</p>
+      <p class="layout-stat"><span class="accent">~4.000 m²</span> · Củ Chi, TP. Hồ Chí Minh</p>
+
+      <div class="layout-diagram" id="layoutDiagram">
+        <svg class="layout-svg" viewBox="0 0 600 480" preserveAspectRatio="xMidYMid meet">
+          <g class="zone" data-zone="A">
+            <rect class="zone-rect dashed" x="30" y="30" width="370" height="150" rx="10"/>
+            <text class="zone-badge" x="48" y="58">A</text>
+            <text class="zone-label" x="74" y="56">KHO &amp; PHƠI TRÚC</text>
+            <text class="zone-sub" x="74" y="72">Sân phơi ngoài trời · phụ thuộc nắng</text>
+            <g opacity=".18" stroke="#8fad5a" stroke-width="1.2">
+              <line x1="50" y1="100" x2="380" y2="100"/><line x1="50" y1="118" x2="380" y2="118"/>
+              <line x1="50" y1="136" x2="380" y2="136"/><line x1="50" y1="154" x2="380" y2="154"/>
+              <line x1="50" y1="172" x2="380" y2="172"/>
+            </g>
+          </g>
+          <g class="zone" data-zone="B">
+            <rect class="zone-rect" x="420" y="30" width="150" height="150" rx="10"/>
+            <text class="zone-badge" x="438" y="58">B</text>
+            <text class="zone-label" x="464" y="56">XƯỞNG CHẺ NAN</text>
+            <text class="zone-sub" x="438" y="78">Mái che · máy chẻ</text>
+            <g opacity=".25" stroke="#8fad5a" stroke-width="1" fill="none">
+              <rect x="440" y="100" width="38" height="22" rx="2"/><rect x="490" y="100" width="38" height="22" rx="2"/>
+              <rect x="440" y="135" width="38" height="22" rx="2"/><rect x="490" y="135" width="38" height="22" rx="2"/>
+            </g>
+          </g>
+          <g class="zone" data-zone="C">
+            <rect class="zone-rect dashed" x="30" y="210" width="150" height="120" rx="10"/>
+            <text class="zone-badge" x="48" y="240">C</text>
+            <text class="zone-label" x="74" y="238">KHU ĐAN</text>
+            <text class="zone-sub" x="48" y="258">Phân tán · nhà hàng xóm</text>
+            <g fill="#8fad5a" opacity=".35">
+              <circle cx="60" cy="290" r="3"/><circle cx="85" cy="298" r="3"/><circle cx="110" cy="285" r="3"/>
+              <circle cx="135" cy="305" r="3"/><circle cx="160" cy="295" r="3"/>
+            </g>
+          </g>
+          <g class="zone" data-zone="D" id="zoneD">
+            <rect class="zone-rect" x="200" y="210" width="200" height="120" rx="10"
+                  style="stroke:var(--accent);stroke-width:2.2;fill:rgba(143,173,90,.07)"/>
+            <text class="zone-badge" x="218" y="240">D</text>
+            <text class="zone-label" x="244" y="238">TRÁNG XI MĂNG</text>
+            <text class="zone-sub" x="218" y="258">Phòng kín · tay nghề bậc cao</text>
+            <text x="218" y="296" style="fill:var(--accent);font-style:italic;font-family:Fraunces,serif;font-size:11px">★ vùng tinh hoa của xưởng</text>
+          </g>
+          <g class="zone" data-zone="E">
+            <rect class="zone-rect" x="420" y="210" width="150" height="120" rx="10"/>
+            <text class="zone-badge" x="438" y="240">E</text>
+            <text class="zone-label" x="464" y="238">BÃI CONTAINER</text>
+            <text class="zone-sub" x="438" y="258">Cổng xuất hàng · 40ft</text>
+            <g opacity=".3" stroke="#8fad5a" stroke-width="1" fill="none">
+              <rect x="440" y="278" width="110" height="32" rx="2"/>
+              <line x1="465" y1="278" x2="465" y2="310"/><line x1="490" y1="278" x2="490" y2="310"/><line x1="515" y1="278" x2="515" y2="310"/>
+            </g>
+          </g>
+          <g opacity=".35">
+            <path d="M 495 332 L 495 420" stroke="#8fad5a" stroke-width="2" stroke-dasharray="4 4" fill="none"/>
+            <text class="zone-sub" x="425" y="438" style="fill:#8fad5a;font-size:9.5px">Đường mở rộng — 100tr · 2005</text>
+          </g>
+          <g opacity=".18" stroke="#8fad5a" stroke-width="1" stroke-dasharray="3 4" fill="none">
+            <path d="M 215 180 L 105 210"/><path d="M 495 180 L 495 210"/>
+            <path d="M 180 270 L 200 270"/><path d="M 400 270 L 420 270"/>
+          </g>
+        </svg>
+        <div class="compass" aria-label="N/S">
+          <svg viewBox="0 0 56 56">
+            <circle cx="28" cy="28" r="22" fill="none" stroke="currentColor" stroke-width="1" opacity=".4"/>
+            <path d="M28 10 L32 28 L28 24 L24 28 Z" fill="#8fad5a"/>
+            <path d="M28 46 L32 28 L28 32 L24 28 Z" fill="currentColor" opacity=".5"/>
+            <text x="28" y="9" text-anchor="middle" font-family="Manrope" font-size="9" font-weight="600" fill="#8fad5a">N</text>
+            <text x="28" y="55" text-anchor="middle" font-family="Manrope" font-size="9" fill="currentColor" opacity=".55">S</text>
+          </svg>
+        </div>
+        <div class="zone-tooltip" id="zoneTooltip">
+          <div class="zt-name">Phòng tráng xi măng</div>
+          <div class="zt-desc">Công đoạn hoàn thiện: tráng xi măng bên trong để sản phẩm không thấm nước. Yêu cầu tay nghề cao nhất trong toàn bộ quy trình.</div>
+          <div class="zt-quote">"Phải làm cho liền. Làm cho đẹp."</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="zone-legend" id="zoneLegend">
+      <div class="zl" data-zone="A"><div class="lbadge">A</div><div><p class="zl-name">Kho &amp; phơi trúc</p><p class="zl-desc">Khu vực lớn nhất. Trúc nhập về phơi nắng đến độ ẩm 60–70%. Không có nắng = không có sản xuất.</p></div></div>
+      <div class="zl" data-zone="B"><div class="lbadge">B</div><div><p class="zl-name">Xưởng chẻ nan</p><p class="zl-desc">Mái che. Máy chẻ nan điện, máy cưa, máy khoan. Tiếng ồn chính trong xưởng.</p></div></div>
+      <div class="zl" data-zone="C"><div class="lbadge">C</div><div><p class="zl-name">Khu đan (phân tán)</p><p class="zl-desc">Công đoạn đan được giao đến nhà hàng xóm đã qua đào tạo. Không tập trung tại xưởng.</p></div></div>
+      <div class="zl" data-zone="D"><div class="lbadge">D</div><div><p class="zl-name">Phòng tráng xi măng</p><p class="zl-desc">Không gian kín. Công đoạn đòi hỏi tay nghề cao nhất. Chỉ bà Huých và một vài thợ lành nghề thực hiện.</p></div></div>
+      <div class="zl" data-zone="E"><div class="lbadge">E</div><div><p class="zl-name">Kho &amp; bãi container</p><p class="zl-desc">Khu xuất hàng. Container 40 feet vào được nhờ con đường bà đã trả 100 triệu để mở rộng.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CRAFT PROCESS ========== -->
+<section class="process" id="process" data-screen-label="07 Process">
+  <div class="process-inner">
+    <div class="process-head">
+      <div>
+        <h2>Quy trình làm một chiếc chậu tre</h2>
+        <p class="sub">Sáu công đoạn — từ trúc miền Tây đến container xuất khẩu sang Đức.</p>
+      </div>
+      <div class="time-badge">Thời gian sản xuất: 1–2 ngày<br>+ 10–14 ngày hoàn thiện tại công ty</div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-head"><div class="num">01</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M8 6l-2 6 2 6M16 6l2 6-2 6"/></svg></div></div><h4>Cắt trúc</h4><p>Cây trúc nhập từ miền Tây được cắt thành đoạn theo kích thước sản phẩm.</p></div>
+      <div class="step"><div class="step-head"><div class="num">02</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="9" r="4"/><path d="M12 13v8M8 21h8"/></svg></div></div><h4>Phơi khô</h4><p>Phơi nắng đến khi đạt độ ẩm 60–70%. Bỏ qua bước này → nan bị nứt trong máy.</p></div>
+      <div class="step"><div class="step-head"><div class="num">03</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div></div><h4>Chẻ nan</h4><p>Máy chẻ chia trúc thành nan mỏng đều. Trước kia làm tay, nay máy hóa để đáp ứng xuất khẩu.</p></div>
+      <div class="step"><div class="step-head"><div class="num">04</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12c4-2 6-2 9 0s5 2 9 0"/></svg></div></div><h4>Đan theo khuôn</h4><p>Nan được đan quanh khuôn mẫu do công ty cung cấp. Tiêu chuẩn đồng đều — KCS kiểm tra.</p></div>
+      <div class="step"><div class="step-head"><div class="num">05</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 16c2-4 5-5 7-5s5 1 7 5"/><path d="M5 16h14M9 16v4M15 16v4"/></svg></div></div><h4>Tráng xi măng</h4><p>Lớp xi măng tráng bên trong. Phải liền mạch, không bong tróc. Đây là công đoạn phân biệt thợ giỏi.</p></div>
+      <div class="step"><div class="step-head"><div class="num">06</div><div class="step-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="1"/><path d="M3 10h18M8 6V4h8v2"/></svg></div></div><h4>Giao công ty hoàn thiện</h4><p>Công ty xử lý phần ngoài, kiểm định, đóng gói xuất khẩu sang Đức.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MATERIALS & SUPPLY ========== -->
+<section class="materials" id="materials" data-screen-label="08 Materials">
+  <div class="materials-inner">
+    <h2>Nguyên liệu &amp; chuỗi cung ứng</h2>
+    <p class="section-sub">Tre trúc địa phương đã không còn. Chuỗi cung ứng ngày một dài hơn — và mong manh hơn.</p>
+
+    <div class="flow">
+      <div class="flow-node origin">
+        <div class="fn-tag">● Nguồn (xa · rủi ro cao)</div>
+        <div class="fn-name">Lâm Đồng / Miền Tây</div>
+        <div class="fn-sub">Cách Củ Chi ~300–400 km · không có nhà cung cấp ổn định</div>
+      </div>
+      <div class="flow-arrow">Thương lái thu gom · vận chuyển xe tải</div>
+      <div class="flow-node">
+        <div class="fn-tag">Trung gian</div>
+        <div class="fn-name">Thương lái</div>
+        <div class="fn-sub">Tự đi lấy từ vùng nguyên liệu — không có hợp đồng dài hạn</div>
+      </div>
+      <div class="flow-arrow">~1–2 ngày vận chuyển</div>
+      <div class="flow-node workshop">
+        <div class="fn-tag">● Xưởng</div>
+        <div class="fn-name">Xưởng bà Huých</div>
+        <div class="fn-sub">Củ Chi · TP. Hồ Chí Minh · 4.000 m²</div>
+      </div>
+    </div>
+
+    <div class="risk-panel">
+      <h3>Rủi ro nguồn cung</h3>
+      <div class="risk-level"><span class="dot"></span>Cao</div>
+      <ul>
+        <li>Trúc tre địa phương bị phá hết để làm đường <em>("họ phá hết… họ làm đường làm xá")</em></li>
+        <li>Phải mua từ tận miền Tây, vận chuyển xa hàng trăm km</li>
+        <li>Không có nhà cung cấp ổn định — phụ thuộc vào thương lái đi thu gom</li>
+      </ul>
+      <div class="env-deps">
+        <strong>Phụ thuộc môi trường</strong>
+        Nắng (phơi khô 60–70%) · nhiệt độ ổn định<br>
+        <em style="color:var(--warn);font-style:normal">Rủi ro:</em> mùa mưa → mốc trên trúc đã xử lý
+      </div>
+      <div class="waste">
+        <strong>Phế liệu</strong>
+        Tre: đốt · Nhựa: xe rác đô thị · Xi măng thừa: đổ bỏ tại chỗ
+      </div>
+
+      <div class="chainlink">
+        <h4>Hộ khác có chuỗi cung tương tự</h4>
+        <a class="chainlink-card" href="#" style="text-decoration:none">
+          <div class="icon">→</div>
+          <div class="body">
+            <p class="ln-name">Mành tre — Bình Dương</p>
+            <p class="ln-why">Cùng phụ thuộc vào trúc nhập từ miền Tây.</p>
+          </div>
+          <div class="arrow">→</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ECONOMIC PORTRAIT ========== -->
+<section class="econ" id="economy" data-screen-label="09 Economy">
+  <div class="econ-inner">
+    <h2>Chân dung kinh tế</h2>
+    <p class="section-sub">Một doanh nghiệp xuất khẩu 30 năm. Một khách hàng. Bốn mươi lao động thời vụ. Không ai kế.</p>
+
+    <div class="sentiment">
+      <div class="label">Cảm nhận kinh tế</div>
+      <div class="word">Bấp bênh</div>
+      <p class="quote">"Làm nghề này cực lắm… muốn nghỉ làm nhưng ráng duy trì."</p>
+    </div>
+
+    <div class="business-model">
+      <div class="bm-cell"><div class="k">Kênh bán hàng</div><div class="v">Xuất khẩu qua một công ty lớn</div></div>
+      <div class="bm-cell"><div class="k">Lao động</div><div class="v">~40 lao động thời vụ <span style="color:var(--paper-mute);font-size:14px">(đan tại nhà)</span></div></div>
+      <div class="bm-cell"><div class="k">Thị trường</div><div class="v">Đức (chính)<br><span style="color:var(--paper-mute);font-size:14px">trước đây Đài Loan</span></div></div>
+    </div>
+
+    <div class="tension">
+      <div class="tension-col strength">
+        <h4>Sức mạnh</h4>
+        <ul>
+          <li>30 năm kinh nghiệm xuất khẩu</li>
+          <li>Xưởng 4.000 m² tự có</li>
+          <li>Hợp đồng bao tiêu ổn định</li>
+          <li>Thương hiệu được nhà nước ghi nhận (2014)</li>
+        </ul>
+      </div>
+      <div class="tension-col pressure">
+        <h4>Áp lực</h4>
+        <ul>
+          <li>Phụ thuộc một khách hàng duy nhất</li>
+          <li>Thuế cao, tự động trừ từ tài khoản ngân hàng</li>
+          <li>Nguyên liệu ngày càng đắt và xa</li>
+          <li>Không có người kế nghiệp</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="engage-row">
+      <span class="erlabel">Liên hệ hợp tác</span>
+      <button class="engage-btn" data-action="commission">Hỏi về đặt làm / hợp tác <span class="arr">→</span></button>
+      <button class="engage-btn" data-action="export">Hợp tác xuất khẩu <span class="arr">→</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SUCCESSION ========== -->
+<section class="succession" id="succession" data-screen-label="10 Succession">
+  <div class="succession-inner">
+    <div class="label">Kế nghiệp · Code 3</div>
+    <h2>Thế hệ cuối</h2>
+    <p class="quote">"Con gái không theo nghề. Người trẻ đi học hết. Tôi làm bao lâu còn sức thì làm."</p>
+    <span class="quote-cite">— Lê Thị Huých</span>
+    <p class="subtext">Các con và cháu bà đã tốt nghiệp đại học, làm hiệu trưởng và thạc sĩ. Bà không oán giận điều đó — bà tự hào. Nhưng khi bà dừng, kỹ thuật dừng cùng.</p>
+    <button class="cta" data-action="learn">Bạn muốn học nghề đan lát truyền thống? <span class="cta-arrow">→</span> Liên hệ qua mapme</button>
+  </div>
+</section>
+
+<!-- ========== CONNECTIONS ========== -->
+<section class="connections" id="connections" data-screen-label="11 Connections">
+  <div class="conn-inner">
+    <div class="conn-head">
+      <div>
+        <h2>Kết nối</h2>
+        <p class="sub">Hộ này không tồn tại một mình. Bốn ống kính kết nối nó với các hộ khác trong mạng lưới mapme.</p>
+      </div>
+    </div>
+
+    <div class="lens-tabs" role="tablist">
+      <button class="lens-tab" data-lens="trip" role="tab">Cùng chuyến đi <span class="count">3</span></button>
+      <!-- Cùng nghề lens hidden: no other basket weavers in corpus -->
+      <button class="lens-tab" data-lens="region" role="tab">Cùng vùng <span class="count">2</span></button>
+      <button class="lens-tab active" data-lens="theme" role="tab">Cùng câu chuyện <span class="count">2</span></button>
+    </div>
+
+    <!-- Same theme — default -->
+    <div class="lens-pane active" data-lens="theme">
+      <div class="conn-grid">
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Cũng là "thế hệ cuối"</span>
+          <h4>Nghệ nhân Đại &amp; Thái Thị Thanh</h4>
+          <p class="meta">Mành tre lacquered · Bình Dương</p>
+          <p class="why">Cũng là người xuất khẩu cuối cùng còn lại trong khu vực. 80%+ hàng xóm đã đóng cửa.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Cùng nỗi không kế</span>
+          <h4>Gốm Tư Thố — Huê Anh</h4>
+          <p class="meta">Gốm Lái Thiêu · Bình Dương</p>
+          <p class="why">Cùng câu chuyện "không có người kế." Cùng cảm nhận: nghề sống bao lâu thì sống.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Same trip -->
+    <div class="lens-pane" data-lens="trip">
+      <div class="conn-grid">
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Cùng chuỗi cung trúc</span>
+          <h4>Nghệ nhân Đại &amp; Thái Thị Thanh</h4>
+          <p class="meta">Mành tre lacquered · Bình Dương</p>
+          <p class="why">Cùng chuyến 01/04 — và cùng nguồn trúc miền Tây.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+        <a class="conn-card" href="household-huynh-xuan-huynh.html" style="text-decoration:none">
+          <span class="lenspill">Đối lập kế nghiệp</span>
+          <h4>Huỳnh Xuân Huỳnh — Nắng Ceramics</h4>
+          <p class="meta">Gốm Lái Thiêu · Bình Dương</p>
+          <p class="why">Cùng chuyến 01/04 — Code 1 (đang truyền) đối lập với Code 3 (thế hệ cuối).</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Cùng câu chuyện</span>
+          <h4>Gốm Tư Thố — Huê Anh</h4>
+          <p class="meta">Gốm Lái Thiêu · Bình Dương</p>
+          <p class="why">Cùng chuyến 01/04 — cùng không có người kế.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Same region -->
+    <div class="lens-pane" data-lens="region">
+      <div class="conn-grid">
+        <a class="conn-card" href="household-huynh-xuan-huynh.html" style="text-decoration:none">
+          <span class="lenspill">Đông Nam Bộ</span>
+          <h4>Huỳnh Xuân Huỳnh — Nắng Ceramics</h4>
+          <p class="meta">Gốm Lái Thiêu · Bình Dương</p>
+          <p class="why">Cùng vùng Đông Nam Bộ. Đối lập về kế nghiệp — một già, một trẻ; một dừng, một mở.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+        <a class="conn-card" href="#" style="text-decoration:none">
+          <span class="lenspill">Đồng bằng SCL</span>
+          <h4>Nguyễn Cát Phụi Thuý</h4>
+          <p class="meta">Nhang · Bến Tre</p>
+          <p class="why">Cùng vùng đồng bằng sông Cửu Long. Mô hình hợp tác xã 47 hộ — con đường khác cho nghề thủ công.</p>
+          <div class="date">Chuyến 01/04/2026</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <h5>Phương pháp</h5>
+      <p>Trang này được biên soạn từ phỏng vấn ngày 01/04/2026 (Phiên A004), phiên âm bằng faster-whisper large-v3, biên tập với hỗ trợ của Claude Sonnet 4.6. Trích dẫn nguồn đầy đủ ở mỗi đoạn. Bản gốc tiếng Việt được lưu giữ.</p>
+      <p style="margin-top:10px;color:var(--paper-mute)">Schema: <code style="font-family:inherit">stg__craft_survey v1</code></p>
+    </div>
+    <div>
+      <h5>Khoảng trống dữ liệu</h5>
+      <ul>
+        <li><span class="icon">📍</span><span>Tọa độ GPS chính xác — chưa ghi lại</span></li>
+        <li><span class="icon">📷</span><span>Một số ảnh quy trình — chưa có</span></li>
+        <li><span class="icon">📏</span><span>Diện tích xưởng — ước tính</span></li>
+        <li><span class="icon">💰</span><span>Số liệu tài chính — ẩn để bảo vệ nghệ nhân</span></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Hành động</h5>
+      <div class="foot-actions">
+        <button data-action="correction">Báo lỗi / chỉnh sửa</button>
+        <button data-action="download">Tải dữ liệu (JSON/CSV)</button>
+        <button class="cit-toggle" data-toggle="cit">Trích dẫn (BibTeX, APA) <span class="chev">▾</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="citation-block">
+    <div class="citation-body" id="cit">
+      <div class="citation-body-inner">
+        mapme. (2026). <em>Lê Thị Huých — Đan lát, TP. Hồ Chí Minh.</em> Craft Village Field Record. Retrieved from mapme.vn/c/basket-weaving-le-thi-huych
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-foot">
+    mapme · Bản đồ làng nghề Việt Nam · Dữ liệu công khai dưới giấy phép <a href="#">CC BY-NC 4.0</a> · <a href="#">Quay lại bản đồ</a> · <a href="#">Đóng góp dữ liệu</a>
+  </div>
+</footer>
+
+<!-- ========== STICKY MOBILE ACTION BAR ========== -->
+<div class="mobile-action-bar" id="mobileBar">
+  <button data-action="message">Nhắn tin nghệ nhân</button>
+</div>
+
+<!-- ========== ACTION MODAL ========== -->
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <button class="modal-close" id="modalClose" aria-label="Đóng">×</button>
+    <h3 id="modalTitle">Nhắn tin nghệ nhân</h3>
+    <p class="modal-sub">Mapme chuyển lời nhắn của bạn đến nghệ nhân và phản hồi trong vòng 3 ngày.</p>
+    <form id="actionForm" onsubmit="event.preventDefault();submitForm()">
+      <div class="form-field">
+        <label for="f-name">Tên của bạn</label>
+        <input id="f-name" type="text" placeholder="Họ và tên" required>
+      </div>
+      <div class="form-field">
+        <label for="f-email">Email</label>
+        <input id="f-email" type="email" placeholder="email@example.com" required>
+      </div>
+      <div class="form-field">
+        <label>Loại liên hệ</label>
+        <div class="radio-row" id="contactType">
+          <label><input type="radio" name="contact" value="message" checked>Nhắn tin</label>
+          <label><input type="radio" name="contact" value="commission">Đặt làm / hợp tác</label>
+          <label><input type="radio" name="contact" value="learn">Học nghề</label>
+          <label><input type="radio" name="contact" value="visit">Tham quan</label>
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="f-msg">Lời nhắn</label>
+        <textarea id="f-msg" placeholder="Bạn muốn nói với nghệ nhân điều gì?"></textarea>
+      </div>
+      <button type="submit" class="modal-submit">Gửi qua mapme</button>
+    </form>
+  </div>
+</div>
+
+<!-- ========== TOAST ========== -->
+<div class="toast" id="toast">Cảm ơn bạn. Mapme sẽ chuyển lời nhắn tới nghệ nhân và phản hồi trong vòng 3 ngày.</div>
+
+<script>
+/* ========== Sticky section nav + mobile action bar ========== */
+const sectionNav = document.getElementById('sectionNav');
+const mobileBar = document.getElementById('mobileBar');
+const hero = document.getElementById('hero');
+const navLinks = document.querySelectorAll('.section-nav a');
+const sectionIds = ['artisan','story','layout','process','materials','economy','succession','connections'];
+const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+
+const heroObserver = new IntersectionObserver(([entry]) => {
+  if (entry.isIntersecting) {
+    sectionNav.classList.remove('show');
+    mobileBar.classList.remove('show');
+  } else {
+    sectionNav.classList.add('show');
+    mobileBar.classList.add('show');
+  }
+}, { threshold: 0.1 });
+heroObserver.observe(hero);
+
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(a => a.classList.toggle('active', a.dataset.target === id));
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+sections.forEach(s => sectionObserver.observe(s));
+
+/* ========== Succession badge tooltip — hover OR tap ========== */
+const succBadge = document.querySelector('.succ-badge');
+const succTip = document.getElementById('succ-tip');
+succBadge.addEventListener('click', (e) => {
+  e.preventDefault();
+  succTip.classList.toggle('show');
+});
+document.addEventListener('click', (e) => {
+  if (!succBadge.contains(e.target) && !succTip.contains(e.target)) succTip.classList.remove('show');
+});
+
+/* ========== Story source-quote toggle ========== */
+document.querySelectorAll('.source-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const targetId = btn.dataset.toggle;
+    const panel = document.getElementById(targetId);
+    if (panel) {
+      panel.classList.toggle('open');
+      btn.classList.toggle('open');
+      btn.querySelector('span:first-child').textContent =
+        btn.classList.contains('open') ? 'Ẩn nguồn gốc' : 'Xem nguồn gốc';
+    }
+  });
+});
+
+/* ========== Footer citation toggle ========== */
+document.querySelectorAll('.cit-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = document.getElementById(btn.dataset.toggle);
+    if (target) {
+      target.classList.toggle('open');
+      btn.classList.toggle('open');
+    }
+  });
+});
+
+/* ========== Audio waveform stand-in (random bars) ========== */
+document.querySelectorAll('.waveform').forEach(wf => {
+  const N = 56;
+  let html = '';
+  for (let i = 0; i < N; i++) {
+    const h = 10 + Math.sin(i * 0.4) * 14 + Math.random() * 20;
+    html += `<span class="bar" style="height:${Math.max(4, Math.abs(h))}px"></span>`;
+  }
+  wf.innerHTML = html;
+});
+
+/* ========== Zone diagram interactions ========== */
+const zoneTooltip = document.getElementById('zoneTooltip');
+const layoutDiagram = document.getElementById('layoutDiagram');
+const zoneRects = document.querySelectorAll('.layout-svg .zone');
+const zoneLegendItems = document.querySelectorAll('#zoneLegend .zl');
+
+function highlightZone(letter, on) {
+  zoneLegendItems.forEach(zl => {
+    zl.classList.toggle('active', on && zl.dataset.zone === letter);
+  });
+}
+zoneRects.forEach(g => {
+  const letter = g.dataset.zone;
+  g.addEventListener('mouseenter', () => {
+    highlightZone(letter, true);
+    if (letter === 'D') {
+      const rect = g.querySelector('rect').getBoundingClientRect();
+      const dRect = layoutDiagram.getBoundingClientRect();
+      zoneTooltip.style.left = (rect.left - dRect.left + rect.width/2) + 'px';
+      zoneTooltip.style.top = (rect.top - dRect.top) + 'px';
+      zoneTooltip.classList.add('show');
+    }
+  });
+  g.addEventListener('mouseleave', () => {
+    highlightZone(letter, false);
+    zoneTooltip.classList.remove('show');
+  });
+});
+zoneLegendItems.forEach(zl => {
+  zl.addEventListener('mouseenter', () => highlightZone(zl.dataset.zone, true));
+  zl.addEventListener('mouseleave', () => highlightZone(zl.dataset.zone, false));
+});
+
+/* ========== CONNECTIONS lens tabs ========== */
+document.querySelectorAll('.lens-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const lens = tab.dataset.lens;
+    document.querySelectorAll('.lens-tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.lens-pane').forEach(p => p.classList.toggle('active', p.dataset.lens === lens));
+  });
+});
+
+/* ========== Action modal ========== */
+const modal = document.getElementById('modalBackdrop');
+const modalClose = document.getElementById('modalClose');
+const modalTitle = document.getElementById('modalTitle');
+const toast = document.getElementById('toast');
+const actionLabels = {
+  message: 'Nhắn tin nghệ nhân',
+  commission: 'Hỏi về đặt làm / hợp tác',
+  learn: 'Học nghề đan lát',
+  visit: 'Đăng ký tham quan',
+  export: 'Đề xuất hợp tác xuất khẩu',
+  download: 'Tải dữ liệu hộ nghệ nhân',
+  correction: 'Báo lỗi / chỉnh sửa'
+};
+
+document.querySelectorAll('[data-action]').forEach(el => {
+  el.addEventListener('click', (e) => {
+    const action = el.dataset.action;
+    if (action === 'download') {
+      // graceful: just show toast
+      showToast('Đang chuẩn bị gói dữ liệu (JSON/CSV/BibTeX) — bạn sẽ nhận email khi sẵn sàng.');
+      return;
+    }
+    modalTitle.textContent = actionLabels[action] || 'Liên hệ qua mapme';
+    const radio = document.querySelector(`input[name="contact"][value="${action}"]`);
+    if (radio) radio.checked = true;
+    else document.querySelector('input[name="contact"][value="message"]').checked = true;
+    modal.classList.add('show');
+  });
+});
+
+function closeModal(){ modal.classList.remove('show'); }
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+function submitForm() {
+  closeModal();
+  showToast('Cảm ơn bạn. Mapme sẽ chuyển lời nhắn tới nghệ nhân và phản hồi trong vòng 3 ngày.');
+  document.getElementById('actionForm').reset();
+  document.querySelector('input[name="contact"][value="message"]').checked = true;
+}
+
+function showToast(msg) {
+  toast.textContent = '';  // remove old text (kept the ::before checkmark)
+  toast.appendChild(document.createTextNode(msg));
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 4500);
+}
+
+/* ========== Audio play buttons (signature quote, gallery audio) ========== */
+document.querySelectorAll('.audio-play, .playover').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showToast('Bản ghi âm sẽ phát khi tư liệu thực được liên kết.');
+  });
+});
+</script>
+
+</body>
+</html>

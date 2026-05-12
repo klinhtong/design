@@ -184,13 +184,13 @@ Until those arrive, optimize for product clarity and design feasibility rather t
 <claude-mem-context>
 # Memory Context
 
-# [design] recent context, 2026-05-11 5:27pm GMT+7
+# [design] recent context, 2026-05-12 2:26pm GMT+7
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 23 obs (9,746t read) | 313,307t work | 97% savings
+Stats: 25 obs (10,865t read) | 324,721t work | 97% savings
 
 ### May 11, 2026
 621 3:24p 🔵 Mapme Platform — Mission, Scope, and Role Defined
@@ -216,6 +216,8 @@ Stats: 23 obs (9,746t read) | 313,307t work | 97% savings
 659 " 🔵 AGENTS.md in mapme/design Was Empty — Deleted Again
 663 5:23p ✅ PLAN.md — No-Ordering Policy + Upstream Craft-Map Contract Added
 664 5:25p ✅ household-detail-brief-v2.md — Final "Đặt hàng" Sweep Complete, All Appendix Samples Updated
+667 5:28p 🟣 New Design Brief — craft-household-index-brief-v1.md Created
+670 " 🟣 New Claude Design Instruction — craft-household-index prototype v1
 
-Access 313k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 325k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
